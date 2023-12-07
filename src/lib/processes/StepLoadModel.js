@@ -16,6 +16,52 @@ export class StepLoadModel extends EventTarget
     geometry_list = []
     material_list = []
 
+    // for debugging, let's count these to help us test performance things better
+    vertex_count = 0;
+    triangle_count = 0;
+    objects_count = 0;
+
+
+
+    // function that goes through all our geometry data and calculates how many triangles we have
+    _calculate_mesh_metrics()
+    {
+      let triangle_count = 0;
+      let vertex_count = 0
+
+      // calculate all the loaded mesh data
+      this.models_geometry_list().forEach((geometry) => {
+        triangle_count += geometry.attributes.position.count / 3;
+        vertex_count += geometry.attributes.position.count;
+      })
+
+      this.triangle_count = triangle_count;
+      this.vertex_count = vertex_count;
+      this.objects_count = this.models_geometry_list().length;
+    }
+
+    _calculate_geometry_list()
+    {
+      if(this.original_model_data === undefined)
+      {
+        console.error('original model not loaded yet. Cannot do calculations')
+      }
+
+      this.original_model_data.traverse((child) => {
+        if(child.type === 'Mesh')
+        {
+          let geometry_to_add = child.geometry.clone();
+          geometry_to_add.name = child.name;
+          this.geometry_list.push(geometry_to_add)
+        }
+      })
+
+      // debugging type data
+      this._calculate_mesh_metrics()
+      console.log( `Vertex count:${this.vertex_count}    Triangle Count:${this.triangle_count}     Object Count:${this.objects_count} `)
+    }
+
+
     constructor() 
     {
         super();
@@ -92,6 +138,8 @@ export class StepLoadModel extends EventTarget
         
         // assign the final cleaned up model to the original model data
         this.original_model_data = clean_scene_with_only_models;
+
+        this._calculate_geometry_list()
 
 
         this.dispatchEvent(new CustomEvent('modelLoaded'));
@@ -183,20 +231,6 @@ export class StepLoadModel extends EventTarget
 
     models_geometry_list()
     {
-      if(this.geometry_list.length > 0)
-      {
-        return this.geometry_list;
-      }
-
-      this.original_model_data.traverse((child) => {
-        if(child.type === 'Mesh')
-        {
-          let geometry_to_add = child.geometry.clone();
-          geometry_to_add.name = child.name;
-          this.geometry_list.push(geometry_to_add)
-        }
-      })
-
       return this.geometry_list;
     }
 
