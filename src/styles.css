@@ -3,7 +3,7 @@
 * {
     color: white;
     font-family: 'Jost', sans-serif;
-    font-size: 15px;
+    font-size: 13px;
     display: inline-block;
 }
 
@@ -67,11 +67,10 @@ button.secondary-button {
     border-radius: 3px;
     border-width: 2px;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 button.secondary-button:hover {
-    background: #657a7638;
-    transform: scale(1.02);
+    background: #7c928e38;
 }
 
 button.secondary-button.play
@@ -79,20 +78,25 @@ button.secondary-button.play
     padding: 0.2rem 0.5rem; /* play has much smaller padding */
 }
 
-
 button, .button {
-    background: linear-gradient(0deg, rgba(87,119,119,1) 0%, rgba(32,105,99,1) 98%);
+    background: #337baa;
     padding: 0.5rem 1.0rem;
     margin-right: 0.5rem;
     border: 1px solid #85c4a3;
     border-radius: 0.25rem;
     cursor: pointer;
     text-align: center; /* useful for custom file upload label */
+    transition: all 0.05s ease-in-out;
 }
 button:hover, .button:hover {
-    background: linear-gradient(0deg, rgba(32,105,99,1) 0%, rgba(87,119,119,1) 98%);
-    transform: scale(1.02);
+    background: #4089b9;
 }
+
+button:active, .button:active {
+
+    transform: scale(0.98);
+}
+
 
 
 .button-icon-group {
@@ -258,4 +262,25 @@ option {
 
 input[type="file"] {
     display: none;
+}
+
+#github-logo {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    opacity: 0.3;
+    column-gap: 6px;
+    align-items: center;
+    transition: opacity 0.5s ease-in-out;
+    text-decoration: none;
+    padding: 0.5rem;
+}
+#github-logo:hover {
+    opacity: 0.6;
+}
+
+#github-logo img {
+    width: 50px;
+    height: auto;
 }

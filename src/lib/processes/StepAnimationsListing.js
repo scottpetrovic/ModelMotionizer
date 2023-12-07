@@ -35,7 +35,7 @@ export class StepAnimationsListing extends EventTarget
         return `<div>Instructions</div> 
         <div>Test and export animations to GLB format</div>
                 <ol>
-                  <li>Only GLTF files can be loaded</li>
+                  <li>Only GLTF files can be exported</li>
                   <li>Go back to edit skeleton if results don't look right</li>
                   <li>Select animations you want to export by checking them by animation</li>
                 </ol>`;

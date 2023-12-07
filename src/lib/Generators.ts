@@ -145,10 +145,10 @@ export class Generators
         camera.position.z = 10;
     
         // @ts-ignore
-        camera.position.y = 10;
+        camera.position.y = 5;
     
         // @ts-ignore
-        camera.position.x = 10; 
+        camera.position.x = 5; 
     
         return camera;
     }

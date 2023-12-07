@@ -29,7 +29,7 @@ document.body.appendChild(renderer.domElement);
 
 // center orbit controls around mid-section area with target change
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0.75, 0);
+controls.target.set(0, 0.9,0);
 controls.update();
 
 // setup transform controls to eventually test out differnt bone rotations
