@@ -15,6 +15,7 @@ export class UI {
         this.dom_load_model_tools = document.querySelector('#load-model-tools')
         this.dom_upload_model_button = document.querySelector('#model-upload')
         this.dom_load_model_button = document.querySelector('#load-model-button')
+        this.dom_load_model_debug_checkbox = document.querySelector('#load-model-debug-checkbox')
 
         // UI controls for loading/working with skeleton
         this.dom_load_skeleton_tools = document.querySelector('#load-skeleton-tools')

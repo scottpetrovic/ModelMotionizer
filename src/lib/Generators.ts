@@ -19,7 +19,10 @@ export class Generators
     {
         // create floor mesh and add to scene to help with shadows
         const floor_geometry = new PlaneGeometry(100, 100, 10, 10);
-        const floor_material = Generators.create_material(false, 0x4e4e7a);
+        const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, opacity: 0.2, transparent: true });
+        floor_material.side = DoubleSide; // helps us see that we are below the character
+        
+
         const floor_mesh = new Mesh(floor_geometry, floor_material);
         floor_mesh.name = 'Floor Mesh';
         floor_mesh.rotation.x = -Math.PI / 2;

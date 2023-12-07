@@ -10,6 +10,7 @@ export class StepLoadModel extends EventTarget
     loader = null
     ui = null
     original_model_data = null
+    debug_model_loading = false
 
     // there can be multiple objects in a model, so store them in a list
     geometry_list = []
@@ -43,6 +44,11 @@ export class StepLoadModel extends EventTarget
         
         });
 
+        this.ui.dom_load_model_debug_checkbox.addEventListener('change', (event) => {
+          const debug_mode = event.target.checked;
+          this.debug_model_loading = debug_mode;
+        });
+
         this.ui.dom_load_model_button.addEventListener('click', () => {
 
             // get currently selected option out of the model-selection drop-down
@@ -62,6 +68,7 @@ export class StepLoadModel extends EventTarget
                 <li>Models with multiple objects won't be rigged correct</li>
                 <li>Mouse primary drag to move view</li>
                 <li>Mouse context drag to pan view</li>
+                <li>Debugging allows you to test odd material artifacts by using a 'Normal' material instead of what is included in the mesh</li>
               </ol>`;
     }
 
@@ -100,17 +107,30 @@ export class StepLoadModel extends EventTarget
       new_scene.name = 'New Scene';
       model_data.traverse((child) => {
 
+        let new_mesh;
+
         // if the schild is a skinned mesh, create a new mesh object and apply the geometry and material
         if(child.type === 'SkinnedMesh')
         {
-          const new_mesh = new THREE.Mesh(child.geometry, child.material);
+          new_mesh = new THREE.Mesh(child.geometry, child.material);    
+          new_mesh.name = child.name;
+          new_scene.add(new_mesh);      
+        }
+        else if(child.type === 'Mesh')
+        {
+          new_mesh = child.clone()
           new_mesh.name = child.name;
           new_scene.add(new_mesh);
         }
 
-        if(child.type === 'Mesh')
+        // potentially use normal material to help debugging models that look odd
+        // some materials have some odd transparency or back-face things that make it look odd
+        let material_to_use;
+        if(this.debug_model_loading && new_mesh !== undefined)
         {
-          new_scene.add(child.clone());
+          material_to_use = new THREE.MeshNormalMaterial()
+          material_to_use.side = THREE.FrontSide;
+          new_mesh.material = material_to_use;
         }
 
       })
