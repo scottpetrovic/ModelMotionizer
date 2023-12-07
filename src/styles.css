@@ -206,9 +206,38 @@ option {
 }
 
 
+/* width */
+::-webkit-scrollbar {
+    width: 14px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(60, 82, 155);
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(184, 210, 214);
+    border-radius: 4px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(126, 152, 156);
+  }
 
 
 
+
+#animations-items{
+    max-height: 15rem;
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    border: 1px solid #5693ca;
+}
 
 #animations-items div {
     display: flex;
