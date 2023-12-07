@@ -187,7 +187,6 @@ function start_skin_weighting_step()
 
   // re-define skeleton helper to use the skinned mesh)
   regenerate_skeleton_helper(weight_skin_step.skeleton())
-  clear_info_panel_message()
 
   // we might want to test out the binding algorithm to see various hitboxes
   // if we are doing debugging, go to that view, if no debugging, go straight to thd animation listing step
@@ -214,10 +213,12 @@ function process_step_changed(process_step)
     case ProcessStep.LoadModel:
       process_step = ProcessStep.LoadModel
       load_model_step.begin()
+      ui.dom_info_panel.innerHTML = load_model_step.instructions_text()
       break;
     case ProcessStep.LoadSkeleton:
       process_step = ProcessStep.LoadSkeleton
       load_skeleton_step.begin()
+      ui.dom_info_panel.innerHTML = load_skeleton_step.instructions_text()
       break;
     case ProcessStep.EditSkeleton:
       process_step = ProcessStep.EditSkeleton
@@ -225,15 +226,18 @@ function process_step_changed(process_step)
       transformControls.enabled = true;
       transformControls.setMode("translate");
       ui.dom_transform_controls_switch.style.display = 'none'; // hide the UI control until we have a bone selected
+      ui.dom_info_panel.innerHTML = edit_skeleton_step.instructions_text()
       break;
     case ProcessStep.BindPose:
       process_step = ProcessStep.BindPose
+      ui.dom_info_panel.innerHTML = weight_skin_step.instructions_text()
       weight_skin_step.begin()
       transformControls.enabled = false; // shouldn't be editing bones
       start_skin_weighting_step()
       break;
     case ProcessStep.AnimationsListing:
       process_step = ProcessStep.AnimationsListing
+      ui.dom_info_panel.innerHTML = animations_listing_step.instructions_text()
       animations_listing_step.begin()
       transformControls.setMode("rotate");
       animations_listing_step.load_and_apply_default_animation_to_skinned_mesh(weight_skin_step.final_skinned_meshes(), 
@@ -260,7 +264,6 @@ const animate = () => {
   renderer.render(scene, camera);
 };
 animate();
-clear_info_panel_message()
 
 //////////////////////////////////
 // EVENT LISTENERS

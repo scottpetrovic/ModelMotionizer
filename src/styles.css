@@ -74,6 +74,11 @@ button.secondary-button:hover {
     transform: scale(1.02);
 }
 
+button.secondary-button.play
+{
+    padding: 0.2rem 0.5rem; /* play has much smaller padding */
+}
+
 
 button, .button {
     background: linear-gradient(0deg, rgba(87,119,119,1) 0%, rgba(32,105,99,1) 98%);

@@ -26,7 +26,7 @@ export class StepEditSkeleton extends EventTarget {
     {
         // show UI elemnents for editing mesh
         this.ui.dom_current_step_index.innerHTML = '3'
-        this.ui.dom_current_step_element.innerHTML = 'Move Skeleton'
+        this.ui.dom_current_step_element.innerHTML = 'Edit Skeleton'
         this.ui.dom_transform_controls_switch.style.display = 'flex';
         this.ui.dom_skeleton_edit_tools.style.display = 'flex';
 
@@ -37,6 +37,20 @@ export class StepEditSkeleton extends EventTarget {
 
 
         this.addEventListeners();
+    }
+
+    
+    instructions_text()
+    {
+        return `<div>Instructions</div> 
+        <div>Position skeleton into correct postion</div>
+                <ol>
+                  <li>Context clicking in model will select bones</li>
+                  <li>Move and rotate bones into position with transform controls</li>
+                  <li>Use the "Mirror" option to help position symmetrical bones</li>
+                  <li>Debug skinning allows you to preview skinning results for testing</li>
+                  <li>Try a different skinning algorithm if you aren't getting the results you like</li>
+                </ol>`;
     }
 
     _update_bind_button_text()

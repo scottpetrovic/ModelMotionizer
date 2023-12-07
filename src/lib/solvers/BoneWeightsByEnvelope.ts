@@ -174,9 +174,12 @@ export class BoneWeightsByEnvelope
 
         const debug_vertices_without_points = Generators.create_spheres_for_points(vertex_positions_without_bones, 
             this.debug_sphere_size, this.debug_sphere_color_failure, 'Vertices unassigned to bone')
-        this.debugging_scene_object.add(debug_vertices_without_points)
+        
+        if(this.debugging_scene_object)
+        {
+            this.debugging_scene_object.add(debug_vertices_without_points)
+        }
 
-         console.log(this.debugging_scene_object)
 
         console.log('Part B: Finding vertices that are not assigned to any bones', vertex_indexes_without_bones)
  

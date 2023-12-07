@@ -53,6 +53,18 @@ export class StepLoadModel extends EventTarget
         });
     }
 
+    instructions_text()
+    {
+      return `<div>Instructions</div> 
+      <div>Select existing models or upload your own.</div>
+              <ol>
+                <li>Only GLTF files can be loaded</li>
+                <li>Models with multiple objects won't be rigged correct</li>
+                <li>Mouse primary drag to move view</li>
+                <li>Mouse context drag to pan view</li>
+              </ol>`;
+    }
+
     _load_model_file(model_file)
     {
       this.loader = new GLTFLoader();

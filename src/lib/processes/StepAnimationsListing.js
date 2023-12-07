@@ -30,6 +30,17 @@ export class StepAnimationsListing extends EventTarget
         this.addEventListeners()
     }
 
+    instructions_text()
+    {
+        return `<div>Instructions</div> 
+        <div>Test and export animations to GLB format</div>
+                <ol>
+                  <li>Only GLTF files can be loaded</li>
+                  <li>Go back to edit skeleton if results don't look right</li>
+                  <li>Select animations you want to export by checking them by animation</li>
+                </ol>`;
+    }
+
     addEventListeners()
     {
         // event listener for animation clip list with changing the current animation

@@ -35,6 +35,17 @@ export class StepLoadSkeleton extends EventTarget
         this.addEventListeners()
     }
 
+    instructions_text()
+    {
+        return `<div>Instructions</div> 
+        <div>Select skeleton based off model type.</div>
+                <ol>
+                  <li>Mixamo human has more bones in hands</li>
+                  <li>Four leg creature has a tail</li>
+                  <li>You will be able to resize or move bones after importing</li>
+                </ol>`;
+    }
+
     addEventListeners()
     {
         this.ui.dom_load_skeleton_button.addEventListener('click', () => {
