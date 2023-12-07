@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title style="display: none">Model Motionizer</title>
+</head>
+<body style="margin: 0">
+    <script type="module" src="./script.js"></script>
+    <link href="./styles.css" rel="stylesheet" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <div id="tool-panel">
+        <!-- create a radio button group. There are two options. Move Skeleton, Rotate Mesh -->
+        <div id="tool-selection-group">
+           
+                <div style="margin-bottom: 1rem;">
+                    <div id="current-step-index"></div>
+                    <div id="current-step-label"></div>
+                </div>
+
+                <div id="load-model-tools">
+                    
+                        <select id="model-selection">
+                            <option value="models/human-simple.glb">Human Cartoon</option>
+                            <option value="models/fox.glb">Fox</option>
+                            <option value="models/mesh-x-bot.glb">X Bot</option>
+                        </select>
+                        <button id="load-model-button">Load</button>
+
+                        <div style="text-align: center">or</div>
+
+                        <label for="model-upload" class="button"  >
+                            <span class="button-icon-group">
+                                <span class="material-symbols-outlined" >upload</span>
+                                Upload
+                            </span>
+                        </label>
+                        <input id="model-upload" type="file" name="file-upload" accept=".glb, .gltf" />
+
+                </div>
+
+                <div id="load-skeleton-tools">
+                        <select id="skeleton-selection">
+                            <option value="bipedal-simple">Simplified Human</option>
+                            <option value="quadraped">4 leg creature</option>
+                            <option value="bipedal-full">Mixamo human</option>
+                        </select>
+                        <button id="load-skeleton-button">Load</button>
+                </div>
+
+                <!-- radio buttons to toggle between rotation and translate -->
+                <div id="transform-controls">
+                    <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
+                        <span>Bone Controls:</span>
+                        
+                        <input type="radio" id="translate-mode" name="tool-selection" value="translation" checked style="display: none">
+                        <label for="translate-mode">
+                            <span class="material-symbols-outlined transform-icons">open_with</span>
+                        </label>
+
+                        <input type="radio" id="rotation-mode" name="tool-selection" value="rotation" style="display: none">
+                        <label for="rotation-mode">                            
+                            <span class="material-symbols-outlined transform-icons" >refresh</span>
+                        </label>
+                    </div>
+
+                   
+
+                    <div style="display: flex; flex-direction: row">
+                        <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
+                        <label for="mirror-skeleton">Mirror</label>
+                    </div>
+
+                    <hr />
+
+                </div>
+
+
+            <span id="skeleton-step-actions">
+
+                <!-- add number input for changing scale of skeleton-->
+                <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
+                    <input type="number" id="scale-input" name="scale-input" value="-1" min="-90" max="90" step="1.0">
+                    <span class="suffix-unit">%</span>
+                    <button id="scale-skeleton-button" class="secondary-button" >Scale</button>
+                </div>
+
+                <button id="action_move_to_origin"  class="secondary-button" >Move to origin</button>
+
+                <hr />
+
+                <!-- option to change out skinning algorithm -->
+                <label for="skinning-algorithm-options">Skinning algorithm:</label>
+                <select id="skinning-algorithm-options">
+                    <option value="bone-envelope">Bone Envelope</option>
+                    <option value="closest-bone">Closest Bone</option>
+                    <option value="closest-bone-middle">Closest Middle Bone</option>
+                </select>
+
+                <hr />
+
+                <!-- checkbox for enabling weight skin debug mode -->
+                <div style="display: flex; flex-direction: row">
+                    <input type="checkbox" id="debug-skinning-checkbox" checked >
+                    <label for="debug-skinning-checkbox">Debug Skinning</label>
+                </div>
+
+                <button id="action_bind_pose" >Bind pose</button>
+            </span>
+
+            <span id="skinned-step-tools">
+                <button id="action_back_to_edit_skeleton" >Edit skeleton</button>
+
+                <!-- checkbox option to show skeleton -->
+                <div style="display: flex; flex-direction: row">
+                    <input type="checkbox" id="show-skeleton-checkbox" name="show-skeleton" value="show" checked>
+                    <label for="show-skeleton-checkbox">Show skeleton</label>
+                </div>
+
+            </span>
+
+        </div>
+
+    </div> <!-- end tool-panel-->
+
+
+    <span id="skinned-step-animation-export-options">
+
+        <div id="animations-listing">
+            <div id="animations-listing-header">
+                <div>Animations</div>
+                <div>Export</div>
+            </div>
+
+            <hr />
+
+            <!-- javascript will populate this item with animations
+                 that we get from the animations file(s)  -->
+            <div id="animations-items"> </div>
+
+
+
+            <button id="export-button">Export to GLB</button>
+            <a id="download-hidden-link" href="#" style="display:none"></a>
+        </div>
+
+       
+    </span>
+
+    <!-- info panel for messages and information-->
+    <div id="info-panel">
+        <div id="info-messaging"> </div>
+        
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost&display=swap');
+
+* {
+    color: white;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    display: inline-block;
+}
+
+
+#skinned-step-animation-export-options {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0b1822;
+    padding: 1rem;
+    width: 20rem;
+    box-shadow: 1px 1px 8px 0px #000000bf;
+    border: 1px dotted #5b8792;
+}
+
+#skinned-step-tools
+{
+    flex-direction: column;
+    row-gap: 1rem;
+}
+
+
+
+hr {
+    border:1px solid #1f405a;
+    width: 100%;
+    margin: 0.3rem 0rem;
+}
+
+li{
+    display: list-item;
+    line-height: 135%;
+    color: #c4c4c4;
+    font-size: 13px;
+}
+
+body {
+    background: #0d2525;
+}
+
+#tool-selection-group {
+   
+}
+
+div {
+
+    padding: 0.25rem;
+}
+
+input[type="number"] {
+    padding: 0.5rem;
+    border: 1px solid #878787;
+    border-radius: 3px;
+    background: none;
+    width: 40px;
+}
+
+/* used for animation play options */
+button.secondary-button {
+    background: #657a7638;
+    border-radius: 3px;
+    border-width: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+button.secondary-button:hover {
+    background: #657a7638;
+    transform: scale(1.02);
+}
+
+
+button, .button {
+    background: linear-gradient(0deg, rgba(87,119,119,1) 0%, rgba(32,105,99,1) 98%);
+    padding: 0.5rem 1.0rem;
+    margin-right: 0.5rem;
+    border: 1px solid #85c4a3;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    text-align: center; /* useful for custom file upload label */
+}
+button:hover, .button:hover {
+    background: linear-gradient(0deg, rgba(32,105,99,1) 0%, rgba(87,119,119,1) 98%);
+    transform: scale(1.02);
+}
+
+
+.button-icon-group {
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    column-gap: 6px;
+}
+
+.transform-icons {
+    width: 25px;
+    height: 25px;
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #d3d6d6;
+    cursor: pointer;
+}
+
+.transform-icons:hover {
+    background: #408b7c3b;
+}
+
+canvas {
+    /* take up entire screen */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+}
+
+select {
+    padding: 0.5rem;
+    background: none;
+
+    border: 1px solid #315978;
+    border-radius: 4px;
+}
+
+option {
+    background: rgb(25, 47, 54);
+
+    border: none;
+    border-radius: 0;
+}
+
+#current-step-index {
+    font-size: 15px;
+    background: white;
+    background: linear-gradient(150deg, rgba(235,255,255,1) 3%, rgba(164,215,233,1) 100%);
+    padding: 0.7rem;
+    border-radius: 39px;
+    color: black;
+    width: 16px;
+    text-align: center;
+    font-weight: 700;
+}
+
+#current-step-label {
+    font-size: 20px;
+}
+
+#info-panel
+{
+    background: #0000003d;
+    overflow-y: auto;
+    height: fit-content;
+    bottom: 20px;
+    position: absolute;
+    display: flex;
+    width: 300px;
+    right: 20px;
+    border-radius: 3px;
+    border: 1px solid #3e4e51;
+    max-height: calc(100% - 50px);
+}
+#info-messaging {
+    padding: 0.5rem;
+    font-size: 13px;
+    color: #d0c8c8;
+}
+
+#load-model-tools, #load-skeleton-tools, #transform-controls, #skeleton-step-actions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.7rem;
+}
+
+#tool-panel {
+    position: fixed;
+    height: fit-content;
+    background: #0b1822;
+    box-shadow: 1px 1px 8px 0px #000000bf;
+    top: 20px;
+    left: 20px;
+    bottom: 0;
+    border: 1px dotted #5b8792;
+    padding: 1rem;
+}
+
+#animations-listing {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#animations-listing-header {
+    justify-content: space-between;
+    display: flex;
+}
+
+
+
+
+
+
+#animations-items div {
+    display: flex;
+    justify-content: space-between;
+}
+/* have every other div child be a different background color */
+#animations-items > div:nth-child(odd) {
+    background: #32546f26;
+}
+
+
+
+
+.anim-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+input[type="file"] {
+    display: none;
+}
