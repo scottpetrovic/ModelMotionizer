@@ -135,7 +135,7 @@
 
         <div id="animations-listing">
             <div id="animations-listing-header">
-                <div>Animations</div>
+                <span>Animations</span>
                 <div>Export</div>
             </div>
 
@@ -143,8 +143,28 @@
                  that we get from the animations file(s)  -->
             <div id="animations-items"> </div>
 
-            <button id="export-button">Export to GLB</button>
-            <a id="download-hidden-link" href="#" style="display:none"></a>
+            <div style="display: flex; column-gap: 10px; justify-content: center;">
+
+                <button id="import-animations-button" class="secondary-button" style="margin: 0;">
+                    <span class="button-icon-group">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Import</span>
+                    </span>
+                </button>
+
+
+                <button id="export-button">
+                    <span class="button-icon-group">
+                        <span class="material-symbols-outlined">save_alt</span>
+                        <span>Download</span>
+                    </span>
+                </button>
+                <a id="download-hidden-link" href="#" style="display:none"></a>
+
+
+            </div>
+
+
         </div>
 
        

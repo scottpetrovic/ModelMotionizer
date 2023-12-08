@@ -35,7 +35,7 @@ export class StepAnimationsListing extends EventTarget
         return `<div>Instructions</div> 
         <div>Test and export animations to GLB format</div>
                 <ol>
-                  <li>Only GLTF files can be exported</li>
+                  <li>Only GLB files can be exported</li>
                   <li>Go back to edit skeleton if results don't look right</li>
                   <li>Select animations you want to export by checking them by animation</li>
                 </ol>`;
@@ -51,6 +51,21 @@ export class StepAnimationsListing extends EventTarget
                 this._play_animation(animation_index);
             }
         });
+
+
+        this.ui.dom_import_animations_button.addEventListener('click', () => {
+            console.log('Nbring up file dialog to import animations')
+
+            // bring up file dialog to import animattions file (just  support GLB for now)
+
+            // parse through the file and extract the animations
+        
+            // make sure the animations are compatible with the skeleton
+
+            // add the animations to the animation_clips_loaded
+
+        });
+
     }
 
     _play_animation(index = 0)

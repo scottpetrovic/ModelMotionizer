@@ -42,6 +42,7 @@ export class UI {
         this.dom_animation_clip_list = document.querySelector('#animations-items')
         this.dom_export_button = document.querySelector('#export-button')
         this.dom_info_panel = document.querySelector('#info-messaging')
+        this.dom_import_animations_button = document.querySelector('#import-animations-button')
 
         // UI for exporting the animation
         this.dom_export_button_hidden_link = document.querySelector('#download-hidden-link')
