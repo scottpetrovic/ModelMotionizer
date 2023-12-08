@@ -121,9 +121,7 @@ export class StepAnimationsListing extends EventTarget
                 animations_to_load_filepath = 'animations/quad-creature-animations.glb'
                 break;
             case SkeletonType.BipedalFull:
-                // TODO: This file doesn't actually exist
-                console.log('NOT IMPLENTENTED YET. NEED TO MAKE ANIMATIONS FOR THIS')
-                animations_to_load_filepath = 'animations/character-full-multiple.glb'
+                animations_to_load_filepath = 'animations/animations-mixamo-default.glb'
                 break;
         }
 
