@@ -123,27 +123,18 @@ export class StepAnimationsListing extends EventTarget
     {
         // loop through each animation_clip and change name if the animaton name already exists
         // see if the aniation name is already taken.. if so, add a number to the end of the name
+
+        console.log(this.animation_clips_loaded)
+
         animation_clips.forEach((animation_clip) => {                
 
-            let animation_clip_name_found = false
-            let name_counter = 0
+            let is_name_found = this.animation_clips_loaded.find((animation_clip_loaded) => {
+                return animation_clip_loaded.name === animation_clip.name
+            })
 
-            while(!animation_clip_name_found)
+            if(is_name_found)
             {
-                let is_name_found = this.animation_clips_loaded.find((animation_clip_loaded) => {
-                    return animation_clip_loaded.name === animation_clip.name
-                })
-
-                if(is_name_found === undefined)
-                {
-                    animation_clip_name_found = true
-                }
-                else
-                {
-                    console.log('duplicate found, adding number to end of name', animation_clip.name)
-                    name_counter++
-                    animation_clip.name = `${animation_clip.name}-${name_counter}`
-                }
+                animation_clip.name = animation_clip.name + ' Copy'
             }
         });
 
