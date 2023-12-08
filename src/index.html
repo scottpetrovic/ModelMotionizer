@@ -34,7 +34,7 @@
                         <label for="model-upload" class="button"  >
                             <span class="button-icon-group">
                                 <span class="material-symbols-outlined" >upload</span>
-                                Upload GLTF
+                                <span>Upload GLTF</span>
                             </span>
                         </label>
                         <input id="model-upload" type="file" name="file-upload" accept=".glb, .gltf" />
@@ -145,12 +145,22 @@
 
             <div style="display: flex; column-gap: 10px; justify-content: center;">
 
-                <button id="import-animations-button" class="secondary-button" style="margin: 0;">
+                <!-- <button id="import-animations-button" class="secondary-button" style="margin: 0;">
                     <span class="button-icon-group">
                         <span class="material-symbols-outlined">add</span>
                         <span>Import</span>
                     </span>
-                </button>
+                </button> -->
+
+                <label for="import-animations-button" class="button"  >
+                    <span class="button-icon-group">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Import</span>
+                    </span>
+                </label>
+                <input id="import-animations-button" type="file" name="animation-upload" accept=".glb, .gltf" />
+
+
 
 
                 <button id="export-button">

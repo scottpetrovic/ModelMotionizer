@@ -53,17 +53,37 @@ export class StepAnimationsListing extends EventTarget
         });
 
 
-        this.ui.dom_import_animations_button.addEventListener('click', () => {
-            console.log('Nbring up file dialog to import animations')
 
-            // bring up file dialog to import animattions file (just  support GLB for now)
+        this.ui.dom_import_animations_button.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
 
-            // parse through the file and extract the animations
+            console.log('loading more files')
         
-            // make sure the animations are compatible with the skeleton
+            reader.onload = () => {
+               var animations_import = reader.result
 
-            // add the animations to the animation_clips_loaded
+               this.loader = new GLTFLoader();
+               this.loader.load(animations_import, (gltf) => {
 
+                    const animations_for_scene = gltf.animations; // we only need the animations
+
+                    // make sure the animations are compatible with the skeleton
+                    // TODO: figure out what type of validation I could do with this
+
+                    // add the animations to the animation_clips_loaded
+                    // update the UI with the new animation clips
+                    this._append_animation_clips(animations_for_scene)
+                    this.ui.build_animation_clip_ui(this.animation_clips_loaded);
+
+                    // clear out the file input field in case we want to test by loading same file again
+                    this.ui.dom_import_animations_button.value = '';
+
+                });
+
+            };
+        
         });
 
     }
@@ -97,6 +117,38 @@ export class StepAnimationsListing extends EventTarget
     load_animation_clips(animation_clips)
     {
         this.animation_clips_loaded = this._remove_position_keyframes_from_animations(animation_clips)
+    }
+
+    _append_animation_clips(animation_clips)
+    {
+        // loop through each animation_clip and change name if the animaton name already exists
+        // see if the aniation name is already taken.. if so, add a number to the end of the name
+        animation_clips.forEach((animation_clip) => {                
+
+            let animation_clip_name_found = false
+            let name_counter = 0
+
+            while(!animation_clip_name_found)
+            {
+                let is_name_found = this.animation_clips_loaded.find((animation_clip_loaded) => {
+                    return animation_clip_loaded.name === animation_clip.name
+                })
+
+                if(is_name_found === undefined)
+                {
+                    animation_clip_name_found = true
+                }
+                else
+                {
+                    console.log('duplicate found, adding number to end of name', animation_clip.name)
+                    name_counter++
+                    animation_clip.name = `${animation_clip.name}-${name_counter}`
+                }
+            }
+        });
+
+        this.animation_clips_loaded.push(...this._remove_position_keyframes_from_animations(animation_clips))
+
     }
 
     _remove_position_keyframes_from_animations(animation_clip_list)

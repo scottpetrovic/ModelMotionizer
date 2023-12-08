@@ -105,6 +105,10 @@ button:active, .button:active {
     justify-content: center;
     column-gap: 6px;
 }
+.button-icon-group span{
+    align-self: center;
+}
+
 
 .transform-icons {
     width: 25px;
