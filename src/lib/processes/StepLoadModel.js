@@ -10,6 +10,9 @@ export class StepLoadModel extends EventTarget
     loader = null
     ui = null
     original_model_data = null
+
+    final_mesh_data = null
+
     debug_model_loading = false
 
     // there can be multiple objects in a model, so store them in a list
@@ -42,17 +45,19 @@ export class StepLoadModel extends EventTarget
 
     _calculate_geometry_list()
     {
-      if(this.original_model_data === undefined)
+
+      if(this.final_mesh_data === undefined)
       {
         console.error('original model not loaded yet. Cannot do calculations')
       }
 
-      this.original_model_data.traverse((child) => {
+      this.final_mesh_data.traverse((child) => {
         if(child.type === 'Mesh')
         {
           let geometry_to_add = child.geometry.clone();
           geometry_to_add.name = child.name;
           this.geometry_list.push(geometry_to_add)
+          this.material_list.push(child.material.clone())
         }
       })
 
@@ -128,6 +133,7 @@ export class StepLoadModel extends EventTarget
     
         this.original_model_data = loaded_scene.clone()
         this.original_model_data.name = 'Cloned Scene';
+        
         this.original_model_data.traverse((child) => {
           child.castShadow = true;
         })
@@ -137,7 +143,9 @@ export class StepLoadModel extends EventTarget
         this._scale_model_on_import(clean_scene_with_only_models, max_height); // if we have multiple objects, we want to scale them all the same
         
         // assign the final cleaned up model to the original model data
-        this.original_model_data = clean_scene_with_only_models;
+        this.final_mesh_data = clean_scene_with_only_models;
+
+       
 
         this._calculate_geometry_list()
 
@@ -224,32 +232,75 @@ export class StepLoadModel extends EventTarget
       return bounding_box
     }
 
-    model_mesh()
+    model_meshes()
     {
-        return this.original_model_data
+      if(this.final_mesh_data !== undefined)
+      {
+        return this.final_mesh_data;
+      }
+
+
+      // create a new scene object, and only include meshes
+      const new_scene = new THREE.Scene();
+      new_scene.name = 'Model data';
+
+      // do a for loop to add all the meshes to the scene from the geometry and material list
+      for(let i = 0; i < this.geometry_list.length; i++)
+      {
+        const mesh = new THREE.Mesh(this.geometry_list[i], this.material_list[i])
+        new_scene.add(mesh)
+      }
+
+      this.final_mesh_data = new_scene;
+
+      return this.final_mesh_data
     }
 
     models_geometry_list()
     {
-      return this.geometry_list;
+      // loop through final mesh data and return the geometeries
+      const geometries_to_return = []
+      this.final_mesh_data.traverse((child) => {
+        if(child.type === 'Mesh')
+        {
+          geometries_to_return.push(child.geometry.clone())
+        }
+      })
+
+      return geometries_to_return;
     }
 
     models_material_list()
     {
-
-      if(this.material_list.length > 0)
-      {
-        return this.material_list;
-      }
-
-      this.original_model_data.traverse((child) => {
-        if(child.type === 'Mesh')
-        {
-          this.material_list.push(child.material.clone())
-        }
-      })
-
       return this.material_list;
     }
+
+
+    rotate_model_by_axis(axis, angle)
+    {
+      this.final_mesh_data.traverse((obj) => {
+        
+        // if object is a mesh, rotate the geometry data
+        if(obj.type === 'Mesh')
+        {
+          switch( axis )
+          {
+            case 'x':
+              obj.geometry.rotateX(THREE.MathUtils.degToRad(angle))
+              break;
+            case 'y':
+              obj.geometry.rotateY(THREE.MathUtils.degToRad(angle))
+              break;
+            case 'z':
+              obj.geometry.rotateZ(THREE.MathUtils.degToRad(angle))
+              break;
+          }
+
+          //obj.geometry.rotateX(THREE.MathUtils.degToRad(angle))
+        }
+
+      })
+    }
+
 
 }

@@ -178,12 +178,9 @@ function start_skin_weighting_step()
     scene.add(...weight_skin_step.final_skinned_meshes())
   });
 
-
-
-
   // remember our skeleton position before we do the skinning process
   // that way if we revert to try again...we will have the original positions/rotations
-  load_model_step.model_mesh().visible = false;   // hide our unskinned mesh after we have done the skinning process
+  load_model_step.model_meshes().visible = false;   // hide our unskinned mesh after we have done the skinning process
 
   // re-define skeleton helper to use the skinned mesh)
   regenerate_skeleton_helper(weight_skin_step.skeleton())
@@ -333,7 +330,7 @@ transformControls.addEventListener('dragging-changed', function (event) {
 });
 
 load_model_step.addEventListener('modelLoaded', (event) => {
-  scene.add(load_model_step.model_mesh())
+  scene.add(load_model_step.model_meshes())
   process_step = process_step_changed(ProcessStep.LoadSkeleton)
 })
 
@@ -380,7 +377,7 @@ ui.dom_back_to_edit_skeleton_button.addEventListener('click', () => {
 
   regenerate_skeleton_helper(edit_skeleton_step.skeleton())
 
-  load_model_step.model_mesh().visible = true; // show the unskinned mesh again
+  load_model_step.model_meshes().visible = true; // show the unskinned mesh again
 
 });
 
@@ -416,3 +413,16 @@ ui.dom_export_button.addEventListener('click', () => {
   file_export_step.set_animation_clips_to_export(all_clips)
   file_export_step.export(weight_skin_step.final_skinned_meshes(), 'exported-model');
 });
+
+ui.dom_rotate_model_x_button.addEventListener('click', () => {
+  load_model_step.rotate_model_by_axis('x', 90)
+})
+
+ui.dom_rotate_model_y_button.addEventListener('click', () => {
+  load_model_step.rotate_model_by_axis('y', 90)
+})
+
+
+ui.dom_rotate_model_z_button.addEventListener('click', () => {
+  load_model_step.rotate_model_by_axis('z', 90)
+})

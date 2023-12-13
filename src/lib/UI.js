@@ -17,6 +17,11 @@ export class UI {
         this.dom_load_model_button = document.querySelector('#load-model-button')
         this.dom_load_model_debug_checkbox = document.querySelector('#load-model-debug-checkbox')
 
+        this.dom_rotate_model_x_button = document.querySelector('#rotate-model-x-button')
+        this.dom_rotate_model_y_button = document.querySelector('#rotate-model-y-button')
+        this.dom_rotate_model_z_button = document.querySelector('#rotate-model-z-button')
+
+
         // UI controls for loading/working with skeleton
         this.dom_load_skeleton_tools = document.querySelector('#load-skeleton-tools')
         this.dom_load_skeleton_button = document.querySelector('#load-skeleton-button')
