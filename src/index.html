@@ -157,14 +157,18 @@
                  that we get from the animations file(s)  -->
             <div id="animations-items"> </div>
 
-            <div style="display: flex; column-gap: 10px; justify-content: center;">
 
-                <!-- <button id="import-animations-button" class="secondary-button" style="margin: 0;">
-                    <span class="button-icon-group">
-                        <span class="material-symbols-outlined">add</span>
-                        <span>Import</span>
-                    </span>
-                </button> -->
+            <!-- slider to control arm extension -->
+            <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
+                <input type="number" id="extend-arm-input" name="arm-extend-input" value="1" min="-25" max="25" step="0.1">
+                <span class="suffix-unit">%</span>
+                <button id="extend-arm-button" class="secondary-button" >Extend</button>
+            </div>
+
+            <hr />
+
+
+            <div style="display: flex; column-gap: 10px; justify-content: center;">
 
                 <label for="import-animations-button" class="button"  >
                     <span class="button-icon-group">
@@ -173,9 +177,6 @@
                     </span>
                 </label>
                 <input id="import-animations-button" type="file" name="animation-upload" accept=".glb, .gltf" />
-
-
-
 
                 <button id="export-button">
                     <span class="button-icon-group">

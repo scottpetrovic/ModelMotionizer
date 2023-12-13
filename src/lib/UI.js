@@ -49,6 +49,10 @@ export class UI {
         this.dom_info_panel = document.querySelector('#info-messaging')
         this.dom_import_animations_button = document.querySelector('#import-animations-button')
 
+        this.dom_extend_arm_input = document.querySelector('#extend-arm-input')
+        this.dom_extend_arm_button = document.querySelector('#extend-arm-button')
+
+
         // UI for exporting the animation
         this.dom_export_button_hidden_link = document.querySelector('#download-hidden-link')
     }

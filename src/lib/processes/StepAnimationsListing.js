@@ -2,7 +2,7 @@ import { UI } from '../UI.js';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-import { AnimationClip, AnimationMixer } from 'three';
+import { AnimationClip, AnimationMixer, Quaternion, Vector3 } from 'three';
 import { SkeletonType } from '../enums/SkeletonType.js';
 
 // Note: EventTarget is a built-ininterface and do not need to import it
@@ -13,6 +13,7 @@ export class StepAnimationsListing extends EventTarget
     animation_loader = null
     animation_mixer = null
     skinned_meshes_to_animate = []
+    current_playing_index = 0
 
     constructor() 
     {
@@ -86,14 +87,64 @@ export class StepAnimationsListing extends EventTarget
         
         });
 
+        this.ui.dom_extend_arm_button.addEventListener('click', (event) => {
+            let extend_arm_value = this.ui.dom_extend_arm_input.value
+            this._extend_arm_animations_by_percentage(extend_arm_value)
+            this._play_animation(this.current_playing_index)
+        })
+
+    }
+
+    _extend_arm_animations_by_percentage(percentage)
+    {
+         // loop through each animation clip to update the tracks
+         this.animation_clips_loaded.forEach((animation_clip) => {
+             
+            animation_clip.tracks.forEach((track) => {
+
+                // if the track is an upper arm bone, then modify that
+                const track_name_to_match = '_Arm.quaternion' // for simplified human skeleton
+                if(track.name.indexOf(track_name_to_match) > -1)
+                {
+                    const new_track_values =  track.values.slice(); // clone array
+                    const track_count = track.times.length
+                    for(let i = 0; i < track_count; i++)
+                    {
+                        // get correct value since it is a quaternion
+                        const units_in_quaternions = 4
+
+                        
+                        const quaternion = new Quaternion();
+                        quaternion.setFromAxisAngle( new Vector3( 0, percentage, 0 ), Math.PI / 2 );
+
+
+
+                        // this should change the first quaternion component of the track
+                        new_track_values[i * units_in_quaternions + 0] = quaternion.x
+                        new_track_values[i * units_in_quaternions + 1] = quaternion.y
+                        new_track_values[i * units_in_quaternions + 2] = quaternion.z
+                        new_track_values[i * units_in_quaternions + 3] = quaternion.w
+                    }
+
+                    track.values = new_track_values
+                    console.log(new_track_values)
+                }
+
+
+             })
+
+         })
+
     }
 
     _play_animation(index = 0)
     {
+        this.current_playing_index = index
+
         this.animation_mixer.stopAllAction(); 
 
         this.skinned_meshes_to_animate.forEach((skinned_mesh) => {
-            let anim_clip = this.animation_mixer.clipAction(this.animation_clips_loaded[index], skinned_mesh);
+            let anim_clip = this.animation_mixer.clipAction(this.animation_clips_loaded[this.current_playing_index], skinned_mesh);
             anim_clip.play();
         });
     }

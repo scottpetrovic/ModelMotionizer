@@ -296,7 +296,6 @@ export class StepLoadModel extends EventTarget
               break;
           }
 
-          //obj.geometry.rotateX(THREE.MathUtils.degToRad(angle))
         }
 
       })
