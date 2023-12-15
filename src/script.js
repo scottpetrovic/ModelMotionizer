@@ -11,7 +11,7 @@ import { UI } from './lib/UI.js';
 import { StepLoadModel } from './lib/processes/StepLoadModel.js';
 import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.js';
 import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.js';
-import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.js';
+import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts';
 import { StepExportToFile } from './lib/processes/StepExportToFile.js';
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.js';
 
