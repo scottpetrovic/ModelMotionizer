@@ -5,6 +5,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { AnimationClip, AnimationMixer, Quaternion, Vector3 } from 'three';
 import { SkeletonType } from '../enums/SkeletonType.js';
 import { SkinnedMesh } from 'three';
+import { QuaternionKeyframeTrack } from 'three';
+import { KeyframeTrack } from 'three';
+import { AnimationAction } from 'three';
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepAnimationsListing extends EventTarget
@@ -106,29 +109,39 @@ export class StepAnimationsListing extends EventTarget
         });
     }
 
-    private extend_arm_animations_by_percentage(percentage)
+    private extend_arm_animations_by_percentage(percentage: number): void
     {
          // loop through each animation clip to update the tracks
-         this.animation_clips_loaded.forEach((animation_clip) => {
+         this.animation_clips_loaded.forEach((animation_clip: AnimationClip) => {
              
-            animation_clip.tracks.forEach((track) => {
+            animation_clip.tracks.forEach((track: KeyframeTrack) => {
+
+                // if our name does not contain 'quaternion', we need to exit
+                // since we are only modifying the quaternion tracks (e.g. L_Arm.quaternion )
+                if(track.name.indexOf('quaternion') < 0)
+                {
+                    return
+                }
+
+                const quaterion_track: QuaternionKeyframeTrack = track;
 
                 // if the track is an upper arm bone, then modify that
-                const track_name_to_match = '_Arm.quaternion' // for simplified human skeleton
-                if(track.name.indexOf(track_name_to_match) > -1)
+                const track_name_to_match: string = '_Arm' // for simplified human skeleton
+                if(quaterion_track.name.indexOf(track_name_to_match) > -1)
                 {
-                    const new_track_values =  track.values.slice(); // clone array
-                    const track_count = track.times.length
+                    const new_track_values: Float32Array =  quaterion_track.values.slice(); // clone array
+
+                    const track_count: number = quaterion_track.times.length
                     for(let i = 0; i < track_count; i++)
                     {
                         // get correct value since it is a quaternion
-                        const units_in_quaternions = 4
-                        const quaternion = new Quaternion();
+                        const units_in_quaternions: number = 4
+                        const quaternion: Quaternion = new Quaternion();
                         quaternion.setFromAxisAngle( new Vector3( 1, 0, 0 ), percentage/100 );
 
 
                         // get the existing quaternion
-                        const existingQuaternion = new Quaternion(
+                        const existingQuaternion: Quaternion = new Quaternion(
                             new_track_values[i * units_in_quaternions + 0],
                             new_track_values[i * units_in_quaternions + 1],
                             new_track_values[i * units_in_quaternions + 2],
@@ -149,58 +162,50 @@ export class StepAnimationsListing extends EventTarget
                     track.values = new_track_values
                 }
 
-
              })
 
          })
 
          // test out the new values for the animation
-         console.log(this.animation_clips_loaded)
-         this.animation_clips_loaded.forEach((animation_clip) => {
-            animation_clip.tracks.forEach((track) => {
+        //  console.log(this.animation_clips_loaded)
+        //  this.animation_clips_loaded.forEach((animation_clip) => {
+        //     animation_clip.tracks.forEach((track) => {
 
-                if(track.name.indexOf('_Arm.quaternion') > -1)
-                {
-                    console.log(animation_clip.name, track.name, track.values)
-                }
-            })
-        })
+        //         if(track.name.indexOf('_Arm.quaternion') > -1)
+        //         {
+        //             console.log(animation_clip.name, track.name, track.values)
+        //         }
+        //     })
+        // })
 
 
     }
 
-    private play_animation(index = 0)
+    private play_animation(index: number = 0): void
     {
         this.current_playing_index = index
 
-        this.animation_mixer.stopAllAction(); 
+        // animation mixer has internal cache with animations. doing this helps clear it
+        // otherwise modifications like arm extension will not update
+        this.animation_mixer = new AnimationMixer();
 
         this.skinned_meshes_to_animate.forEach((skinned_mesh) => {
 
-            
-            const clip_to_play = this.animation_clips_loaded[this.current_playing_index]
-            let anim_action = this.animation_mixer.clipAction(clip_to_play, skinned_mesh);
-            
-            // remove the cache for the animation action before playing
-            
+            const clip_to_play: AnimationClip = this.animation_clips_loaded[this.current_playing_index]
+            let anim_action: AnimationAction = this.animation_mixer.clipAction(clip_to_play, skinned_mesh);
 
-
-
-
-
-
-            anim_action.reset();
             anim_action.stop();
             anim_action.play();
+
         });
     }
 
-    private load_animation_clips(animation_clips)
+    private load_animation_clips(animation_clips): void
     {
         this.animation_clips_loaded = this.remove_position_and_scale_keyframes_from_animations(animation_clips)
     }
 
-    private addEventListeners()
+    private addEventListeners(): void
     {
         // event listener for animation clip list with changing the current animation
         if (this.ui.dom_animation_clip_list) {
