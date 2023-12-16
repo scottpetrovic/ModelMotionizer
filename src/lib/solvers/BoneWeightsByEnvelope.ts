@@ -11,7 +11,6 @@ export class BoneWeightsByEnvelope
     private show_debug: boolean = false;
     private bone_idx_test: number = -1;
 
-
     private debugging_scene_object: Object3D;
     private debug_sphere_size = 0.06;
     private debug_sphere_color_success = 0x00ff00; // vertices that are part of envelope
@@ -40,11 +39,14 @@ export class BoneWeightsByEnvelope
             const has_child_bone: boolean = bone.children.length > 0
             const supports_envelope: boolean = is_bone_valid_for_envelope_calculation(bone)
 
-            // used for 4 legged creatures now to prevent expanding too far
+            // 4 leg creature has entire word "right", while human has appreviation "R"
             let use_minimum_expand_distance: boolean = false;
             if(bone.name === 'Right_Front_Leg_Upper' 
                 || bone.name === 'Left_Front_Leg_Upper' 
                 || bone.name === 'Right_Back_Leg_Upper' 
+                || bone.name === 'L_Toe' 
+                || bone.name === 'R_Toe' 
+                || bone.name.includes('UpLeg') 
                 || bone.name === 'Left_Back_Leg_Upper' )
             {
                 use_minimum_expand_distance = true
@@ -83,7 +85,7 @@ export class BoneWeightsByEnvelope
     {
         this.bones_master_data.forEach( (bone: BoneCalculationData, bone_index: number) => {
             if (bone.supports_envelope_calculation)
-            {
+            {               
                 const rays_to_cast: number = 4;
                 let bone_start: Bone = bone.bone_object
                 let bone_end: Bone = bone.bone_object.children[0] as Bone
@@ -406,9 +408,10 @@ function is_bone_valid_for_envelope_calculation(bone: Bone): boolean
     // we are going to ignore certain bones for the bone as they 
     // have odd angles and create bad envelopes
     if(
-    bone.name.includes('Fingers') ||   
-    bone.name.includes('HandBase') ||
-    bone.name === 'SpineUp'  )
+        bone.name.includes('Fingers') ||   
+        bone.name.includes('HandBase') ||
+        bone.name.includes('Shoulder') ||
+        bone.name === 'SpineUp'  )
     {
         return false;
     }
