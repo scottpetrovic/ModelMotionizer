@@ -1,52 +1,54 @@
-mixamorigHips
-mixamorigSpine
-mixamorigSpine1
-mixamorigSpine2
-mixamorigNeck
-mixamorigHead
-mixamorigRightShoulder
-mixamorigRightArm
-mixamorigRightForeArm
-mixamorigRightHand
-mixamorigRightHandThumb1
-mixamorigRightHandThumb2
-mixamorigRightHandThumb3
-mixamorigRightHandIndex1
-mixamorigRightHandIndex2
-mixamorigRightHandIndex3
-mixamorigRightHandMiddle1
-mixamorigRightHandMiddle2
-mixamorigRightHandMiddle3
-mixamorigRightHandRing1
-mixamorigRightHandRing2
-mixamorigRightHandRing3
-mixamorigRightHandPinky1
-mixamorigRightHandPinky2
-mixamorigRightHandPinky3
-mixamorigLeftShoulder
-mixamorigLeftArm
-mixamorigLeftForeArm
-mixamorigLeftHand
-mixamorigLeftHandThumb1
-mixamorigLeftHandThumb2
-mixamorigLeftHandThumb3
-mixamorigLeftHandIndex1
-mixamorigLeftHandIndex2
-mixamorigLeftHandIndex3
-mixamorigLeftHandMiddle1
-mixamorigLeftHandMiddle2
-mixamorigLeftHandMiddle3
-mixamorigLeftHandRing1
-mixamorigLeftHandRing2
-mixamorigLeftHandRing3
-mixamorigLeftHandPinky1
-mixamorigLeftHandPinky2
-mixamorigLeftHandPinky3
-mixamorigRightUpLeg
-mixamorigRightLeg
-mixamorigRightFoot
-mixamorigRightToeBase
-mixamorigLeftUpLeg
-mixamorigLeftLeg
-mixamorigLeftFoot
-mixamorigLeftToeBase
+export const MixamoToSimpleMapping = {
+    mixamorigHips: 'SpineBase',
+    mixamorigSpine: 'SpineLow',
+    mixamorigSpine1: 'SpineLow',
+    mixamorigSpine2: 'SpineMid',
+    mixamorigNeck: 'Neck',
+    mixamorigHead: 'Head',
+    mixamorigRightShoulder: 'R_Shoulder',
+    mixamorigRightArm: 'R_Arm',
+    mixamorigRightForeArm: 'R_Forearm',
+    mixamorigRightHand: 'R_HandBase',
+    mixamorigRightHandThumb1: 'R_ThumbBase',
+    mixamorigRightHandThumb2: 'R_ThumbMid',
+    mixamorigRightHandThumb3: 'R_ThumbTip',
+    mixamorigRightHandIndex1: 'R_PointerBase',
+    mixamorigRightHandIndex2: 'R_PointerMid',
+    mixamorigRightHandIndex3: 'R_PointerTip',
+    mixamorigRightHandMiddle1: 'R_FingersBase',
+    mixamorigRightHandMiddle2: 'R_FingersMid',
+    mixamorigRightHandMiddle3: 'R_FingersTip',
+    mixamorigRightHandRing1: '',
+    mixamorigRightHandRing2: '',
+    mixamorigRightHandRing3: '',
+    mixamorigRightHandPinky1: '',
+    mixamorigRightHandPinky2: '',
+    mixamorigRightHandPinky3: '',
+    mixamorigLeftShoulder: 'L_Shoulder',
+    mixamorigLeftArm: 'L_Arm',
+    mixamorigLeftForeArm: 'L_Forearm',
+    mixamorigLeftHand: 'L_HandBase',
+    mixamorigLeftHandThumb1: 'L_ThumbBase',
+    mixamorigLeftHandThumb2: 'L_ThumbMid',
+    mixamorigLeftHandThumb3: 'L_ThumbTip',
+    mixamorigLeftHandIndex1: 'L_PointerBase',
+    mixamorigLeftHandIndex2: 'L_PointerMid',
+    mixamorigLeftHandIndex3: 'L_PointerTip',
+    mixamorigLeftHandMiddle1: 'L_FingersBase',
+    mixamorigLeftHandMiddle2: 'L_FingersMid',
+    mixamorigLeftHandMiddle3: 'L_FingersTip',
+    mixamorigLeftHandRing1: '',
+    mixamorigLeftHandRing2: '',
+    mixamorigLeftHandRing3: '',
+    mixamorigLeftHandPinky1: '',
+    mixamorigLeftHandPinky2: '',
+    mixamorigLeftHandPinky3: '',
+    mixamorigRightUpLeg: 'R_UpLeg',
+    mixamorigRightLeg: 'R_Leg',
+    mixamorigRightFoot: 'R_Foot',
+    mixamorigRightToeBase: 'R_Toe',
+    mixamorigLeftUpLeg: 'L_UpLeg',
+    mixamorigLeftLeg: 'L_Leg',
+    mixamorigLeftFoot: 'L_Foot',
+    mixamorigLeftToeBase: 'L_Toe',
+};

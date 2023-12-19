@@ -9,6 +9,7 @@ import { SkinnedMesh } from 'three';
 import { QuaternionKeyframeTrack } from 'three';
 import { KeyframeTrack } from 'three';
 import { AnimationAction } from 'three';
+import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js';
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepAnimationsListing extends EventTarget
@@ -21,6 +22,7 @@ export class StepAnimationsListing extends EventTarget
     private animation_mixer: AnimationMixer;
     private skinned_meshes_to_animate: SkinnedMesh[] = []
     private current_playing_index: number = 0
+    private skeleton_type: string = SkeletonType.BipedalSimple;
 
     constructor() 
     {
@@ -52,8 +54,6 @@ export class StepAnimationsListing extends EventTarget
        
             this.addEventListeners();       
         }
-
-       
     }
 
     public instructions_text()
@@ -80,6 +80,7 @@ export class StepAnimationsListing extends EventTarget
     public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes, skeleton_type)
     {
         this.skinned_meshes_to_animate = final_skinned_meshes
+        this.skeleton_type = skeleton_type
 
         let animations_to_load_filepath: string = ''
         switch(skeleton_type)
@@ -261,7 +262,10 @@ export class StepAnimationsListing extends EventTarget
 
         this.fbx_animation_loader.load(fbx_file, (fbx) => {
 
-            const animations_for_scene = fbx.animations; // we only need the animations
+            let animations_for_scene = fbx.animations; // we only need the animations
+
+            // check to see if the animation is a mixamo skeleton. we will need this later for potential mapping
+            const is_mixamo_animation = animations_for_scene[0].name === 'mixamo.com';
 
             // if name is just a website, update it so it is slightly more informative
             animations_for_scene.forEach((animation_clip, index) => {
@@ -270,6 +274,42 @@ export class StepAnimationsListing extends EventTarget
                     animation_clip.name = `${file_name} (${ index.toString() })`;
                 }
             })
+
+            // if we are, but we are using a simplified skeleton, we need to map the values to the correct bones
+            if(is_mixamo_animation && this.skeleton_type === SkeletonType.BipedalSimple)
+            {
+                // loop through each animation clip to update the tracks
+                animations_for_scene.forEach((animation_clip) => {
+                    animation_clip.tracks.forEach((track) => {
+
+                        // get the track name and replace it with our simplfied mapping
+                        const mixamo_bone_name = track.name.split('.')[0];
+                        const keyframe_type = track.name.split('.')[1];
+
+                        const is_mappping_found = MixamoToSimpleMapping[mixamo_bone_name];
+
+                        if (is_mappping_found)
+                        {
+                            track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type;
+
+
+                            // TODO: if track is a position track, we need to scale everything based off
+                            // how much we imported the model at. Otherwise the position movement will be multiplied
+
+                        }
+                   
+                    })
+
+                    console.log(animations_for_scene)
+
+
+                    // filter out any tracks that contain the word mixamorig in it
+                    // we don't need those since we are using a simplified skeleton
+                    animation_clip.tracks = animation_clip.tracks.filter(x => x.name.indexOf('mixamorig') < 0);
+
+                });
+
+            }
 
             // add the animations to the animation_clips_loaded
             // update the UI with the new animation clips
