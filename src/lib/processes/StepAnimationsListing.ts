@@ -1,6 +1,7 @@
 import { UI } from '../UI.js';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 import { AnimationClip, AnimationMixer, Quaternion, Vector3 } from 'three';
 import { SkeletonType } from '../enums/SkeletonType.js';
@@ -14,8 +15,10 @@ export class StepAnimationsListing extends EventTarget
 {
     private ui: UI;
     private animation_clips_loaded: AnimationClip[] = []
-    private animation_loader: GLTFLoader;
-    private animation_mixer: AnimationMixer = null;
+    private gltf_animation_loader: GLTFLoader;
+    private fbx_animation_loader: FBXLoader;
+
+    private animation_mixer: AnimationMixer;
     private skinned_meshes_to_animate: SkinnedMesh[] = []
     private current_playing_index: number = 0
 
@@ -76,10 +79,9 @@ export class StepAnimationsListing extends EventTarget
 
     public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes, skeleton_type)
     {
-        this.animation_loader = new GLTFLoader();
         this.skinned_meshes_to_animate = final_skinned_meshes
 
-        let animations_to_load_filepath = null
+        let animations_to_load_filepath: string = ''
         switch(skeleton_type)
         {
             case SkeletonType.BipedalSimple:
@@ -93,7 +95,8 @@ export class StepAnimationsListing extends EventTarget
                 break;
         }
 
-        this.animation_loader.load(animations_to_load_filepath, (gltf) => {
+        this.gltf_animation_loader = new GLTFLoader();
+        this.gltf_animation_loader.load(animations_to_load_filepath, (gltf) => {
 
             // remove the animation position keyframes. That will mess up the skinning
             // process since we will be offsetting and moving the bone root positions
@@ -218,39 +221,31 @@ export class StepAnimationsListing extends EventTarget
             });
         }
 
-        this.ui.dom_import_animations_button.addEventListener('change', (event) => {
-            const file = event.target.files[0];
+        this.ui.dom_import_animations_button?.addEventListener('change', (event) => {
+            const file = event.target?.files[0];
             const reader = new FileReader();
             reader.readAsDataURL(file);
 
-            console.log('loading more files')
-        
+            // extract filename from the file path
+            const file_name = file.name.split('.').shift();
+            const file_extension = file.name.split('.').pop();
+
             reader.onload = () => {
-               var animations_import = reader.result
+               var file_info = reader.result
 
-               this.loader = new GLTFLoader();
-               this.loader.load(animations_import, (gltf) => {
-
-                    const animations_for_scene = gltf.animations; // we only need the animations
-
-                    // make sure the animations are compatible with the skeleton
-                    // TODO: figure out what type of validation I could do with this
-
-                    // add the animations to the animation_clips_loaded
-                    // update the UI with the new animation clips
-                    this.append_animation_clips(animations_for_scene)
-                    this.ui.build_animation_clip_ui(this.animation_clips_loaded);
-
-                    // clear out the file input field in case we want to test by loading same file again
-                    this.ui.dom_import_animations_button.value = '';
-
-                });
-
+               if(file_extension === 'fbx')
+               {
+                   this.load_fbx_animation_clips(file_info, file_name)
+               }
+               else if(file_extension === 'glb' || file_extension === 'gltf')
+               {
+                    this.load_gltf_animation_clips(file_info)
+               }
             };
         
         });
 
-        this.ui.dom_extend_arm_button.addEventListener('click', (event) => {
+        this.ui.dom_extend_arm_button?.addEventListener('click', (event) => {
 
             let extend_arm_value = this.ui.dom_extend_arm_input.value
             this.extend_arm_animations_by_percentage(extend_arm_value)
@@ -258,6 +253,57 @@ export class StepAnimationsListing extends EventTarget
             this.play_animation(this.current_playing_index)
 
         })
+    }
+
+    private load_fbx_animation_clips(fbx_file, file_name)
+    {
+        this.fbx_animation_loader = new FBXLoader();
+
+        this.fbx_animation_loader.load(fbx_file, (fbx) => {
+
+            const animations_for_scene = fbx.animations; // we only need the animations
+
+            // if name is just a website, update it so it is slightly more informative
+            animations_for_scene.forEach((animation_clip, index) => {
+                if(animation_clip.name.indexOf('.com') > -1)
+                {
+                    animation_clip.name = `${file_name} (${ index.toString() })`;
+                }
+            })
+
+            // add the animations to the animation_clips_loaded
+            // update the UI with the new animation clips
+            this.append_animation_clips(animations_for_scene)
+            this.ui.build_animation_clip_ui(this.animation_clips_loaded);
+
+            // clear out the file input field in case we want to test by loading same file again
+            this.ui.dom_import_animations_button.value = '';
+        });
+
+    }
+
+    private load_gltf_animation_clips(gltf_file)
+    {
+        this.gltf_animation_loader = new GLTFLoader();
+
+        this.gltf_animation_loader.load(gltf_file, (gltf) => {
+
+            const animations_for_scene = gltf.animations; // we only need the animations
+
+            // make sure the animations are compatible with the skeleton
+            // TODO: figure out what type of validation I could do with this
+
+            // add the animations to the animation_clips_loaded
+            // update the UI with the new animation clips
+            this.append_animation_clips(animations_for_scene)
+            this.ui.build_animation_clip_ui(this.animation_clips_loaded);
+
+            // clear out the file input field in case we want to test by loading same file again
+            this.ui.dom_import_animations_button.value = '';
+
+        });
+
+
     }
 
     private removeEventListeners()
