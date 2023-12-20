@@ -203,7 +203,6 @@ function process_step_changed(process_step)
 
   // clean up any event listeners from the previous steps
   edit_skeleton_step.removeEventListeners()
-  animations_listing_step.removeEventListeners()
 
   switch(process_step)
   {

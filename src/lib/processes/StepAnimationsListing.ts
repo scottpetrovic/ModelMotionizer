@@ -24,6 +24,8 @@ export class StepAnimationsListing extends EventTarget
     private current_playing_index: number = 0
     private skeleton_type: string = SkeletonType.BipedalSimple;
 
+    private has_added_event_listeners: boolean = false
+
     constructor() 
     {
         super();
@@ -211,6 +213,11 @@ export class StepAnimationsListing extends EventTarget
 
     private addEventListeners(): void
     {
+        if(this.has_added_event_listeners)
+        {
+            return
+        }
+
         // event listener for animation clip list with changing the current animation
         if (this.ui.dom_animation_clip_list) {
             this.ui.dom_animation_clip_list.addEventListener('click', (event) => {
@@ -257,6 +264,9 @@ export class StepAnimationsListing extends EventTarget
             this.play_animation(this.current_playing_index)
 
         })
+
+        // helps ensure we don't add event listeners multiple times
+        this.has_added_event_listeners = true
     }
 
     private load_fbx_animation_clips(fbx_file, file_name: string): void
@@ -344,11 +354,6 @@ export class StepAnimationsListing extends EventTarget
         });
 
 
-    }
-
-    private removeEventListeners()
-    {
-        this.ui.dom_animation_clip_list.removeEventListener('click', () => {});
     }
 
     private append_animation_clips(animation_clips)
