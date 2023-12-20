@@ -242,6 +242,9 @@ export class StepAnimationsListing extends EventTarget
                {
                     this.load_gltf_animation_clips(file_info)
                }
+
+               // clear out the file input field in case we want to test by loading same file again
+               this.ui.dom_import_animations_button.value = '';
             };
         
         });
@@ -256,73 +259,74 @@ export class StepAnimationsListing extends EventTarget
         })
     }
 
-    private load_fbx_animation_clips(fbx_file, file_name)
+    private load_fbx_animation_clips(fbx_file, file_name: string): void
     {
         this.fbx_animation_loader = new FBXLoader();
 
         this.fbx_animation_loader.load(fbx_file, (fbx) => {
 
-            let animations_for_scene = fbx.animations; // we only need the animations
+            let animations_for_scene: AnimationClip[] = fbx.animations; // we only need the animations
 
             // check to see if the animation is a mixamo skeleton. we will need this later for potential mapping
-            const is_mixamo_animation = animations_for_scene[0].name === 'mixamo.com';
+            const is_mixamo_animation: boolean = animations_for_scene[0].name === 'mixamo.com';
 
-            // if name is just a website, update it so it is slightly more informative
-            animations_for_scene.forEach((animation_clip, index) => {
-                if(animation_clip.name.indexOf('.com') > -1)
-                {
-                    animation_clip.name = `${file_name} (${ index.toString() })`;
-                }
-            })
-
-            // if we are, but we are using a simplified skeleton, we need to map the values to the correct bones
-            if(is_mixamo_animation && this.skeleton_type === SkeletonType.BipedalSimple)
+            if(is_mixamo_animation)
             {
-                // loop through each animation clip to update the tracks
-                animations_for_scene.forEach((animation_clip) => {
-                    animation_clip.tracks.forEach((track) => {
-
-                        // get the track name and replace it with our simplfied mapping
-                        const mixamo_bone_name = track.name.split('.')[0];
-                        const keyframe_type = track.name.split('.')[1];
-
-                        const is_mappping_found = MixamoToSimpleMapping[mixamo_bone_name];
-
-                        if (is_mappping_found)
-                        {
-                            track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type;
-
-                            // if we are a position track, we need to set to divide by 100
-                            if(keyframe_type === 'position')
-                            {            
-                                (track.values as Float32Array).forEach((value, index) => {
-                                    track.values[index] = value / 200
-                                })
-                            }
-                        }
-                   
-                    })
-
-                    console.log(animations_for_scene)
-
-
-                    // filter out any tracks that contain the word mixamorig in it
-                    // we don't need those since we are using a simplified skeleton
-                    animation_clip.tracks = animation_clip.tracks.filter(x => x.name.indexOf('mixamorig') < 0);
-
-                });
-
+                // mutates animations_for_scene contents
+                this.process_mixamo_animation_clips(animations_for_scene, file_name)
             }
 
             // add the animations to the animation_clips_loaded
             // update the UI with the new animation clips
             this.append_animation_clips(animations_for_scene)
             this.ui.build_animation_clip_ui(this.animation_clips_loaded);
-
-            // clear out the file input field in case we want to test by loading same file again
-            this.ui.dom_import_animations_button.value = '';
         });
 
+    }
+
+    private process_mixamo_animation_clips(animation_clips: AnimationClip[], file_name: string): void
+    {
+        const using_simplified_skeleton: boolean = this.skeleton_type === SkeletonType.BipedalSimple;
+
+        // loop through each animation clip to update the tracks
+        animation_clips.forEach((animation_clip, index) => {
+
+            animation_clip.name = `${file_name} (${ index.toString() })`; // mixamo just calles the clip names 'mixamo.com'
+
+            // get the track name and replace it with our simplfied mapping
+            animation_clip.tracks.forEach((track) => {
+
+                const mixamo_bone_name = track.name.split('.')[0];
+                const keyframe_type = track.name.split('.')[1];
+
+                // selected skeleton is a simplified mixamo skeleton. We need to map bone names
+                if(using_simplified_skeleton)
+                {
+                    const is_mappping_found = MixamoToSimpleMapping[mixamo_bone_name];
+                    if (is_mappping_found)
+                    {
+                        track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type;
+                    }
+                }
+
+                // Mixamo has 1 unit = 1cm. We need to scale position data to compensate for that
+                // the 200 value is arbitrary, but the results seem to look good, so I went with that.
+                if(keyframe_type === 'position')
+                {
+                    (track.values as Float32Array).forEach((value, index) => {
+                        track.values[index] = value / 200
+                    })
+                }
+            })
+
+            // with the simple skeleton, there are many bones that are not used from the full mixamo animation
+            // remove unmapped bones since they won't be used
+            if(using_simplified_skeleton)
+            {
+                animation_clip.tracks = animation_clip.tracks.filter(x => x.name.indexOf('mixamorig') < 0);
+            }
+        });
+            
     }
 
     private load_gltf_animation_clips(gltf_file)
@@ -333,17 +337,10 @@ export class StepAnimationsListing extends EventTarget
 
             const animations_for_scene = gltf.animations; // we only need the animations
 
-            // make sure the animations are compatible with the skeleton
-            // TODO: figure out what type of validation I could do with this
-
             // add the animations to the animation_clips_loaded
             // update the UI with the new animation clips
             this.append_animation_clips(animations_for_scene)
             this.ui.build_animation_clip_ui(this.animation_clips_loaded);
-
-            // clear out the file input field in case we want to test by loading same file again
-            this.ui.dom_import_animations_button.value = '';
-
         });
 
 
