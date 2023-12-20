@@ -292,10 +292,13 @@ export class StepAnimationsListing extends EventTarget
                         {
                             track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type;
 
-
-                            // TODO: if track is a position track, we need to scale everything based off
-                            // how much we imported the model at. Otherwise the position movement will be multiplied
-
+                            // if we are a position track, we need to set to divide by 100
+                            if(keyframe_type === 'position')
+                            {            
+                                (track.values as Float32Array).forEach((value, index) => {
+                                    track.values[index] = value / 200
+                                })
+                            }
                         }
                    
                     })
@@ -381,7 +384,7 @@ export class StepAnimationsListing extends EventTarget
             return new AnimationClip(animation_clip.name, animation_clip.duration, filteredTracks);
         });
 
-        return filtered_tracks
+        return animation_clips
     }
 
     private deep_clone_animation_clips(animation_clips)
