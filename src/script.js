@@ -9,7 +9,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { UI } from './lib/UI.ts'
 
 import { StepLoadModel } from './lib/processes/StepLoadModel.ts'
-import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.js'
+import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.ts'
 import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.ts'
 import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts'
 import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
