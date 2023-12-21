@@ -1,0 +1,29 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "standard-with-typescript",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "default",
+                "format": ["snake_case"]
+            },
+            {
+                "selector": "class",
+                "format": ["PascalCase"]
+            } 
+        ],
+        "indent": "off",
+        "keyword-spacing": "off",
+        "brace-style": "off",
+        "@typescript-eslint/brace-style": "error"
+    }
+
+}

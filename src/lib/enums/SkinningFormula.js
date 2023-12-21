@@ -1,5 +1,5 @@
 export const SkinningFormula = {
-    Distance: 'distance',
-    MedianDistance: 'median-distance',
-    Envelope: 'envelope'
-  };
+  Distance: 'distance',
+  MedianDistance: 'median-distance',
+  Envelope: 'envelope'
+}

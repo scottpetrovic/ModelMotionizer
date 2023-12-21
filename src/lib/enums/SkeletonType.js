@@ -4,4 +4,4 @@ export const SkeletonType = {
   Quadraped: 'skeletons/skeleton-quadraped.glb',
   BipedalSimple: 'skeletons/skeleton-bipedal-simple.glb',
   BipedalFull: 'skeletons/skeleton-mecanim-full.glb',
-};
+}

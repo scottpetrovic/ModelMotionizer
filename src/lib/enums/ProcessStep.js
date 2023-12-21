@@ -5,10 +5,9 @@ export const ProcessStep = {
   WeightSkin: 'weight-skin',
   AnimationsListing: 'animations-export',
   StepExportToFile: 'export-to-file'
-};
+}
 
 export const step_data = [
-  
   {
     name: ProcessStep.LoadModel,
     index: 0,
@@ -50,6 +49,6 @@ export const step_data = [
     title: 'Export to File',
     description: 'Export to File',
     instructions: 'Export to File',
-  },
-  
+  }
+
 ]
