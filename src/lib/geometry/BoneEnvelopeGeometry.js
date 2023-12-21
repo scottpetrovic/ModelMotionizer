@@ -1,9 +1,11 @@
 import { BufferGeometry } from 'three/src/core/BufferGeometry.js'
 import { BufferAttribute } from 'three/src/core/BufferAttribute.js'
-import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 class BoneEnvelopeGeometry {
-  constructor () 
+  constructor ()
   {
     let geometry = new BufferGeometry()
     geometry.type = 'BoneEnvelopeGeometry'
@@ -118,7 +120,7 @@ class BoneEnvelopeGeometryUtils
     // X-Positive Bottom Left indexed vertex
     geometry.attributes.position.array[9] += x
     geometry.attributes.position.array[10] += y
-    geometry.attributes.position.array[11] += z	
+    geometry.attributes.position.array[11] += z
   }
 
   static move_x_pos_bottom_right(geometry, x, y, z)
@@ -126,7 +128,7 @@ class BoneEnvelopeGeometryUtils
     // X-Positive Bottom Right indexed vertex
     geometry.attributes.position.array[12] += x
     geometry.attributes.position.array[13] += y
-    geometry.attributes.position.array[14] += z	
+    geometry.attributes.position.array[14] += z
   }
 
   static move_x_pos_top_right(geometry, x, y, z)
@@ -134,7 +136,7 @@ class BoneEnvelopeGeometryUtils
     // X-Positive Top Right indexed vertex
     geometry.attributes.position.array[21] += x
     geometry.attributes.position.array[22] += y
-    geometry.attributes.position.array[23] += z	
+    geometry.attributes.position.array[23] += z
   }
 }
 

@@ -12,7 +12,7 @@ import { StepLoadModel } from './lib/processes/StepLoadModel.js'
 import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.js'
 import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.ts'
 import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts'
-import { StepExportToFile } from './lib/processes/StepExportToFile.js'
+import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.js'
 
 import { ProcessStep } from './lib/enums/ProcessStep.js'
