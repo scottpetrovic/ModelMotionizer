@@ -1,4 +1,4 @@
-import { UI } from '../UI.js'
+import { UI } from '../UI.ts'
 import * as THREE from 'three'
 import { Box3 } from 'three/src/math/Box3.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'

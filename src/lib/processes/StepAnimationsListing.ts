@@ -1,4 +1,4 @@
-import { UI } from '../UI.js'
+import { UI } from '../UI.ts'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
@@ -9,8 +9,7 @@ import { SkeletonType } from '../enums/SkeletonType.js'
 import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
-export class StepAnimationsListing extends EventTarget
-{
+export class StepAnimationsListing extends EventTarget {
   private readonly ui: UI
   private animation_clips_loaded: AnimationClip[] = []
   private gltf_animation_loader: GLTFLoader = new GLTFLoader()
@@ -28,20 +27,16 @@ export class StepAnimationsListing extends EventTarget
     this.ui = new UI()
   }
 
-  public begin (): void 
-  {
-    if (this.ui.dom_current_step_index != null)
-    {
+  public begin (): void {
+    if (this.ui.dom_current_step_index != null) {
       this.ui.dom_current_step_index.innerHTML = '4'
     }
 
-    if (this.ui.dom_current_step_element != null)
-    {
+    if (this.ui.dom_current_step_element != null) {
       this.ui.dom_current_step_element.innerHTML = 'Test animations'
     }
 
-    if (this.ui.dom_skinned_mesh_tools != null)
-    {
+    if (this.ui.dom_skinned_mesh_tools != null) {
       this.ui.dom_skinned_mesh_tools.style.display = 'flex'
     }
 
@@ -52,8 +47,7 @@ export class StepAnimationsListing extends EventTarget
     this.add_event_listeners()
   }
 
-  public instructions_text (): string
-  {
+  public instructions_text (): string {
     return `<div>Instructions</div> 
         <div>Test and export animations to GLB format</div>
                 <ol>
@@ -63,24 +57,20 @@ export class StepAnimationsListing extends EventTarget
                 </ol>`
   }
 
-  public mixer (): AnimationMixer
-  {
+  public mixer (): AnimationMixer {
     return this.animation_mixer
   }
 
-  public animation_clips(): AnimationClip[]
-  {
+  public animation_clips(): AnimationClip[] {
     return this.animation_clips_loaded
   }
 
-  public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes: SkinnedMesh[], skeleton_type: string): void
-  {
+  public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes: SkinnedMesh[], skeleton_type: string): void {
     this.skinned_meshes_to_animate = final_skinned_meshes
     this.skeleton_type = skeleton_type
 
     let animations_to_load_filepath: string = ''
-    switch (skeleton_type)
-    {
+    switch (skeleton_type) {
       case SkeletonType.BipedalSimple:
         animations_to_load_filepath = 'animations/character-simple-multiple.glb'
         break
@@ -109,15 +99,13 @@ export class StepAnimationsListing extends EventTarget
     })
   }
 
-  private extend_arm_animations_by_percentage(percentage: number): void
-  {
+  private extend_arm_animations_by_percentage(percentage: number): void {
     // loop through each animation clip to update the tracks
     this.animation_clips_loaded.forEach((animation_clip: AnimationClip) => {
       animation_clip.tracks.forEach((track: KeyframeTrack) => {
         // if our name does not contain 'quaternion', we need to exit
         // since we are only modifying the quaternion tracks (e.g. L_Arm.quaternion )
-        if (track.name.indexOf('quaternion') < 0)
-        {
+        if (track.name.indexOf('quaternion') < 0) {
           return
         }
 
@@ -125,13 +113,11 @@ export class StepAnimationsListing extends EventTarget
 
         // if the track is an upper arm bone, then modify that
         const track_name_to_match: string = '_Arm' // for simplified human skeleton
-        if (quaterion_track.name.indexOf(track_name_to_match) > -1)
-        {
+        if (quaterion_track.name.indexOf(track_name_to_match) > -1) {
           const new_track_values: Float32Array = quaterion_track.values.slice() // clone array
 
           const track_count: number = quaterion_track.times.length
-          for (let i = 0; i < track_count; i++)
-          {
+          for (let i = 0; i < track_count; i++) {
             // get correct value since it is a quaternion
             const units_in_quaternions: number = 4
             const quaternion: Quaternion = new Quaternion()
@@ -161,8 +147,7 @@ export class StepAnimationsListing extends EventTarget
     })
   }
 
-  private play_animation(index: number = 0): void
-  {
+  private play_animation(index: number = 0): void {
     this.current_playing_index = index
 
     // animation mixer has internal cache with animations. doing this helps clear it
@@ -178,23 +163,19 @@ export class StepAnimationsListing extends EventTarget
     })
   }
 
-  private load_animation_clips(animation_clips: AnimationClip[]): void
-  {
+  private load_animation_clips(animation_clips: AnimationClip[]): void {
     this.animation_clips_loaded = this.remove_position_and_scale_keyframes_from_animations(animation_clips)
   }
 
-  private add_event_listeners(): void
-  {
-    if (this.has_added_event_listeners)
-    {
+  private add_event_listeners(): void {
+    if (this.has_added_event_listeners) {
       return
     }
 
     // event listener for animation clip list with changing the current animation
     if (this.ui.dom_animation_clip_list != null) {
       this.ui.dom_animation_clip_list.addEventListener('click', (event) => {
-        if ((event.target != null) && event.target.tagName === 'BUTTON')
-        {
+        if ((event.target != null) && event.target.tagName === 'BUTTON') {
           const animation_index: number = event.target.getAttribute('data-index')
           this.play_animation(animation_index)
         }
@@ -216,12 +197,9 @@ export class StepAnimationsListing extends EventTarget
         // even the binary data comes in as string, so treat it all that way for now
         const file_info: string = reader.result
 
-        if (file_extension === 'fbx')
-        {
+        if (file_extension === 'fbx') {
           this.load_fbx_animation_clips(file_info, file_name)
-        }
-        else if (file_extension === 'glb' || file_extension === 'gltf')
-        {
+        } else if (file_extension === 'glb' || file_extension === 'gltf') {
           this.load_gltf_animation_clips(file_info)
         }
 
@@ -240,8 +218,7 @@ export class StepAnimationsListing extends EventTarget
     this.has_added_event_listeners = true
   }
 
-  private load_fbx_animation_clips(fbx_file: string, file_name: string): void
-  {
+  private load_fbx_animation_clips(fbx_file: string, file_name: string): void {
     this.fbx_animation_loader = new FBXLoader()
 
     this.fbx_animation_loader.load(fbx_file, (fbx) => {
@@ -250,8 +227,7 @@ export class StepAnimationsListing extends EventTarget
       // check to see if the animation is a mixamo skeleton. we will need this later for potential mapping
       const is_mixamo_animation: boolean = animations_for_scene[0].name === 'mixamo.com'
 
-      if (is_mixamo_animation)
-      {
+      if (is_mixamo_animation) {
         // mutates animations_for_scene contents
         this.process_mixamo_animation_clips(animations_for_scene, file_name)
       }
@@ -263,8 +239,7 @@ export class StepAnimationsListing extends EventTarget
     })
   }
 
-  private process_mixamo_animation_clips(animation_clips: AnimationClip[], file_name: string): void
-  {
+  private process_mixamo_animation_clips(animation_clips: AnimationClip[], file_name: string): void {
     const using_simplified_skeleton: boolean = this.skeleton_type === SkeletonType.BipedalSimple
 
     // loop through each animation clip to update the tracks
@@ -277,19 +252,16 @@ export class StepAnimationsListing extends EventTarget
         const keyframe_type: string = track.name.split('.')[1]
 
         // selected skeleton is a simplified mixamo skeleton. We need to map bone names
-        if (using_simplified_skeleton)
-        {
+        if (using_simplified_skeleton) {
           const is_mappping_found: boolean = MixamoToSimpleMapping[mixamo_bone_name]
-          if (is_mappping_found)
-          {
+          if (is_mappping_found) {
             track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type
           }
         }
 
         // Mixamo has 1 unit = 1cm. We need to scale position data to compensate for that
         // the 200 value is arbitrary, but the results seem to look good, so I went with that.
-        if (keyframe_type === 'position')
-        {
+        if (keyframe_type === 'position') {
           (track.values as Float32Array).forEach((value, index) => {
             track.values[index] = value / 200
           })
@@ -298,15 +270,13 @@ export class StepAnimationsListing extends EventTarget
 
       // with the simple skeleton, there are many bones that are not used from the full mixamo animation
       // remove unmapped bones since they won't be used
-      if (using_simplified_skeleton)
-      {
+      if (using_simplified_skeleton) {
         animation_clip.tracks = animation_clip.tracks.filter(x => !x.name.includes('mixamorig'))
       }
     })
   }
 
-  private load_gltf_animation_clips(gltf_file: string): void
-  {
+  private load_gltf_animation_clips(gltf_file: string): void {
     this.gltf_animation_loader = new GLTFLoader()
 
     this.gltf_animation_loader.load(gltf_file, (gltf) => {
@@ -319,8 +289,7 @@ export class StepAnimationsListing extends EventTarget
     })
   }
 
-  private append_animation_clips(animation_clips: AnimationClip[]): void
-  {
+  private append_animation_clips(animation_clips: AnimationClip[]): void {
     // loop through each animation_clip and change name if the animaton name already exists
     // see if the aniation name is already taken.. if so, add a number to the end of the name
     animation_clips.forEach((animation_clip) => {
@@ -328,8 +297,7 @@ export class StepAnimationsListing extends EventTarget
         return animation_clip_loaded.name === animation_clip.name
       })
 
-      if (is_name_found !== undefined)
-      {
+      if (is_name_found !== undefined) {
         animation_clip.name = animation_clip.name + ' Copy'
       }
     })
@@ -337,8 +305,7 @@ export class StepAnimationsListing extends EventTarget
     this.animation_clips_loaded.push(...this.remove_position_and_scale_keyframes_from_animations(animation_clips))
   }
 
-  private remove_position_and_scale_keyframes_from_animations(animation_clip_list: AnimationClip[]): AnimationClip[]
-  {
+  private remove_position_and_scale_keyframes_from_animations(animation_clip_list: AnimationClip[]): AnimationClip[] {
     // Don't use this for now. Maybe delete this function later
 
     const animation_clips = this.deep_clone_animation_clips(animation_clip_list)
@@ -352,8 +319,7 @@ export class StepAnimationsListing extends EventTarget
     return animation_clips
   }
 
-  private deep_clone_animation_clips(animation_clips: AnimationClip[]): AnimationClip[]
-  {
+  private deep_clone_animation_clips(animation_clips: AnimationClip[]): AnimationClip[] {
     return animation_clips.map((clip: AnimationClip) => {
       const tracks = clip.tracks.map(track => track.clone())
       return new AnimationClip(clip.name, clip.duration, tracks)

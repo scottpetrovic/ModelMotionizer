@@ -1,4 +1,4 @@
-import { UI } from '../UI.js'
+import { UI } from '../UI.ts'
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js'
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 

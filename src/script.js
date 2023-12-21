@@ -6,11 +6,11 @@ import { Generators } from './lib/Generators.ts'
 
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 
-import { UI } from './lib/UI.js'
+import { UI } from './lib/UI.ts'
 
 import { StepLoadModel } from './lib/processes/StepLoadModel.js'
 import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.js'
-import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.js'
+import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.ts'
 import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts'
 import { StepExportToFile } from './lib/processes/StepExportToFile.js'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.js'
@@ -177,7 +177,7 @@ function start_skin_weighting_step () {
 
 function process_step_changed (process_step) {
   // we will have the current step turn on the UI elements it needs
-  ui.hideAllElements()
+  ui.hide_all_elements()
 
   // clean up any event listeners from the previous steps
   edit_skeleton_step.removeEventListeners()

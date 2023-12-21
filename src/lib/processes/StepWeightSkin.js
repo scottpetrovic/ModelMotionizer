@@ -1,4 +1,4 @@
-import { UI } from '../UI.js'
+import { UI } from '../UI.ts'
 
 import { BoneWeightsByEnvelope } from '../solvers/BoneWeightsByEnvelope.ts'
 import BoneWeightsByDistance from '../solvers/BoneWeightsByDistance.ts'

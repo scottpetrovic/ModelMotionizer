@@ -1,4 +1,4 @@
-import { UI } from '../UI.js'
+import { UI } from '../UI.ts'
 import { Generators } from '../Generators.ts'
 import { BufferGeometry, Float32BufferAttribute, Mesh, Box3, MeshBasicMaterial } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
