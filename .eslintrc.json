@@ -12,9 +12,10 @@
         "@typescript-eslint/naming-convention": [
             "error",
             {
-                "selector": "default",
+                "selector": "variable",
                 "format": ["snake_case"]
             },
+          
             {
                 "selector": "class",
                 "format": ["PascalCase"]
@@ -22,7 +23,11 @@
             {
                 "selector": "import",
                 "format": ["PascalCase", "snake_case"]
-            } 
+            },
+            {
+                "selector": "enumMember",
+                "format": ["PascalCase"]
+            }  
         ],
         "indent": "off",
         "brace-style": "off",

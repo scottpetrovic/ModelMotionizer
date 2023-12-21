@@ -54,7 +54,9 @@ export class StepExportToFile extends EventTarget {
         }
 
     gltf_exporter.parse(exported_scene, (result) => {
-      if (result instanceof ArrayBuffer) {
+      // I have tried casting this as an ArrayBuffer...but there are problems for some reason
+      // doing this. Maybe come back later to see what is going on
+      if (result) {
         this.save_array_buffer(result, `${file_name}.glb`)
       } else {
         console.log('ERROR: result is not an instance of ArrayBuffer')

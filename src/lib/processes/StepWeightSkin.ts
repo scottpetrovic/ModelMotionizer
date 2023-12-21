@@ -4,7 +4,7 @@ import { BoneWeightsByEnvelope } from '../solvers/BoneWeightsByEnvelope.ts'
 import BoneWeightsByDistance from '../solvers/BoneWeightsByDistance.ts'
 import BoneWeightsByMedianDistance from '../solvers/BoneWeightsByMedianDistance.ts'
 
-import { SkinningFormula } from '../enums/SkinningFormula.js'
+import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
 import { Generators } from '../Generators.ts'
 

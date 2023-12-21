@@ -5,7 +5,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 
 import { AnimationClip, AnimationMixer, Quaternion, Vector3, type SkinnedMesh, type QuaternionKeyframeTrack, type KeyframeTrack, type AnimationAction } from 'three'
 
-import { SkeletonType } from '../enums/SkeletonType.js'
+import { SkeletonType } from '../enums/SkeletonType.ts'
 import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js'
 
 // Note: EventTarget is a built-ininterface and do not need to import it

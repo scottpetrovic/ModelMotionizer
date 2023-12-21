@@ -15,7 +15,7 @@ import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts'
 import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
-import { ProcessStep } from './lib/enums/ProcessStep.js'
+import { ProcessStep } from './lib/enums/ProcessStep.ts'
 
 // Initialize basic sene things that are not related to the main work that is being tested
 const camera = Generators.create_camera()

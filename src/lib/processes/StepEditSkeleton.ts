@@ -1,8 +1,8 @@
 import { UI } from '../UI.ts'
 import { Generators } from '../Generators.ts'
 import { Utility } from '../Utilities.ts'
-import { Vector3, Euler, Object3D, Skeleton, Bone } from 'three'
-import { SkinningFormula } from '../enums/SkinningFormula.js'
+import { Vector3, Euler, Object3D, Skeleton, type Bone } from 'three'
+import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
 export class StepEditSkeleton extends EventTarget {
   private readonly ui: UI
