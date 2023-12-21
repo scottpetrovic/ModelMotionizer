@@ -1,11 +1,11 @@
-import { Bone, BufferGeometry, Object3D, Scene, Vector3 } from 'three'
+import { type Bone, BufferGeometry, type Object3D, type Scene, Vector3 } from 'three'
 import { Utility } from '../Utilities.js'
 import BoneCalculationData from '../models/BoneCalculationData.js'
 
 export default class BoneWeightsByDistance
 {
-  private bones_master_data: Array<BoneCalculationData> = []
-  private geometry: BufferGeometry
+  private readonly bones_master_data: BoneCalculationData[] = []
+  private geometry: BufferGeometry = new BufferGeometry()
   private show_debug: boolean = false
   private bone_idx_test: number = -1
   private debugging_scene_object: Scene

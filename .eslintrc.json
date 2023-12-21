@@ -18,6 +18,10 @@
             {
                 "selector": "class",
                 "format": ["PascalCase"]
+            },
+            {
+                "selector": "import",
+                "format": ["PascalCase", "snake_case"]
             } 
         ],
         "indent": "off",

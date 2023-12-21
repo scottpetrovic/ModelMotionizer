@@ -13,7 +13,7 @@ import { StepLoadSkeleton } from './lib/processes/StepLoadSkeleton.ts'
 import { StepEditSkeleton } from './lib/processes/StepEditSkeleton.ts'
 import { StepAnimationsListing } from './lib/processes/StepAnimationsListing.ts'
 import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
-import { StepWeightSkin } from './lib/processes/StepWeightSkin.js'
+import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.js'
 
@@ -180,7 +180,7 @@ function process_step_changed (process_step) {
   ui.hide_all_elements()
 
   // clean up any event listeners from the previous steps
-  edit_skeleton_step.removeEventListeners()
+  edit_skeleton_step.remove_event_listeners()
 
   switch (process_step) {
     case ProcessStep.LoadModel:
