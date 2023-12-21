@@ -21,7 +21,6 @@
             } 
         ],
         "indent": "off",
-        "keyword-spacing": "off",
         "brace-style": "off",
         "@typescript-eslint/brace-style": "error"
     }

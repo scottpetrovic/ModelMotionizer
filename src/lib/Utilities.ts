@@ -102,7 +102,7 @@ export class Utility {
 
   static intersection_points_between_positions_and_mesh(positions, envelope_mesh) {
     const vertex_positions_inside_bone_envelope: Array<Vector3> = []
-    const vertex_indexes_inside_bone_evelope: Array<number> = []
+    const vertex_indexes_inside_bone_evelope: number[] = []
     const vertex_count: number = positions.array.length / 3
 
     for( let i = 0; i < vertex_count; i++)

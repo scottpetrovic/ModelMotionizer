@@ -11,8 +11,8 @@ import BoneCalculationData from '../models/BoneCalculationData.js';
 export default class BoneWeightsByMedianDistance 
 {
   private geometry: BufferGeometry;
-  private skinIndices: Array<number> = [];
-  private skinWeights: Array<number> = [];
+  private skinIndices: number[] = [];
+  private skinWeights: number[] = [];
   private show_debug: boolean = false;
   private bone_idx_test: number = -1;
   private bones_master_data: Array<BoneCalculationData> = [];
