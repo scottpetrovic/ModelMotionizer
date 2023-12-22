@@ -1,8 +1,12 @@
-import { Vector3, Vector2, Object3D, Mesh, Group, Bone, Skeleton, Euler, Raycaster} from 'three'
+import {
+  Vector3, Vector2, type Object3D, Mesh, Group, Bone, type Skeleton, Euler, Raycaster,
+  type PerspectiveCamera, type Scene, type Object3DEventMap, type BufferAttribute
+} from 'three'
 import BoneTransformState from './models/BoneTransformState'
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Utility {
-  static distance_between_objects(
+  static distance_between_objects (
     object_1: Object3D,
     object_2: Object3D
   ): number {
@@ -21,32 +25,37 @@ export class Utility {
    * @param {*} object
    * @returns local position for object in a Vector3 object
    */
-  static world_position_from_object(object: Object3D): Vector3 {
+  static world_position_from_object (object: Object3D): Vector3 {
     const position: Vector3 = new Vector3()
     return object.getWorldPosition(position)
   }
 
-  static direction_between_points(point_1: Vector3, point_2: Vector3): Vector3 {
-    let direction: Vector3 = new Vector3()
+  static direction_between_points (point_1: Vector3, point_2: Vector3): Vector3 {
+    const direction: Vector3 = new Vector3()
     direction.subVectors(point_2, point_1).normalize()
     return direction
   }
 
-  static is_point_in_box(point: Vector3, box_mesh: Mesh): boolean {
-    //Transform the point from world space into the objects space
+  static is_point_in_box (point: Vector3, box_mesh: Mesh): boolean {
+    if (box_mesh.geometry.boundingBox === null) {
+      console.warn('is_point_in_box() - box_mesh does not have a bounding box')
+      return false
+    }
+
+    // Transform the point from world space into the objects space
     box_mesh.updateMatrixWorld()
-    let localPt: Vector3 = box_mesh.worldToLocal(point.clone()) 
-    return box_mesh.geometry.boundingBox.containsPoint(localPt)
+    const local_point: Vector3 = box_mesh.worldToLocal(point.clone())
+    return box_mesh.geometry.boundingBox.containsPoint(local_point)
   }
 
-  static remove_object_array(obj: Object3D): void {
+  static remove_object_array (obj: Object3D): void {
     obj.traverse((child: any) => {
       if (child instanceof Mesh) {
         child.geometry.dispose()
 
         for (const key in child.material) {
           const value = child.material[key]
-          if (value && typeof value.dispose === "function") {
+          if (value && typeof value.dispose === 'function') {
             value.dispose()
           }
         }
@@ -56,7 +65,7 @@ export class Utility {
     })
   }
 
-  static remove_object_with_children(obj: Object3D): void {
+  static remove_object_with_children (obj: Object3D): void {
     if (obj.children.length > 0) {
       obj.children.forEach((child) => {
         this.remove_object_with_children(child)
@@ -64,11 +73,11 @@ export class Utility {
     }
 
     if (obj instanceof Mesh) {
-      if (obj.geometry) {
+      if (obj.geometry !== null) {
         obj.geometry.dispose()
       }
 
-      if (obj.material) {
+      if (obj.material !== undefined) {
         if (obj.material.map) {
           obj.material.map.dispose()
         }
@@ -77,14 +86,14 @@ export class Utility {
       }
     }
 
-    if (obj.parent) {
+    if (obj.parent != null) {
       obj.parent.remove(obj)
     }
 
     obj.removeFromParent()
   }
 
-  static bone_list_from_hierarchy(bone_hierarchy: Object3D): Bone[] {
+  static bone_list_from_hierarchy (bone_hierarchy: Object3D): Bone[] {
     if (bone_hierarchy === undefined || bone_hierarchy === null) {
       throw new Error(
         'bone_list_from_hierarchy() - bone_hierarchy parameter is undefined or null'
@@ -100,18 +109,16 @@ export class Utility {
     return bone_list
   }
 
-  static intersection_points_between_positions_and_mesh(positions, envelope_mesh) {
-    const vertex_positions_inside_bone_envelope: Array<Vector3> = []
+  static intersection_points_between_positions_and_mesh (positions: BufferAttribute, envelope_mesh: Mesh) {
+    const vertex_positions_inside_bone_envelope: Vector3[] = []
     const vertex_indexes_inside_bone_evelope: number[] = []
     const vertex_count: number = positions.array.length / 3
 
-    for( let i = 0; i < vertex_count; i++)
-    {
+    for (let i = 0; i < vertex_count; i++) {
       const vertex_position: Vector3 = new Vector3().fromBufferAttribute(positions, i)
       const is_intersecting: boolean = Utility.is_point_in_box(vertex_position, envelope_mesh)
 
-      if(is_intersecting)
-      {
+      if (is_intersecting) {
         vertex_positions_inside_bone_envelope.push(vertex_position)
         vertex_indexes_inside_bone_evelope.push(i)
       }
@@ -127,8 +134,8 @@ export class Utility {
    * @param {*} mouse_event
    * @returns x and y coordinates normalized between -1 and 1
    */
-  static normalized_mouse_position(mouse_event): Vector2 {
-    let mouse: Vector2 = new Vector2()
+  static normalized_mouse_position (mouse_event: MouseEvent): Vector2 {
+    const mouse: Vector2 = new Vector2()
     mouse.x = (mouse_event.clientX / window.innerWidth) * 2 - 1
     mouse.y = -(mouse_event.clientY / window.innerHeight) * 2 + 1
     return mouse
@@ -140,17 +147,19 @@ export class Utility {
    * @param {*} scene
    * @returns
    */
-  static regenerate_debugging_scene(scene): Group {
-    const debugging_object_name: string = "Skinning Debug Container"
+  static regenerate_debugging_scene (scene: Scene): Group {
+    const debugging_object_name: string = 'Skinning Debug Container'
 
     // clear out debugging container if it exists
-    const existing_debugging_container: Object3D = scene.getObjectByName(
+    const existing_debugging_container: Object3D<Object3DEventMap> | undefined = scene.getObjectByName(
       debugging_object_name
     )
-    if (existing_debugging_container) {
+    if (existing_debugging_container !== undefined) {
       this.remove_object_array(existing_debugging_container)
       existing_debugging_container.clear()
       scene.remove(existing_debugging_container)
+    } else {
+      console.warn('regenerate_debugging_scene() error - debugging container does not exist')
     }
 
     // add a reusable container for debugging
@@ -160,13 +169,15 @@ export class Utility {
     return debugging_scene_object
   }
 
-  static store_bone_transforms(skeleton: Skeleton): Array<BoneTransformState> {
-    const bone_transforms: Array<BoneTransformState> = []
+  static store_bone_transforms (skeleton: Skeleton): BoneTransformState[] {
+    const bone_transforms: BoneTransformState[] = []
     skeleton.bones.forEach((bone) => {
+      const new_rotation: Vector3 = new Vector3().setFromEuler(bone.rotation)
+
       const new_transform_state = new BoneTransformState(
         bone.name,
         bone.position.clone(),
-        bone.rotation.clone(),
+        new_rotation,
         bone.scale.clone()
       )
       bone_transforms.push(new_transform_state)
@@ -175,10 +186,10 @@ export class Utility {
     return bone_transforms
   }
 
-  static restore_bone_transforms(
+  static restore_bone_transforms (
     skeleton: Skeleton,
-    original_bone_transforms: Array<BoneTransformState>
-  ) {
+    original_bone_transforms: BoneTransformState[]
+  ): void {
     original_bone_transforms.forEach((bone_transform) => {
       const bone: Bone | null =
         skeleton.bones.find((bone) => bone.name === bone_transform.name) ??
@@ -186,7 +197,7 @@ export class Utility {
 
       if (bone !== null) {
         bone.position.copy(bone_transform.position)
-        let euler = new Euler()
+        const euler: Euler = new Euler()
         euler.setFromVector3(bone_transform.rotation)
         bone.rotation.copy(euler)
         bone.scale.copy(bone_transform.scale)
@@ -194,51 +205,46 @@ export class Utility {
     })
   }
 
-  static calculate_bone_base_name(bone_name) {
+  static calculate_bone_base_name (bone_name: string): string {
     return bone_name
-      .replace("mixamorig_", "")
-      .replace(/(Right|Right_|R_|_Right|_R|Left|Left_|_Left|L_)/g, "")
+      .replace('mixamorig_', '')
+      .replace(/(Right|Right_|R_|_Right|_R|Left|Left_|_Left|L_)/g, '')
   }
 
-  static raycast_closest_bone_test(camera, mouse_event, skeleton)
-  {
+  static raycast_closest_bone_test (camera: PerspectiveCamera, mouse_event: MouseEvent, skeleton: Skeleton): Array<number | null> {
     // Find the closest bone for raycaster. Select that
-    let raycaster = new Raycaster()
+    const raycaster: Raycaster = new Raycaster()
     raycaster.setFromCamera(Utility.normalized_mouse_position(mouse_event), camera)
-    let closestBone = null
-    let closestBoneIndex = 0
-    let closestDistance = Infinity
- 
+    let closest_bone = null
+    let closest_bone_index = 0
+    let closest_distance = Infinity
+
     skeleton.bones.forEach((bone, bone_index) => {
-      let worldPosition = Utility.world_position_from_object(bone)
-      let target = new Vector3()
-      let point = raycaster.ray.closestPointToPoint(worldPosition, target)
-      let distance = point.distanceTo(worldPosition)
- 
-      if (distance < closestDistance) {
-        closestBone = bone
-        closestDistance = distance
-        closestBoneIndex = bone_index
+      const world_position = Utility.world_position_from_object(bone)
+      const target = new Vector3()
+      const point = raycaster.ray.closestPointToPoint(world_position, target)
+      const distance = point.distanceTo(world_position)
+
+      if (distance < closest_distance) {
+        closest_bone = bone
+        closest_distance = distance
+        closest_bone_index = bone_index
       }
     })
- 
-    return [closestBone, closestBoneIndex, closestDistance]
+
+    const output = [closest_bone, closest_bone_index, closest_distance]
+    return output
   }
 
-  static scale_armature_by_scalar(armature, scalar)
-  {
+  static scale_armature_by_scalar (armature: Object3D, scalar: number): void {
     armature.traverse((bone) => {
-      if(bone.type === 'Bone')
-      {
+      if (bone.type === 'Bone') {
         bone.position.multiplyScalar(scalar)
       }
     })
-  
   }
 
-  static clean_bone_name_for_messaging(bone_name: string): string
-  {
+  static clean_bone_name_for_messaging (bone_name: string): string {
     return bone_name.replace('mixamorig_', '')
   }
- 
 }

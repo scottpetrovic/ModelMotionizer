@@ -16,6 +16,7 @@ import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.ts'
+import { type Bone, Group, Scene, type Skeleton, type Vector3, type SkeletonHelper, type Points } from 'three'
 
 // Initialize basic sene things that are not related to the main work that is being tested
 const camera = Generators.create_camera()
@@ -29,11 +30,11 @@ document.body.appendChild(renderer.domElement)
 
 // center orbit controls around mid-section area with target change
 const controls = new OrbitControls(camera, renderer.domElement)
-controls.target.set(0, 0.9,0)
+controls.target.set(0, 0.9, 0)
 controls.update()
 
 // setup transform controls to eventually test out differnt bone rotations
-let transformControls = new TransformControls(camera, renderer.domElement)
+const transform_controls = new TransformControls(camera, renderer.domElement)
 let is_transform_controls_dragging = false
 
 // has UI elements on the HTML page that we will reference/use
@@ -45,11 +46,11 @@ const weight_skin_step = new StepWeightSkin()
 const animations_listing_step = new StepAnimationsListing()
 const file_export_step = new StepExportToFile()
 
-const scene = new THREE.Scene()
-scene.add(transformControls)
+const scene: Scene = new Scene()
+scene.add(transform_controls)
 
 // basic things in another group, to better isolate what we are working on
-const environment_container = new THREE.Group()
+const environment_container: Group = new Group()
 environment_container.name = 'Setup objects'
 environment_container.add(...Generators.create_default_lights())
 environment_container.add(...Generators.create_grid_helper())
@@ -61,17 +62,17 @@ const fog_color = 0x0d2525
 scene.fog = new THREE.Fog(fog_color, fog_near, fog_far)
 
 // for looking at specific bones
-let skeleton_helper
-let debugging_visual_object = null
-let process_step = null
+let skeleton_helper: SkeletonHelper
+let debugging_visual_object: Group = new Group()
+let process_step: ProcessStep = ProcessStep.LoadModel
 
 const clock = new THREE.Clock()
 
 process_step = process_step_changed(ProcessStep.LoadModel)
 
-function regenerate_skeleton_helper (new_skeleton, helper_name = 'Skeleton Helper') {
+function regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
   // if skeleton helper exists...remove it
-  if (skeleton_helper) {
+  if (skeleton_helper !== undefined) {
     scene.remove(skeleton_helper)
   }
 
@@ -80,33 +81,38 @@ function regenerate_skeleton_helper (new_skeleton, helper_name = 'Skeleton Helpe
   scene.add(skeleton_helper)
 }
 
-function handle_transform_controls_moving () {
+function handle_transform_controls_moving (): void {
   if (edit_skeleton_step.is_mirror_mode_enabled()) {
-    const selected_bone = transformControls.object
-    edit_skeleton_step.apply_mirror_mode(selected_bone, transformControls.getMode())
+    const selected_bone: Bone = transform_controls.object as Bone
+    edit_skeleton_step.apply_mirror_mode(selected_bone, transform_controls.getMode())
   }
 }
 
-function show_skin_failure_message (bones_with_errors) {
+function show_skin_failure_message (bones_with_errors: Vector3[]): void {
   // add the bone vertices as sphere to debugging object
-  const sphere_failures = Generators.create_spheres_for_points(bones_with_errors, 0.02, 0xff0000)
+  const sphere_failures: Points = Generators.create_spheres_for_points(bones_with_errors, 0.02, 0xff0000)
   debugging_visual_object.add(sphere_failures)
 
   // add information to the info panel
+  if (ui.dom_info_panel === null) {
+    console.warn('There was a skin failure, but the UI Info panel DOM element is not set to show the message.')
+    return
+  }
+
   ui.dom_info_panel.innerHTML = 'Some bones are outside the mesh. Fix them up and try to bind again'
   ui.dom_info_panel.innerHTML += '<br>'
 
   // display the bones names in an HTML list
   let bones_error_list = '<ol id="bone-list">'
   bones_with_errors.forEach((bone) => {
-    bones_error_list += `<li>${ Utility.clean_bone_name_for_messaging(bone) }</li>`
+    bones_error_list += `<li>${Utility.clean_bone_name_for_messaging(bone)}</li>`
   })
 
   bones_error_list += '</ol>'
   ui.dom_info_panel.innerHTML += bones_error_list
 }
 
-function test_bone_weighting_success () {
+function test_bone_weighting_success (): boolean {
   debugging_visual_object = Utility.regenerate_debugging_scene(scene) // clear out the debugging scene
 
   weight_skin_step.create_bone_formula_object(edit_skeleton_step.armature(), edit_skeleton_step.algorithm())
@@ -122,10 +128,10 @@ function test_bone_weighting_success () {
   let testing_geometry_success = true
   load_model_step.models_geometry_list().forEach((mesh_geometry, index) => {
     weight_skin_step.set_mesh_geometry(mesh_geometry)
-    const [bone_names_failing_skin_test, bone_positions_failing_skin_test] = weight_skin_step.test_geometry()
+    const [bone_names_failing_skin_test] = weight_skin_step.test_geometry()
 
     if (bone_names_failing_skin_test.length > 0) {
-      let names_with_object_index = bone_names_failing_skin_test.map((bone_name) => bone_name + ` (${mesh_geometry.name})`)
+      const names_with_object_index = bone_names_failing_skin_test.map((bone_name) => bone_name + ` (${mesh_geometry.name})`)
       show_skin_failure_message(names_with_object_index)
       testing_geometry_success = false
     }
@@ -138,7 +144,7 @@ function test_bone_weighting_success () {
   return true
 }
 
-function start_skin_weighting_step () {
+function start_skin_weighting_step (): void {
   // we only need one binding skeleton. All skinned meshes will use this.
   weight_skin_step.create_binding_skeleton()
 
@@ -161,9 +167,15 @@ function start_skin_weighting_step () {
 
   // remember our skeleton position before we do the skinning process
   // that way if we revert to try again...we will have the original positions/rotations
-  load_model_step.model_meshes().visible = false   // hide our unskinned mesh after we have done the skinning process
+  load_model_step.model_meshes().visible = false // hide our unskinned mesh after we have done the skinning process
 
   // re-define skeleton helper to use the skinned mesh)
+  if (weight_skin_step.skeleton() === undefined) {
+    console.warn('Tried to regenerate skeleton helper, but skeleton is undefined!')
+    return
+  }
+
+  // not sure why typescript linter cannot figure out that the skeleton is defined here as I did a check above
   regenerate_skeleton_helper(weight_skin_step.skeleton())
 
   // we might want to test out the binding algorithm to see various hitboxes
@@ -175,7 +187,7 @@ function start_skin_weighting_step () {
   process_step_changed(ProcessStep.AnimationsListing)
 }
 
-function process_step_changed (process_step) {
+function process_step_changed (process_step: ProcessStep): ProcessStep {
   // we will have the current step turn on the UI elements it needs
   ui.hide_all_elements()
 
@@ -196,8 +208,8 @@ function process_step_changed (process_step) {
     case ProcessStep.EditSkeleton:
       process_step = ProcessStep.EditSkeleton
       edit_skeleton_step.begin()
-      transformControls.enabled = true
-      transformControls.setMode('translate')
+      transform_controls.enabled = true
+      transform_controls.setMode('translate')
       ui.dom_transform_controls_switch.style.display = 'none' // hide the UI control until we have a bone selected
       ui.dom_info_panel.innerHTML = edit_skeleton_step.instructions_text()
       break
@@ -205,14 +217,14 @@ function process_step_changed (process_step) {
       process_step = ProcessStep.BindPose
       ui.dom_info_panel.innerHTML = weight_skin_step.instructions_text()
       weight_skin_step.begin()
-      transformControls.enabled = false // shouldn't be editing bones
+      transform_controls.enabled = false // shouldn't be editing bones
       start_skin_weighting_step()
       break
     case ProcessStep.AnimationsListing:
       process_step = ProcessStep.AnimationsListing
       ui.dom_info_panel.innerHTML = animations_listing_step.instructions_text()
       animations_listing_step.begin()
-      transformControls.setMode('rotate')
+      transform_controls.setMode('rotate')
       animations_listing_step.load_and_apply_default_animation_to_skinned_mesh(weight_skin_step.final_skinned_meshes(),
         load_skeleton_step.skeleton_type())
       break
@@ -220,26 +232,24 @@ function process_step_changed (process_step) {
 
   // when we change steps, we are re-creating the skeleeton and helper
   // so the current transform control reference will be lost/give an error
-  transformControls.detach()
+  transform_controls.detach()
 
   return process_step
 }
 
-const animate = () => {
+const animate = (): void => {
   requestAnimationFrame(animate)
 
-  if (animations_listing_step?.mixer()) {
-    const deltaTime = clock.getDelta()
-    animations_listing_step.mixer().update(deltaTime)
-  }
+  const delta_time = clock.getDelta()
+  animations_listing_step.mixer().update(delta_time)
 
   renderer.render(scene, camera)
-};
+}
 animate()
 
-//////////////////////////////////
-// EVENT LISTENERS
-//////////////////////////////////
+/**
+* EVENT LISTENERS
+ */
 
 renderer.domElement.addEventListener('mousemove', (event) => {
   if (is_transform_controls_dragging) {
@@ -251,15 +261,13 @@ renderer.domElement.addEventListener('mousedown', (event) => {
   // primary click is made for rotating around 3d scene
   const is_primary_button_click = event.button === 0
 
-  if (is_primary_button_click)  { return }
+  if (is_primary_button_click) { return }
   if (edit_skeleton_step.skeleton()?.bones === undefined) { return }
 
-
   // when we are done with skinned mesh, we shouldn't be editing transforms
-  if (!transformControls.enabled) {
+  if (!transform_controls.enabled) {
     return
   }
-
 
   // we will change which skeleton we do an intersection test with
   // depending on what step we are on. We are either moving the setup skeleton
@@ -280,17 +288,17 @@ renderer.domElement.addEventListener('mousedown', (event) => {
   }
 
   if (closestBone !== null) {
-    transformControls.attach(closestBone)
+    transform_controls.attach(closestBone)
     weight_skin_step.set_bone_index_to_test(closestBoneIndex)
     ui.dom_transform_controls_switch.style.display = 'flex'
   }
- }, false)
+}, false)
 
-transformControls.addEventListener('dragging-changed', function (event) {
+transform_controls.addEventListener('dragging-changed', function (event) {
   is_transform_controls_dragging = event.value // monitor the dragging state for transform control
 })
 
-transformControls.addEventListener('dragging-changed', function (event) {
+transform_controls.addEventListener('dragging-changed', function (event) {
   controls.enabled = !event.value
 })
 
@@ -309,10 +317,9 @@ load_skeleton_step.addEventListener('skeletonLoaded', (event) => {
   process_step = process_step_changed(ProcessStep.EditSkeleton)
 })
 
-
-//////////////////////////////////
+/// ///////////////////////////////
 // EVENT LISTENERS FOR UI ELEMENTS
-//////////////////////////////////
+/// ///////////////////////////////
 
 ui.dom_bind_pose_button.addEventListener('click', () => {
   // make sure we have a valid bone position before we try to do any weighting
@@ -340,7 +347,6 @@ ui.dom_back_to_edit_skeleton_button.addEventListener('click', () => {
   load_model_step.model_meshes().visible = true // show the unskinned mesh again
 })
 
-
 ui.dom_transform_controls_switch.addEventListener('click', function (event) {
   const targetElement = event.target
 
@@ -349,9 +355,9 @@ ui.dom_transform_controls_switch.addEventListener('click', function (event) {
   }
 
   if (targetElement.value === 'translation') {
-    transformControls.setMode('translate')
+    transform_controls.setMode('translate')
   } else if (targetElement.value === 'rotation') {
-    transformControls.setMode('rotate')
+    transform_controls.setMode('rotate')
   }
 })
 
@@ -373,7 +379,6 @@ ui.dom_rotate_model_x_button.addEventListener('click', () => {
 ui.dom_rotate_model_y_button.addEventListener('click', () => {
   load_model_step.rotate_model_by_axis('y', 90)
 })
-
 
 ui.dom_rotate_model_z_button.addEventListener('click', () => {
   load_model_step.rotate_model_by_axis('z', 90)

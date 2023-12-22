@@ -8,27 +8,34 @@ import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
 import { Generators } from '../Generators.ts'
 
-import { type BufferGeometry, type Material, type Object3D, type Skeleton, SkinnedMesh } from 'three'
+import { type BufferGeometry, type Material, type Object3D, type Skeleton, SkinnedMesh, type Scene } from 'three'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
-export class StepWeightSkin extends EventTarget
-{
+export class StepWeightSkin extends EventTarget {
   private readonly ui: UI = new UI()
-  skinning_armature: Object3D | undefined
-  bone_skinning_formula = null
-  binding_skeleton: Skeleton | undefined
-  skinned_meshes: SkinnedMesh[] = []
+  private skinning_armature: Object3D | undefined
+  private bone_skinning_formula = null
+  private binding_skeleton: Skeleton | undefined
+  private skinned_meshes: SkinnedMesh[] = []
 
   // debug options for bone skinning formula
-  enable_debugging = false
-  show_debug = false
-  debug_scene_object = null
-  bone_index_to_test = -1
+  private enable_debugging: boolean = false
+  private show_debug: boolean = false
+  private debug_scene_object: Scene | undefined
+  private bone_index_to_test: number = -1
 
   public begin (): void {
-    this.ui.dom_current_step_index.innerHTML = '3.5'
-    this.ui.dom_current_step_element.innerHTML = 'Skin Debug'
-    this.ui.dom_skinned_mesh_tools.style.display = 'flex'
+    if (this.ui.dom_current_step_index !== null) {
+      this.ui.dom_current_step_index.innerHTML = '3.5'
+    }
+
+    if (this.ui.dom_current_step_element !== null) {
+      this.ui.dom_current_step_element.innerHTML = 'Skin Debug'
+    }
+
+    if (this.ui.dom_skinned_mesh_tools !== null) {
+      this.ui.dom_skinned_mesh_tools.style.display = 'flex'
+    }
   }
 
   public instructions_text (): string {
@@ -41,7 +48,7 @@ export class StepWeightSkin extends EventTarget
               </ol>`
   }
 
-  public create_bone_formula_object(editable_armature: Object3D, skinning_formula: string): any {
+  public create_bone_formula_object (editable_armature: Object3D, skinning_formula: string): any {
     this.skinning_armature = editable_armature.clone()
     this.skinning_armature.name = 'Armature for skinning'
 
@@ -57,18 +64,16 @@ export class StepWeightSkin extends EventTarget
     return this.bone_skinning_formula
   }
 
-  public skeleton (): Skeleton | undefined
-  {
+  public skeleton (): Skeleton | undefined {
     // gets bone hierarchy from the armature
     return this.binding_skeleton
   }
 
-  public set_mesh_geometry(geometry: BufferGeometry): void
-  {
+  public set_mesh_geometry (geometry: BufferGeometry): void {
     this.bone_skinning_formula.set_geometry(geometry)
   }
 
-  public test_geometry() {
+  public test_geometry () {
     if (this.show_debug) {
       this.bone_skinning_formula.set_show_debug(this.show_debug)
       this.bone_skinning_formula.set_debugging_scene_object(this.debug_scene_object)
@@ -78,7 +83,7 @@ export class StepWeightSkin extends EventTarget
     return this.bone_skinning_formula.test_bones_outside_in_mesh()
   }
 
-  public create_binding_skeleton(): void {
+  public create_binding_skeleton (): void {
     if (this.skinning_armature !== undefined) {
       // when we copy over the armature with the bind, we will lose the reference in the variable
       this.binding_skeleton = Generators.create_skeleton(this.skinning_armature.children[0])
@@ -88,8 +93,7 @@ export class StepWeightSkin extends EventTarget
     }
   }
 
-  public clear_skinned_meshes(): void
-  {
+  public clear_skinned_meshes (): void {
     this.skinned_meshes = []
   }
 
@@ -112,24 +116,28 @@ export class StepWeightSkin extends EventTarget
     this.skinned_meshes.push(skinned_mesh)
   }
 
-  public final_skinned_meshes(): SkinnedMesh[] {
+  public final_skinned_meshes (): SkinnedMesh[] {
     return this.skinned_meshes
   }
 
-  public set_show_debug(value: boolean): void
-  {
+  public set_show_debug (value: boolean): void {
     this.show_debug = value
   }
 
-  public set_debug_scene_object(scene): void {
+  public set_debug_scene_object (scene: Scene): void {
     this.debug_scene_object = scene
   }
 
-  public set_bone_index_to_test(index): void {
+  public set_bone_index_to_test (index: number): void {
     this.bone_index_to_test = index
   }
 
-  public calculate_weights() {
+  public calculate_weights (): void {
+    if (this.bone_skinning_formula === null) {
+      console.warn('Tried to calculate_weights() but bone_skinning_formula is null!')
+      return
+    }
+
     return this.bone_skinning_formula.calculate_indexes_and_weights()
   }
 }
