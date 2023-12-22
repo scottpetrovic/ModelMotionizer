@@ -5,6 +5,9 @@ import { Utility } from '../Utilities.ts'
 import BoneCalculationData from '../models/BoneCalculationData.ts'
 import { BufferGeometry, type Bone, Object3D, Mesh, Vector3, Raycaster, type Intersection } from 'three'
 import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
+import type IntersectionPointData from '../models/IntersectionPointData.ts'
+import IntersectionGeometryData from '../models/IntersectionGeometryData.ts'
+import BoneTesterData from '../models/BoneTesterData.ts'
 
 export class BoneWeightsByEnvelope implements IAutoSkinSolver {
   private bones_master_data: BoneCalculationData[] = []
@@ -18,8 +21,7 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
   private readonly debug_sphere_color_failure = 0xff0000 // vertices that will have to use closest bone
 
   // two variables used for testing to see if we have an ok bone envelope to bind
-  private readonly bone_names_with_errors: string[] = []
-  private readonly bone_vertices_with_errors: Vector3[] = []
+  private readonly bone_testing_data: BoneTesterData = new BoneTesterData([], [])
 
   constructor (bone_hier: Object3D) {
     this.init_bone_weights_data_structure(bone_hier)
@@ -29,26 +31,20 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     this.geometry = geom
   }
 
-  public test_bones_outside_in_mesh (): [string[], Vector3[]] {
+  public test_bones_outside_in_mesh (): BoneTesterData {
     this.bones_master_data.forEach((bone: BoneCalculationData, bone_index: number) => {
       if (bone.supports_envelope_calculation) {
         const rays_to_cast: number = 4
         const bone_start: Bone = bone.bone_object
         const bone_end: Bone = bone.bone_object.children[0] as Bone
         const intersection_plane_mesh = Generators.create_bone_plane_mesh(bone_start, bone_end, rays_to_cast)
-        const [intersection_distances] = this.intersections_for_geometry(rays_to_cast, intersection_plane_mesh)
+        const geometry_data: IntersectionGeometryData = this.intersections_for_geometry(rays_to_cast, intersection_plane_mesh)
         const envelope_mesh = this.create_envelope_mesh_for_bone(bone)
-        this.expand_envelope_mesh_to_fit_bone(envelope_mesh, intersection_distances, bone)
+        this.expand_envelope_mesh_to_fit_bone(envelope_mesh, geometry_data.distances, bone)
       }
     })
 
-    // there are some errors in bone positions being outside of the mesh.
-    // avoid future calculations and eventually exit out
-    if (this.bone_names_with_errors.length > 0) {
-      return [this.bone_names_with_errors, this.bone_vertices_with_errors]
-    }
-
-    return [[], []]
+    return this.bone_testing_data
   }
 
   public calculate_indexes_and_weights (): number[][] {
@@ -63,18 +59,18 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
         const bone_start: Bone = bone.bone_object
         const bone_end: Bone = bone.bone_object.children[0] as Bone
         const intersection_plane_mesh = Generators.create_bone_plane_mesh(bone_start, bone_end, rays_to_cast)
-        const [intersection_distances] = this.intersections_for_geometry(rays_to_cast, intersection_plane_mesh)
+        const intersection_geometry_data: IntersectionGeometryData = this.intersections_for_geometry(rays_to_cast, intersection_plane_mesh)
         const envelope_mesh = this.create_envelope_mesh_for_bone(bone)
 
-        this.expand_envelope_mesh_to_fit_bone(envelope_mesh, intersection_distances, bone)
+        this.expand_envelope_mesh_to_fit_bone(envelope_mesh, intersection_geometry_data.distances, bone)
 
-        const { vertex_positions_inside_bone_envelope, vertex_indexes_inside_bone_evelope } =
-                    Utility.intersection_points_between_positions_and_mesh(this.geometry.attributes.position, envelope_mesh)
+        const intersection_data: IntersectionPointData =
+          Utility.intersection_points_between_positions_and_mesh(this.geometry.attributes.position, envelope_mesh)
 
-        bone.assigned_vertices.push(...vertex_indexes_inside_bone_evelope)
+        bone.assigned_vertices.push(...intersection_data.vertex_indices)
 
         // show all of these visually when we are done with checks
-        vertex_points_that_passed.push(...vertex_positions_inside_bone_envelope)
+        vertex_points_that_passed.push(...intersection_data.vertex_positions)
         envelope_shapes_to_show.push(envelope_mesh)
       }
     })
@@ -93,8 +89,9 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
 
     // There could be some bones that aren't inside the mesh from the last calculation. This will mess up the bone envelope calculations
     // and need to be fixed. We need to abort the calculations
-    if (this.bone_names_with_errors.length > 0) {
-      throw new Error(`ERROR: Some bones are outside the mesh. Need to fix this. Bones: ${this.bone_names_with_errors}`)
+    if (this.bone_testing_data.bones_names_with_errors.length > 0) {
+      throw new Error(`ERROR: Some bones are outside the mesh. 
+        Need to fix this. Bones: ${this.bone_testing_data.bones_names_with_errors.toString()}`)
     }
 
     if (this.show_debug) {
@@ -177,13 +174,11 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
 
       // 4 leg creature has entire word "right", while human has appreviation "R"
       let use_minimum_expand_distance: boolean = false
-      if (bone.name === 'Right_Front_Leg_Upper' ||
-            bone.name === 'Left_Front_Leg_Upper' ||
-            bone.name === 'Right_Back_Leg_Upper' ||
-            bone.name === 'L_Toe' ||
-            bone.name === 'R_Toe' ||
-            bone.name.includes('UpLeg') ||
-            bone.name === 'Left_Back_Leg_Upper') {
+      if (bone.name.includes('Front_Leg_Upper') ||
+            bone.name.includes('Back_Leg_Upper') ||
+            bone.name.includes('_Toe') ||
+            bone.name.includes('Shoulder') ||
+            bone.name.includes('UpLeg')) {
         use_minimum_expand_distance = true
       }
 
@@ -197,6 +192,7 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     const envelope_color = 0xaaaaff
 
     const envelope_geometry: BoneEnvelopeGeometry = new BoneEnvelopeGeometry()
+
     const envelope_mesh = new Mesh(envelope_geometry as BufferGeometry, Generators.create_material(true, envelope_color))
     envelope_mesh.name = `Envelope Box Mesh: ${bone.name}`
     const padding_multiplier: number = 1.2 // scale the box to help with overlap and points just outside box
@@ -212,23 +208,23 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     const bone_direction = Utility.direction_between_points(Utility.world_position_from_object(bone_start), Utility.world_position_from_object(bone_end))
     const facing_direction = Utility.world_position_from_object(bone_end)
     envelope_mesh.position.copy(Utility.world_position_from_object(bone_start))
-    envelope_mesh.translateOnAxis(bone_direction, height*0.5)
+    envelope_mesh.translateOnAxis(bone_direction, height * 0.5)
     envelope_mesh.lookAt(facing_direction)
-    envelope_mesh.rotateOnAxis(new Vector3(1,0,0), Math.PI * 0.5)
+    envelope_mesh.rotateOnAxis(new Vector3(1, 0, 0), Math.PI * 0.5)
 
     return envelope_mesh
   }
 
-  private expand_envelope_mesh_to_fit_bone (envelope_mesh: Mesh, intersections, bone: BoneCalculationData): void {
+  private expand_envelope_mesh_to_fit_bone (envelope_mesh: Mesh, intersection_distances: number[], bone: BoneCalculationData): void {
     const bone_start = bone.bone_object
     const bone_end = bone_start.children[0]
 
     // Grow bone envelope to fix space
     const height = Utility.distance_between_objects(bone_start, bone_end)
-    const left_ray_distance: number = intersections[0]
-    const back_ray_distance: number = intersections[1]
-    const right_ray_distance: number = intersections[2]
-    const forward_ray_distance: number = intersections[3]
+    const left_ray_distance: number = intersection_distances[0]
+    const back_ray_distance: number = intersection_distances[1]
+    const right_ray_distance: number = intersection_distances[2]
+    const forward_ray_distance: number = intersection_distances[3]
 
     if (bone.use_minimum_envelope_expand) {
       const min_x_side = Math.min(right_ray_distance, left_ray_distance)
@@ -238,21 +234,21 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
       BoneEnvelopeGeometryUtils.expand_x_negative_face(envelope_mesh.geometry, min_x_side)
       BoneEnvelopeGeometryUtils.expand_z_positive_face(envelope_mesh.geometry, min_z_side)
       BoneEnvelopeGeometryUtils.expand_z_negative_face(envelope_mesh.geometry, min_z_side)
-      BoneEnvelopeGeometryUtils.expand_y_positive_face(envelope_mesh.geometry, height*0.5)
-      BoneEnvelopeGeometryUtils.expand_y_negative_face(envelope_mesh.geometry, height*0.5)
+      BoneEnvelopeGeometryUtils.expand_y_positive_face(envelope_mesh.geometry, height * 0.5)
+      BoneEnvelopeGeometryUtils.expand_y_negative_face(envelope_mesh.geometry, height * 0.5)
     } else {
       BoneEnvelopeGeometryUtils.expand_x_positive_face(envelope_mesh.geometry, right_ray_distance)
       BoneEnvelopeGeometryUtils.expand_x_negative_face(envelope_mesh.geometry, left_ray_distance)
       BoneEnvelopeGeometryUtils.expand_z_positive_face(envelope_mesh.geometry, forward_ray_distance)
       BoneEnvelopeGeometryUtils.expand_z_negative_face(envelope_mesh.geometry, back_ray_distance)
-      BoneEnvelopeGeometryUtils.expand_y_positive_face(envelope_mesh.geometry, height*0.5)
-      BoneEnvelopeGeometryUtils.expand_y_negative_face(envelope_mesh.geometry, height*0.5)
+      BoneEnvelopeGeometryUtils.expand_y_positive_face(envelope_mesh.geometry, height * 0.5)
+      BoneEnvelopeGeometryUtils.expand_y_negative_face(envelope_mesh.geometry, height * 0.5)
     }
 
     // if a bone goes outside a mesh, the intersection will be undefined. keep track of what bones do this and
     if (left_ray_distance === undefined || right_ray_distance === undefined || back_ray_distance === undefined || forward_ray_distance === undefined) {
-      this.bone_names_with_errors.push(bone.name)
-      this.bone_vertices_with_errors.push(Utility.world_position_from_object(bone_start))
+      this.bone_testing_data.bones_names_with_errors.push(bone.name)
+      this.bone_testing_data.bones_vertices_with_errors.push(Utility.world_position_from_object(bone_start))
       return
     }
 
@@ -260,11 +256,12 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     envelope_mesh.geometry.computeBoundingBox() // need to recompute for collision next
   }
 
-  private intersections_for_geometry (rays_to_cast: number, debug_bone_plane_mesh: Mesh): Array<number[] | Vector3[]> {
+  private intersections_for_geometry (rays_to_cast: number, debug_bone_plane_mesh: Mesh): IntersectionGeometryData {
     const intersection_distances: number[] = [] // ray cast around the object and find how far out the mesh goes
     const intersection_vertexes: Vector3[] = [] // output for potentially showing in debugger
     const normal_mesh: Mesh = new Mesh(this.geometry, Generators.create_material(true))
     normal_mesh.name = 'Normal mesh used for intersection'
+
     for (let j = 0; j < rays_to_cast; j++) {
       const point_2: Vector3 = Utility.world_position_from_object(debug_bone_plane_mesh.children[j])
       const ray_origin: Vector3 = Utility.world_position_from_object(debug_bone_plane_mesh)
@@ -275,12 +272,20 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
       // this.debugging_scene_object.add(ray_helper)
       // calculate where closest intersection happens
       const intersects: Intersection[] = raycaster.intersectObject(normal_mesh)
+
+      // if there is no intersection, that means the bone is outside the mesh
+      // and we need to abort calculations
+      if (intersects.length === 0) {
+        // this.bone_testing_data.bones_names_with_errors.push(debug_bone_plane_mesh.name)
+        // this.bone_testing_data.bones_vertices_with_errors.push(Utility.world_position_from_object(debug_bone_plane_mesh))
+        return new IntersectionGeometryData([], [])
+      }
+
       intersection_distances.push(intersects[0].distance)
       intersection_vertexes.push(intersects[0].point)
     } // end for loop through rays
 
-    const return_value = [intersection_distances, intersection_vertexes]
-    return return_value
+    return new IntersectionGeometryData(intersection_vertexes, intersection_distances)
   }
 
   /**
@@ -361,7 +366,6 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     if (
       bone.name.includes('Fingers') ||
           bone.name.includes('HandBase') ||
-          bone.name.includes('Shoulder') ||
           bone.name === 'SpineUp') {
       return false
     }

@@ -1,20 +1,22 @@
 import { Utility } from '../Utilities.js'
-import { type Bone, BufferGeometry, type Object3D, type Scene, Vector3 } from 'three'
+import { type Bone, BufferGeometry, Object3D, type Scene, Vector3 } from 'three'
 import BoneCalculationData from '../models/BoneCalculationData.js'
+import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
+import BoneTesterData from '../models/BoneTesterData.js'
 
 /**
  * This calculation is similar to the normal bone weights by distance, but uses the
  * location half way between the bone and the child's bone. This gives better results with the joints
  * If there is no child bone, it just uses the bone's position for the distance calculation
  */
-export default class BoneWeightsByMedianDistance {
+export default class BoneWeightsByMedianDistance implements IAutoSkinSolver {
   private geometry: BufferGeometry = new BufferGeometry()
   private readonly skin_indices: number[] = []
   private readonly skin_weights: number[] = []
   private show_debug: boolean = false
   private bone_idx_test: number = -1
   private readonly bones_master_data: BoneCalculationData[] = []
-  private debugging_scene_object: Scene
+  private debugging_scene_object: Object3D = new Object3D()
 
   constructor (bone_hier: Object3D) {
     this.init_bone_weights_data_structure(bone_hier)
@@ -36,7 +38,7 @@ export default class BoneWeightsByMedianDistance {
     this.bone_idx_test = bone_idx
   }
 
-  public set_debugging_scene_object (scene_object: Scene): void {
+  public set_debugging_scene_object (scene_object: Object3D): void {
     this.debugging_scene_object = scene_object
   }
 
@@ -74,9 +76,8 @@ export default class BoneWeightsByMedianDistance {
     return output
   }
 
-  public test_bones_outside_in_mesh (): never[][] {
+  public test_bones_outside_in_mesh (): BoneTesterData {
     // don't do test for now and just return success
-    const output = [[], []]
-    return output
+    return new BoneTesterData([], [])
   }
 } // end class

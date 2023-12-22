@@ -2,6 +2,7 @@ import { type Bone, BufferGeometry, Object3D, Vector3 } from 'three'
 import { Utility } from '../Utilities.js'
 import BoneCalculationData from '../models/BoneCalculationData.js'
 import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
+import BoneTesterData from '../models/BoneTesterData.js'
 
 export default class BoneWeightsByDistance implements IAutoSkinSolver {
   private readonly bones_master_data: BoneCalculationData[] = []
@@ -66,10 +67,9 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
     return [skin_indices, skin_weights]
   }
 
-  public test_bones_outside_in_mesh (): never[][] {
+  public test_bones_outside_in_mesh (): BoneTesterData {
     // don't do test for now and just return success
-    const return_data = [[], []]
-    return return_data
+    return new BoneTesterData([], [])
   }
 
   private init_bone_weights_data_structure (bone_hier: Object3D): void {

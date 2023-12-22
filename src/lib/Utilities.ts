@@ -1,9 +1,10 @@
 import {
   Vector3, Vector2, type Object3D, Mesh, Group, Bone, type Skeleton, Euler, Raycaster,
-  type PerspectiveCamera, type Scene, type Object3DEventMap, type BufferAttribute, BufferGeometry
+  type PerspectiveCamera, type Scene, type Object3DEventMap, type BufferAttribute, BufferGeometry, InterleavedBufferAttribute
 } from 'three'
 import BoneTransformState from './models/BoneTransformState'
 import BoneCalculationData from './models/BoneCalculationData'
+import IntersectionPointData from './models/IntersectionPointData'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Utility {
@@ -38,14 +39,15 @@ export class Utility {
   }
 
   static is_point_in_box (point: Vector3, box_mesh: Mesh): boolean {
-    if (box_mesh.geometry.boundingBox === null) {
-      console.warn('is_point_in_box() - box_mesh does not have a bounding box')
-      return false
-    }
-
     // Transform the point from world space into the objects space
     box_mesh.updateMatrixWorld()
     const local_point: Vector3 = box_mesh.worldToLocal(point.clone())
+
+    if (box_mesh.geometry.boundingBox === null) {
+      console.warn('is_point_in_box() - box_mesh does not have a bounding box', box_mesh)
+      return false
+    }
+
     return box_mesh.geometry.boundingBox.containsPoint(local_point)
   }
 
@@ -110,7 +112,8 @@ export class Utility {
     return bone_list
   }
 
-  static intersection_points_between_positions_and_mesh (positions: BufferAttribute, envelope_mesh: Mesh) {
+  static intersection_points_between_positions_and_mesh (positions: BufferAttribute | InterleavedBufferAttribute,
+    envelope_mesh: Mesh): IntersectionPointData {
     const vertex_positions_inside_bone_envelope: Vector3[] = []
     const vertex_indexes_inside_bone_evelope: number[] = []
     const vertex_count: number = positions.array.length / 3
@@ -125,7 +128,7 @@ export class Utility {
       }
     }
 
-    return { vertex_positions_inside_bone_envelope, vertex_indexes_inside_bone_evelope }
+    return new IntersectionPointData(vertex_positions_inside_bone_envelope, vertex_indexes_inside_bone_evelope)
   }
 
   /**
@@ -159,8 +162,6 @@ export class Utility {
       this.remove_object_array(existing_debugging_container)
       existing_debugging_container.clear()
       scene.remove(existing_debugging_container)
-    } else {
-      console.warn('regenerate_debugging_scene() error - debugging container does not exist')
     }
 
     // add a reusable container for debugging

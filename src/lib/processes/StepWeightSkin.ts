@@ -9,19 +9,20 @@ import { SkinningFormula } from '../enums/SkinningFormula.ts'
 import { Generators } from '../Generators.ts'
 
 import { type BufferGeometry, type Material, type Object3D, type Skeleton, SkinnedMesh, type Scene } from 'three'
+import { IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
+import BoneTesterData from '../models/BoneTesterData.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepWeightSkin extends EventTarget {
   private readonly ui: UI = new UI()
   private skinning_armature: Object3D | undefined
-  private bone_skinning_formula = null
+  private bone_skinning_formula: IAutoSkinSolver | undefined
   private binding_skeleton: Skeleton | undefined
   private skinned_meshes: SkinnedMesh[] = []
 
   // debug options for bone skinning formula
-  private enable_debugging: boolean = false
   private show_debug: boolean = false
-  private debug_scene_object: Scene | undefined
+  private debug_scene_object: Object3D | undefined
   private bone_index_to_test: number = -1
 
   public begin (): void {
@@ -70,10 +71,20 @@ export class StepWeightSkin extends EventTarget {
   }
 
   public set_mesh_geometry (geometry: BufferGeometry): void {
+    if (this.bone_skinning_formula === undefined) {
+      console.warn('Tried to set_mesh_geometry() in weight skinning step, but bone_skinning_formula is undefined!')
+      return
+    }
+
     this.bone_skinning_formula.set_geometry(geometry)
   }
 
-  public test_geometry () {
+  public test_geometry (): BoneTesterData {
+    if (this.bone_skinning_formula === undefined) {
+      console.warn('Tried to test_geometry() in weight skinning step, but bone_skinning_formula is undefined!')
+      return new BoneTesterData([], [])
+    }
+
     if (this.show_debug) {
       this.bone_skinning_formula.set_show_debug(this.show_debug)
       this.bone_skinning_formula.set_debugging_scene_object(this.debug_scene_object)
@@ -132,10 +143,10 @@ export class StepWeightSkin extends EventTarget {
     this.bone_index_to_test = index
   }
 
-  public calculate_weights () {
-    if (this.bone_skinning_formula === null) {
-      console.warn('Tried to calculate_weights() but bone_skinning_formula is null!')
-      return
+  public calculate_weights (): number[][] {
+    if (this.bone_skinning_formula === undefined) {
+      console.warn('Tried to calculate_weights() but bone_skinning_formula is null for some reason!')
+      return [[], []]
     }
 
     return this.bone_skinning_formula.calculate_indexes_and_weights()

@@ -17,13 +17,14 @@ import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.ts'
 import { type Bone, Group, Scene, type Skeleton, type Vector3, type SkeletonHelper, type Points } from 'three'
+import BoneTesterData from './lib/models/BoneTesterData.ts'
 
 export class Bootstrap {
   private readonly camera = Generators.create_camera()
   private readonly renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
   private controls: OrbitControls | undefined = undefined
 
-  private transform_controls: TransformControls | undefined = undefined
+  private readonly transform_controls: TransformControls = new TransformControls(this.camera, this.renderer.domElement)
   private is_transform_controls_dragging: boolean = false
 
   // has UI elements on the HTML page that we will reference/use
@@ -43,7 +44,7 @@ export class Bootstrap {
 
   private readonly clock = new THREE.Clock()
 
-  private environment_container: Group = new Group()
+  private readonly environment_container: Group = new Group()
 
   public initialize (): void {
     this.setup_environment()
@@ -69,9 +70,6 @@ export class Bootstrap {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.target.set(0, 0.9, 0)
     this.controls.update()
-
-    // setup transform controls to eventually test out differnt bone rotations
-    this.transform_controls = new TransformControls(this.camera, this.renderer.domElement)
 
     this.scene.add(this.transform_controls)
 
@@ -105,11 +103,9 @@ export class Bootstrap {
     }
   }
 
-  private show_skin_failure_message (bones_with_errors: string[]): void {
-    console.log(bones_with_errors, 'BONE WITH ERRORS')
-
+  private show_skin_failure_message (bone_names_with_errors: string[], error_point_positions: Vector3[]): void {
     // add the bone vertices as sphere to debugging object
-    const sphere_failures: Points = Generators.create_spheres_for_points(bones_with_errors, 0.02, 0xff0000)
+    const sphere_failures: Points = Generators.create_spheres_for_points(error_point_positions, 0.08, 0xff0000)
     this.debugging_visual_object.add(sphere_failures)
 
     // add information to the info panel
@@ -123,8 +119,8 @@ export class Bootstrap {
 
     // display the bones names in an HTML list
     let bones_error_list = '<ol id="bone-list">'
-    bones_with_errors.forEach((bone) => {
-      bones_error_list += `<li>${Utility.clean_bone_name_for_messaging(bone)}</li>`
+    bone_names_with_errors.forEach((bone_name: string) => {
+      bones_error_list += `<li>${Utility.clean_bone_name_for_messaging(bone_name)}</li>`
     })
 
     bones_error_list += '</ol>'
@@ -338,7 +334,7 @@ export class Bootstrap {
     this.load_model_step.models_geometry_list().forEach((mesh_geometry, index) => {
       // we passed the bone test, so we can do the skinning process
       this.weight_skin_step.set_mesh_geometry(mesh_geometry)
-      const [final_skin_indices, final_skin_weights] = this.weight_skin_step.calculate_weights()
+      const [final_skin_indices, final_skin_weights]: number[][] = this.weight_skin_step.calculate_weights();
 
       mesh_geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(final_skin_indices, 4))
       mesh_geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(final_skin_weights, 4))
@@ -389,11 +385,12 @@ export class Bootstrap {
     let testing_geometry_success = true
     this.load_model_step.models_geometry_list().forEach((mesh_geometry, index) => {
       this.weight_skin_step.set_mesh_geometry(mesh_geometry)
-      const [bone_names_failing_skin_test] = this.weight_skin_step.test_geometry()
+      const tester_data: BoneTesterData = this.weight_skin_step.test_geometry()
 
-      if (bone_names_failing_skin_test.length > 0) {
-        const names_with_object_index: string[] = bone_names_failing_skin_test.map((bone_name: string) => bone_name + ` (${mesh_geometry.name})`)
-        this.show_skin_failure_message(names_with_object_index)
+      if (tester_data.bones_names_with_errors.length > 0) {
+        const names_with_object_index: string[] =
+          tester_data.bones_names_with_errors.map((bone_name: string) => bone_name + ` ${mesh_geometry.name}`)
+        this.show_skin_failure_message(names_with_object_index, tester_data.bones_vertices_with_errors)
         testing_geometry_success = false
       }
     })
