@@ -4,5 +4,6 @@ export enum ProcessStep {
   EditSkeleton = 'edit-skeleton',
   WeightSkin = 'weight-skin',
   AnimationsListing = 'animations-export',
-  StepExportToFile = 'export-to-file'
+  StepExportToFile = 'export-to-file',
+  BindPose = 'BindPose'
 }

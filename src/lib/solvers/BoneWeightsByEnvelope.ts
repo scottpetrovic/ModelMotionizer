@@ -4,8 +4,9 @@ import { Generators } from '../Generators.js'
 import { Utility } from '../Utilities.ts'
 import BoneCalculationData from '../models/BoneCalculationData.ts'
 import { BufferGeometry, type Bone, Object3D, Mesh, Vector3, Raycaster, type Intersection } from 'three'
+import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
 
-export class BoneWeightsByEnvelope {
+export class BoneWeightsByEnvelope implements IAutoSkinSolver {
   private bones_master_data: BoneCalculationData[] = []
   private geometry: BufferGeometry = new BufferGeometry()
   private show_debug: boolean = false
@@ -24,52 +25,11 @@ export class BoneWeightsByEnvelope {
     this.init_bone_weights_data_structure(bone_hier)
   }
 
-  public set_geometry(geom: BufferGeometry): void {
+  public set_geometry (geom: BufferGeometry): void {
     this.geometry = geom
   }
 
-  private init_bone_weights_data_structure (bone_hier: Object3D) {
-    const bones: Bone[] = Utility.bone_list_from_hierarchy(bone_hier)
-    this.bones_master_data = []
-    bones.forEach((bone) => {
-      const has_child_bone: boolean = bone.children.length > 0
-      const supports_envelope: boolean = is_bone_valid_for_envelope_calculation(bone)
-
-      // 4 leg creature has entire word "right", while human has appreviation "R"
-      let use_minimum_expand_distance: boolean = false
-      if (bone.name === 'Right_Front_Leg_Upper' ||
-            bone.name === 'Left_Front_Leg_Upper' ||
-            bone.name === 'Right_Back_Leg_Upper' ||
-            bone.name === 'L_Toe' ||
-            bone.name === 'R_Toe' ||
-            bone.name.includes('UpLeg') ||
-            bone.name === 'Left_Back_Leg_Upper') {
-        use_minimum_expand_distance = true
-      }
-
-      const new_bone_object: BoneCalculationData = new BoneCalculationData(bone.name, bone, supports_envelope, has_child_bone, [], use_minimum_expand_distance)
-
-      this.bones_master_data.push(new_bone_object)
-    })
-  }
-
-  public set_show_debug(debug_value: boolean): void {
-    this.show_debug = debug_value
-  }
-
-  public set_bone_index_to_test(bone_idx: number): void {
-    this.bone_idx_test = bone_idx
-  }
-
-  public set_debugging_scene_object(scene_object: Object3D): void {
-    this.debugging_scene_object = scene_object
-  }
-
-  private geometry_vertex_count(): number {
-    return this.geometry?.attributes?.position.array.length / 3
-  }
-
-  public test_bones_outside_in_mesh(): [string[], Vector3[]] {
+  public test_bones_outside_in_mesh (): [string[], Vector3[]] {
     this.bones_master_data.forEach((bone: BoneCalculationData, bone_index: number) => {
       if (bone.supports_envelope_calculation) {
         const rays_to_cast: number = 4
@@ -91,7 +51,7 @@ export class BoneWeightsByEnvelope {
     return [[], []]
   }
 
-  public calculate_indexes_and_weights(): number[][] {
+  public calculate_indexes_and_weights (): number[][] {
     // go through each bone, build a bone envelope, see which vertices intersect it,
     // then assign it to the bone
     const vertex_points_that_passed: Vector3[] = []
@@ -144,7 +104,7 @@ export class BoneWeightsByEnvelope {
     // B.
     // find out if there are any vertices that are not assigned to a bone
     // loop through the vertices without bones and find out what their position is... show that in the debugger
-    const vertex_indexes_without_bones = vertices_not_assigned_to_bone(this.geometry_vertex_count(), this.bones_master_data)
+    const vertex_indexes_without_bones = this.vertices_not_assigned_to_bone(this.geometry_vertex_count(), this.bones_master_data)
     const vertex_positions_without_bones: Vector3[] = []
     vertex_indexes_without_bones.forEach((vertex_index) => {
       const vertex_position = new Vector3().fromBufferAttribute(this.geometry.attributes.position, vertex_index)
@@ -164,7 +124,7 @@ export class BoneWeightsByEnvelope {
     const closest_bone_list: number[] = [] // bone index linked list
 
     vertex_indexes_without_bones.forEach((vertex_index, idx) => {
-      const closest_bone_index: number = find_closest_bone_index_from_vertex_index(vertex_index, this.geometry, this.bones_master_data)
+      const closest_bone_index: number = Utility.find_closest_bone_index_from_vertex_index(vertex_index, this.geometry, this.bones_master_data)
       closest_vertex_list.push(vertex_indexes_without_bones[idx])
       closest_bone_list.push(closest_bone_index)
     })
@@ -176,13 +136,13 @@ export class BoneWeightsByEnvelope {
     })
 
     if (this.show_debug) {
-      const left_over_after_all_assigned = vertices_not_assigned_to_bone(this.geometry_vertex_count(), this.bones_master_data)
+      const left_over_after_all_assigned = this.vertices_not_assigned_to_bone(this.geometry_vertex_count(), this.bones_master_data)
       console.log('Part C: Seeing if anything is leftover after assignment', left_over_after_all_assigned)
     }
 
     // D. Map all weights for each bone to the final skin indices and weights
     // that the buffer attribute needs for the skinning process
-    const { final_skin_indices, final_skin_weights } = this.calculate_final_weights(this.bones_master_data, this.geometry_vertex_count())
+    const [final_skin_indices, final_skin_weights] = this.calculate_final_weights(this.bones_master_data, this.geometry_vertex_count())
 
     if (this.show_debug) {
       console.log('Assigned all the bones to vertices: ', this.bones_master_data)
@@ -192,7 +152,48 @@ export class BoneWeightsByEnvelope {
     return final_data
   }
 
-  private create_envelope_mesh_for_bone(bone: BoneCalculationData): Mesh {
+  public set_show_debug (debug_value: boolean): void {
+    this.show_debug = debug_value
+  }
+
+  public set_bone_index_to_test (bone_idx: number): void {
+    this.bone_idx_test = bone_idx
+  }
+
+  public set_debugging_scene_object (scene_object: Object3D): void {
+    this.debugging_scene_object = scene_object
+  }
+
+  private geometry_vertex_count (): number {
+    return this.geometry?.attributes?.position.array.length / 3
+  }
+
+  private init_bone_weights_data_structure (bone_hier: Object3D): void {
+    const bones: Bone[] = Utility.bone_list_from_hierarchy(bone_hier)
+    this.bones_master_data = []
+    bones.forEach((bone) => {
+      const has_child_bone: boolean = bone.children.length > 0
+      const supports_envelope: boolean = this.is_bone_valid_for_envelope_calculation(bone)
+
+      // 4 leg creature has entire word "right", while human has appreviation "R"
+      let use_minimum_expand_distance: boolean = false
+      if (bone.name === 'Right_Front_Leg_Upper' ||
+            bone.name === 'Left_Front_Leg_Upper' ||
+            bone.name === 'Right_Back_Leg_Upper' ||
+            bone.name === 'L_Toe' ||
+            bone.name === 'R_Toe' ||
+            bone.name.includes('UpLeg') ||
+            bone.name === 'Left_Back_Leg_Upper') {
+        use_minimum_expand_distance = true
+      }
+
+      const new_bone_object: BoneCalculationData = new BoneCalculationData(bone.name, bone, supports_envelope, has_child_bone, [], use_minimum_expand_distance)
+
+      this.bones_master_data.push(new_bone_object)
+    })
+  }
+
+  private create_envelope_mesh_for_bone (bone: BoneCalculationData): Mesh {
     const envelope_color = 0xaaaaff
 
     const envelope_geometry: BoneEnvelopeGeometry = new BoneEnvelopeGeometry()
@@ -218,7 +219,7 @@ export class BoneWeightsByEnvelope {
     return envelope_mesh
   }
 
-  private expand_envelope_mesh_to_fit_bone(envelope_mesh: Mesh, intersections, bone: BoneCalculationData): void {
+  private expand_envelope_mesh_to_fit_bone (envelope_mesh: Mesh, intersections, bone: BoneCalculationData): void {
     const bone_start = bone.bone_object
     const bone_end = bone_start.children[0]
 
@@ -259,7 +260,7 @@ export class BoneWeightsByEnvelope {
     envelope_mesh.geometry.computeBoundingBox() // need to recompute for collision next
   }
 
-  private intersections_for_geometry(rays_to_cast: number, debug_bone_plane_mesh: Mesh) {
+  private intersections_for_geometry (rays_to_cast: number, debug_bone_plane_mesh: Mesh): Array<number[] | Vector3[]> {
     const intersection_distances: number[] = [] // ray cast around the object and find how far out the mesh goes
     const intersection_vertexes: Vector3[] = [] // output for potentially showing in debugger
     const normal_mesh: Mesh = new Mesh(this.geometry, Generators.create_material(true))
@@ -289,7 +290,7 @@ export class BoneWeightsByEnvelope {
      * @param {*} geometry_vertex_count
      * @returns
      */
-  private calculate_final_weights(bones_master_data: BoneCalculationData[], geometry_vertex_count: number) {
+  private calculate_final_weights (bones_master_data: BoneCalculationData[], geometry_vertex_count: number): number[][] {
     const final_skin_indices: number[] = []
     const final_skin_weights: number[] = []
 
@@ -344,80 +345,46 @@ export class BoneWeightsByEnvelope {
             4)${vertices_with_4_bones} 5+)${vertices_with_too_many_bones}`)
     }
 
-    const return_value = { final_skin_indices, final_skin_weights }
+    const return_value = [final_skin_indices, final_skin_weights]
     return return_value
   }
+
+  private is_bone_valid_for_envelope_calculation (bone: Bone): boolean {
+    // if our bone doesn't have any children, that means it is the final tip
+    // and not a bone we want to use for envelope calculations
+    if (bone.children.length === 0) {
+      return false
+    }
+
+    // we are going to ignore certain bones for the bone as they
+    // have odd angles and create bad envelopes
+    if (
+      bone.name.includes('Fingers') ||
+          bone.name.includes('HandBase') ||
+          bone.name.includes('Shoulder') ||
+          bone.name === 'SpineUp') {
+      return false
+    }
+
+    return true // bone is ok to do envelope calculations
+  }
+
+  private vertices_not_assigned_to_bone (geometry_vertex_count: number, bones_master_data: BoneCalculationData[]): number[] {
+    const vertex_indexes_without_bones: number[] = []
+
+    for (let i = 0; i < geometry_vertex_count; i++) {
+      let does_vertex_exist_in_bones: boolean = false
+      bones_master_data.forEach((bone) => {
+        if (bone.assigned_vertices.includes(i)) {
+          does_vertex_exist_in_bones = true
+        }
+      })
+
+      if (!does_vertex_exist_in_bones) {
+        vertex_indexes_without_bones.push(i)
+      }
+    }
+
+    return vertex_indexes_without_bones
+  }
 } // end Class BoneWeightsByEnvelope
-
-function is_bone_valid_for_envelope_calculation(bone: Bone): boolean {
-  // if our bone doesn't have any children, that means it is the final tip
-  // and not a bone we want to use for envelope calculations
-  if (bone.children.length === 0) {
-    return false
-  }
-
-  // we are going to ignore certain bones for the bone as they
-  // have odd angles and create bad envelopes
-  if (
-    bone.name.includes('Fingers') ||
-        bone.name.includes('HandBase') ||
-        bone.name.includes('Shoulder') ||
-        bone.name === 'SpineUp') {
-    return false
-  }
-
-  return true // bone is ok to do envelope calculations
-}
-
-function vertices_not_assigned_to_bone(geometry_vertex_count: number, bones_master_data: BoneCalculationData[]) {
-  const vertex_indexes_without_bones: number[] = []
-
-  for (let i = 0; i < geometry_vertex_count; i++) {
-    let does_vertex_exist_in_bones: boolean = false
-    bones_master_data.forEach((bone) => {
-      if (bone.assigned_vertices.includes(i)) {
-        does_vertex_exist_in_bones = true
-      }
-    })
-
-    if (!does_vertex_exist_in_bones) {
-      vertex_indexes_without_bones.push(i)
-    }
-  }
-
-  return vertex_indexes_without_bones
-}
-
-function find_closest_bone_index_from_vertex_index(vertex_index: number, geometry: BufferGeometry, bones: BoneCalculationData[]): number {
-  const vertex_position: Vector3 = new Vector3().fromBufferAttribute(geometry.attributes.position, vertex_index)
-  // let closest_bone: Bone = bones[0].bone_object
-  let closest_bone_distance: number = 10000
-  let closest_bone_index: number = 0
-
-  bones.forEach((bone: BoneCalculationData, idx: number) => {
-    let distance: number = Utility.world_position_from_object(bone.bone_object).distanceTo(vertex_position)
-
-    // if bone has a child, we are going to calculate the distance by getting the half way
-    // point between bone and child bone...to hopefully yield better results
-    if (bone.has_child_bone) {
-      const child_bone: Bone = bone.bone_object.children[0] as Bone
-      const child_bone_position: Vector3 = Utility.world_position_from_object(child_bone)
-      const bone_position: Vector3 = Utility.world_position_from_object(bone.bone_object)
-      const half_way_point: Vector3 = bone_position.add(child_bone_position).divideScalar(2)
-      const distance_to_half_way_point: number = half_way_point.distanceTo(vertex_position)
-
-      if (distance_to_half_way_point < closest_bone_distance) {
-        distance = distance_to_half_way_point
-      }
-    }
-
-    if (distance < closest_bone_distance) {
-      // closest_bone = bone.bone_object
-      closest_bone_distance = distance
-      closest_bone_index = idx
-    }
-  })
-
-  bones[closest_bone_index].assigned_vertices.push(vertex_index)
-  return closest_bone_index
-}

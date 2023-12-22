@@ -1,8 +1,9 @@
 import {
   Vector3, Vector2, type Object3D, Mesh, Group, Bone, type Skeleton, Euler, Raycaster,
-  type PerspectiveCamera, type Scene, type Object3DEventMap, type BufferAttribute
+  type PerspectiveCamera, type Scene, type Object3DEventMap, type BufferAttribute, BufferGeometry
 } from 'three'
 import BoneTransformState from './models/BoneTransformState'
+import BoneCalculationData from './models/BoneCalculationData'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Utility {
@@ -246,5 +247,39 @@ export class Utility {
 
   static clean_bone_name_for_messaging (bone_name: string): string {
     return bone_name.replace('mixamorig_', '')
+  }
+
+  static find_closest_bone_index_from_vertex_index (vertex_index: number, geometry: BufferGeometry, bones: BoneCalculationData[]): number {
+    const vertex_position: Vector3 = new Vector3().fromBufferAttribute(geometry.attributes.position, vertex_index)
+    // let closest_bone: Bone = bones[0].bone_object
+    let closest_bone_distance: number = 10000
+    let closest_bone_index: number = 0
+
+    bones.forEach((bone: BoneCalculationData, idx: number) => {
+      let distance: number = Utility.world_position_from_object(bone.bone_object).distanceTo(vertex_position)
+
+      // if bone has a child, we are going to calculate the distance by getting the half way
+      // point between bone and child bone...to hopefully yield better results
+      if (bone.has_child_bone) {
+        const child_bone: Bone = bone.bone_object.children[0] as Bone
+        const child_bone_position: Vector3 = Utility.world_position_from_object(child_bone)
+        const bone_position: Vector3 = Utility.world_position_from_object(bone.bone_object)
+        const half_way_point: Vector3 = bone_position.add(child_bone_position).divideScalar(2)
+        const distance_to_half_way_point: number = half_way_point.distanceTo(vertex_position)
+
+        if (distance_to_half_way_point < closest_bone_distance) {
+          distance = distance_to_half_way_point
+        }
+      }
+
+      if (distance < closest_bone_distance) {
+        // closest_bone = bone.bone_object
+        closest_bone_distance = distance
+        closest_bone_index = idx
+      }
+    })
+
+    bones[closest_bone_index].assigned_vertices.push(vertex_index)
+    return closest_bone_index
   }
 }
