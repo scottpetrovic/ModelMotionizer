@@ -132,7 +132,7 @@ export class StepWeightSkin extends EventTarget {
     this.bone_index_to_test = index
   }
 
-  public calculate_weights (): void {
+  public calculate_weights () {
     if (this.bone_skinning_formula === null) {
       console.warn('Tried to calculate_weights() but bone_skinning_formula is null!')
       return
