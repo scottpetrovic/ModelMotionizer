@@ -17,7 +17,9 @@ import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.ts'
 import { type Bone, Group, Scene, type Skeleton, type Vector3, type SkeletonHelper, type Points } from 'three'
-import BoneTesterData from './lib/models/BoneTesterData.ts'
+import type BoneTesterData from './lib/models/BoneTesterData.ts'
+
+import { build_version } from './environment.js'
 
 export class Bootstrap {
   private readonly camera = Generators.create_camera()
@@ -52,11 +54,20 @@ export class Bootstrap {
 
     this.process_step = this.process_step_changed(ProcessStep.LoadModel)
     this.animate()
+    this.inject_build_version()
   } // end initialize()
 
   constructor () {
     // helps resolve requestAnimationFrame calling animate() with wrong context
     this.animate = this.animate.bind(this)
+  }
+
+  private inject_build_version (): void {
+    if (this.ui.dom_build_version !== null) {
+      this.ui.dom_build_version.innerHTML = build_version
+    } else {
+      console.warn('Build version DOM element is null. Cannot set number')
+    }
   }
 
   private setup_environment (): void {
