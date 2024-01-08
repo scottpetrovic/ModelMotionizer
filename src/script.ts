@@ -20,6 +20,7 @@ import { type Bone, Group, Scene, type Skeleton, type Vector3, type SkeletonHelp
 import type BoneTesterData from './lib/models/BoneTesterData.ts'
 
 import { build_version } from './environment.js'
+import { SkeletonType } from './lib/enums/SkeletonType.ts'
 
 export class Bootstrap {
   private readonly camera = Generators.create_camera()
@@ -383,7 +384,8 @@ export class Bootstrap {
   private test_bone_weighting_success (): boolean {
     this.debugging_visual_object = Utility.regenerate_debugging_scene(this.scene) // clear out the debugging scene
 
-    this.weight_skin_step.create_bone_formula_object(this.edit_skeleton_step.armature(), this.edit_skeleton_step.algorithm())
+    this.weight_skin_step.create_bone_formula_object(this.edit_skeleton_step.armature(), this.edit_skeleton_step.algorithm(),
+      this.load_skeleton_step.skeleton_type())
 
     if (this.edit_skeleton_step.show_debugging()) {
       this.weight_skin_step.set_show_debug(this.edit_skeleton_step.show_debugging())

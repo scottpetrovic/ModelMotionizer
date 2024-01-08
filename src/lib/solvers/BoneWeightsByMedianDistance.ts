@@ -3,6 +3,7 @@ import { type Bone, BufferGeometry, Object3D, type Scene, Vector3 } from 'three'
 import BoneCalculationData from '../models/BoneCalculationData.js'
 import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
 import BoneTesterData from '../models/BoneTesterData.js'
+import { SkeletonType } from '../enums/SkeletonType.js'
 
 /**
  * This calculation is similar to the normal bone weights by distance, but uses the
@@ -17,8 +18,10 @@ export default class BoneWeightsByMedianDistance implements IAutoSkinSolver {
   private bone_idx_test: number = -1
   private readonly bones_master_data: BoneCalculationData[] = []
   private debugging_scene_object: Object3D = new Object3D()
+  private skeleton_type: SkeletonType = SkeletonType.BipedalSimple
 
-  constructor (bone_hier: Object3D) {
+  constructor (bone_hier: Object3D, skeleton_type: SkeletonType) {
+    this.set_skeleton_type(skeleton_type)
     this.init_bone_weights_data_structure(bone_hier)
   }
 
@@ -36,6 +39,10 @@ export default class BoneWeightsByMedianDistance implements IAutoSkinSolver {
 
   public set_bone_index_to_test (bone_idx: number): void {
     this.bone_idx_test = bone_idx
+  }
+
+  public set_skeleton_type (skinning_type: SkeletonType): void {
+    this.skeleton_type = skinning_type
   }
 
   public set_debugging_scene_object (scene_object: Object3D): void {

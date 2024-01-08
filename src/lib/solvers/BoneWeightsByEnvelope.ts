@@ -8,12 +8,14 @@ import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
 import type IntersectionPointData from '../models/IntersectionPointData.ts'
 import IntersectionGeometryData from '../models/IntersectionGeometryData.ts'
 import BoneTesterData from '../models/BoneTesterData.ts'
+import { SkeletonType } from '../enums/SkeletonType.ts'
 
 export class BoneWeightsByEnvelope implements IAutoSkinSolver {
   private bones_master_data: BoneCalculationData[] = []
   private geometry: BufferGeometry = new BufferGeometry()
   private show_debug: boolean = false
   private bone_idx_test: number = -1
+  private skeleton_type: SkeletonType = SkeletonType.BipedalSimple
 
   private debugging_scene_object: Object3D = new Object3D()
   private readonly debug_sphere_size: number = 0.06
@@ -23,7 +25,8 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
   // two variables used for testing to see if we have an ok bone envelope to bind
   private readonly bone_testing_data: BoneTesterData = new BoneTesterData([], [])
 
-  constructor (bone_hier: Object3D) {
+  constructor (bone_hier: Object3D, skeleton_type: SkeletonType) {
+    this.set_skeleton_type(skeleton_type)
     this.init_bone_weights_data_structure(bone_hier)
   }
 
@@ -161,6 +164,11 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     this.debugging_scene_object = scene_object
   }
 
+  public set_skeleton_type (skinning_type: SkeletonType): void {
+    this.skeleton_type = skinning_type
+    console.log('setting skeleton type to: ', this.skeleton_type)
+  }
+
   private geometry_vertex_count (): number {
     return this.geometry?.attributes?.position.array.length / 3
   }
@@ -171,21 +179,30 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
     bones.forEach((bone) => {
       const has_child_bone: boolean = bone.children.length > 0
       const supports_envelope: boolean = this.is_bone_valid_for_envelope_calculation(bone)
+      const uses_minimum_expand_distance: boolean = this.is_bone_using_minimum_expand_distance(bone)
+      const new_bone_object: BoneCalculationData = new BoneCalculationData(bone.name, bone, supports_envelope, has_child_bone, [], uses_minimum_expand_distance)
+      this.bones_master_data.push(new_bone_object)
+    })
+  }
 
-      // 4 leg creature has entire word "right", while human has appreviation "R"
-      let use_minimum_expand_distance: boolean = false
+  private is_bone_using_minimum_expand_distance(bone: Bone): boolean {
+    if (this.skeleton_type === SkeletonType.Quadraped) {
       if (bone.name.includes('Front_Leg_Upper') ||
             bone.name.includes('Back_Leg_Upper') ||
             bone.name.includes('_Toe') ||
-            bone.name.includes('Shoulder') ||
             bone.name.includes('UpLeg')) {
-        use_minimum_expand_distance = true
+        return true
       }
+    }
 
-      const new_bone_object: BoneCalculationData = new BoneCalculationData(bone.name, bone, supports_envelope, has_child_bone, [], use_minimum_expand_distance)
+    // humanoid character has separate rules with bone envelopes
+    if (this.skeleton_type === SkeletonType.BipedalFull || this.skeleton_type === SkeletonType.BipedalSimple) {
+      if (bone.name.includes('Shoulder')) {
+        return true
+      }
+    }
 
-      this.bones_master_data.push(new_bone_object)
-    })
+    return false // each direction will expand to the max distance
   }
 
   private create_envelope_mesh_for_bone (bone: BoneCalculationData): Mesh {
@@ -363,11 +380,18 @@ export class BoneWeightsByEnvelope implements IAutoSkinSolver {
 
     // we are going to ignore certain bones for the bone as they
     // have odd angles and create bad envelopes
-    if (
-      bone.name.includes('Fingers') ||
+    if (this.skeleton_type === SkeletonType.BipedalSimple) {
+      if (bone.name.includes('Fingers') ||
           bone.name.includes('HandBase') ||
           bone.name === 'SpineUp') {
-      return false
+        return false
+      }
+    }
+
+    if (this.skeleton_type === SkeletonType.BipedalFull) {
+      if (bone.name === 'mixamorig_Spine2') {
+        return false
+      }
     }
 
     return true // bone is ok to do envelope calculations

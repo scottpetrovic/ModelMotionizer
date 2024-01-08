@@ -1,5 +1,6 @@
 import { type Object3D, type BufferGeometry } from 'three'
 import type BoneTesterData from '../models/BoneTesterData'
+import { type SkeletonType } from '../enums/SkeletonType'
 
 export interface IAutoSkinSolver {
   set_geometry: (geom: BufferGeometry) => void
@@ -8,4 +9,5 @@ export interface IAutoSkinSolver {
   set_bone_index_to_test: (bone_idx: number) => void
   calculate_indexes_and_weights: () => number[][]
   test_bones_outside_in_mesh: () => BoneTesterData
+  set_skeleton_type: (skinning_type: SkeletonType) => void
 }

@@ -3,6 +3,7 @@ import { Utility } from '../Utilities.js'
 import BoneCalculationData from '../models/BoneCalculationData.js'
 import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
 import BoneTesterData from '../models/BoneTesterData.js'
+import { SkeletonType } from '../enums/SkeletonType.js'
 
 export default class BoneWeightsByDistance implements IAutoSkinSolver {
   private readonly bones_master_data: BoneCalculationData[] = []
@@ -10,8 +11,10 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
   private show_debug: boolean = false
   private bone_idx_test: number = -1
   private debugging_scene_object: Object3D = new Object3D()
+  private skeleton_type: SkeletonType = SkeletonType.BipedalSimple
 
-  constructor (bone_hier: Object3D) {
+  constructor (bone_hier: Object3D, skeleton_type: SkeletonType) {
+    this.set_skeleton_type(skeleton_type)
     this.init_bone_weights_data_structure(bone_hier)
   }
 
@@ -21,6 +24,10 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
 
   public set_geometry (geom: BufferGeometry): void {
     this.geometry = geom
+  }
+
+  public set_skeleton_type (skinning_type: SkeletonType): void {
+    this.skeleton_type = skinning_type
   }
 
   public set_show_debug (debug_value: boolean): void {

@@ -14,10 +14,10 @@ export class StepLoadSkeleton extends EventTarget {
   private readonly ui: UI = new UI()
   private loaded_armature: Object3D = new Object3D()
   private loaded_skeleton: Skeleton | undefined
-  private skeleton_ty: string = ''
+  private skeleton_t: SkeletonType = SkeletonType.BipedalSimple
 
-  public skeleton_type (): string {
-    return this.skeleton_ty
+  public skeleton_type (): SkeletonType {
+    return this.skeleton_t
   }
 
   begin (): void {
@@ -63,18 +63,18 @@ export class StepLoadSkeleton extends EventTarget {
         // so it knows what animations to load
         switch (skeleton_file) {
           case 'quadraped':
-            this.skeleton_ty = SkeletonType.Quadraped
+            this.skeleton_t = SkeletonType.Quadraped
             break
           case 'bipedal-simple':
-            this.skeleton_ty = SkeletonType.BipedalSimple
+            this.skeleton_t = SkeletonType.BipedalSimple
             break
           case 'bipedal-full':
-            this.skeleton_ty = SkeletonType.BipedalFull
+            this.skeleton_t = SkeletonType.BipedalFull
             break
         }
 
         // load skeleton from GLB file
-        this.loader.load(this.skeleton_ty, (gltf) => {
+        this.loader.load(this.skeleton_t, (gltf) => {
           // traverse scene and find first bone object
           // we will go to the parent and mark that as the original armature
           let armature_found = false

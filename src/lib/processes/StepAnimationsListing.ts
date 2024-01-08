@@ -65,7 +65,7 @@ export class StepAnimationsListing extends EventTarget {
     return this.animation_clips_loaded
   }
 
-  public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes: SkinnedMesh[], skeleton_type: string): void {
+  public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes: SkinnedMesh[], skeleton_type: SkeletonType): void {
     this.skinned_meshes_to_animate = final_skinned_meshes
     this.skeleton_type = skeleton_type
 
