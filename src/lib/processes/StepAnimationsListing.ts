@@ -61,11 +61,11 @@ export class StepAnimationsListing extends EventTarget {
     return this.animation_mixer
   }
 
-  public animation_clips(): AnimationClip[] {
+  public animation_clips (): AnimationClip[] {
     return this.animation_clips_loaded
   }
 
-  public load_and_apply_default_animation_to_skinned_mesh(final_skinned_meshes: SkinnedMesh[], skeleton_type: SkeletonType): void {
+  public load_and_apply_default_animation_to_skinned_mesh (final_skinned_meshes: SkinnedMesh[], skeleton_type: SkeletonType): void {
     this.skinned_meshes_to_animate = final_skinned_meshes
     this.skeleton_type = skeleton_type
 
@@ -99,7 +99,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private extend_arm_animations_by_percentage(percentage: number): void {
+  private extend_arm_animations_by_percentage (percentage: number): void {
     // loop through each animation clip to update the tracks
     this.animation_clips_loaded.forEach((animation_clip: AnimationClip) => {
       animation_clip.tracks.forEach((track: KeyframeTrack) => {
@@ -147,7 +147,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private play_animation(index: number = 0): void {
+  private play_animation (index: number = 0): void {
     this.current_playing_index = index
 
     // animation mixer has internal cache with animations. doing this helps clear it
@@ -163,11 +163,11 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private load_animation_clips(animation_clips: AnimationClip[]): void {
+  private load_animation_clips (animation_clips: AnimationClip[]): void {
     this.animation_clips_loaded = this.remove_position_and_scale_keyframes_from_animations(animation_clips)
   }
 
-  private add_event_listeners(): void {
+  private add_event_listeners (): void {
     if (this.has_added_event_listeners) {
       return
     }
@@ -218,7 +218,7 @@ export class StepAnimationsListing extends EventTarget {
     this.has_added_event_listeners = true
   }
 
-  private load_fbx_animation_clips(fbx_file: string, file_name: string): void {
+  private load_fbx_animation_clips (fbx_file: string, file_name: string): void {
     this.fbx_animation_loader = new FBXLoader()
 
     this.fbx_animation_loader.load(fbx_file, (fbx) => {
@@ -239,9 +239,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private process_mixamo_animation_clips(animation_clips: AnimationClip[], file_name: string): void {
-    const using_simplified_skeleton: boolean = this.skeleton_type === SkeletonType.BipedalSimple
-
+  private process_mixamo_animation_clips (animation_clips: AnimationClip[], file_name: string): void {
     // loop through each animation clip to update the tracks
     animation_clips.forEach((animation_clip, index) => {
       animation_clip.name = `${file_name} (${index.toString()})` // mixamo just calles the clip names 'mixamo.com'
@@ -264,6 +262,7 @@ export class StepAnimationsListing extends EventTarget {
         if (this.skeleton_type === SkeletonType.BipedalFull) {
           track.name = mixamo_bone_name.replace('mixamorig', 'mixamorig_') + '.' + keyframe_type
         }
+
         // Mixamo has 1 unit = 1cm. We need to scale position data to compensate for that
         // the 200 value is arbitrary, but the results seem to look good, so I went with that.
         if (keyframe_type === 'position') {
@@ -281,7 +280,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private load_gltf_animation_clips(gltf_file: string): void {
+  private load_gltf_animation_clips (gltf_file: string): void {
     this.gltf_animation_loader = new GLTFLoader()
 
     this.gltf_animation_loader.load(gltf_file, (gltf) => {
@@ -294,7 +293,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
-  private append_animation_clips(animation_clips: AnimationClip[]): void {
+  private append_animation_clips (animation_clips: AnimationClip[]): void {
     // loop through each animation_clip and change name if the animaton name already exists
     // see if the aniation name is already taken.. if so, add a number to the end of the name
     animation_clips.forEach((animation_clip) => {
@@ -310,7 +309,7 @@ export class StepAnimationsListing extends EventTarget {
     this.animation_clips_loaded.push(...this.remove_position_and_scale_keyframes_from_animations(animation_clips))
   }
 
-  private remove_position_and_scale_keyframes_from_animations(animation_clip_list: AnimationClip[]): AnimationClip[] {
+  private remove_position_and_scale_keyframes_from_animations (animation_clip_list: AnimationClip[]): AnimationClip[] {
     // Don't use this for now. Maybe delete this function later
 
     const animation_clips = this.deep_clone_animation_clips(animation_clip_list)
@@ -324,7 +323,7 @@ export class StepAnimationsListing extends EventTarget {
     return animation_clips
   }
 
-  private deep_clone_animation_clips(animation_clips: AnimationClip[]): AnimationClip[] {
+  private deep_clone_animation_clips (animation_clips: AnimationClip[]): AnimationClip[] {
     return animation_clips.map((clip: AnimationClip) => {
       const tracks = clip.tracks.map(track => track.clone())
       return new AnimationClip(clip.name, clip.duration, tracks)
