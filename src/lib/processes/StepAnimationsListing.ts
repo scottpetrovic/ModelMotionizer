@@ -252,13 +252,18 @@ export class StepAnimationsListing extends EventTarget {
         const keyframe_type: string = track.name.split('.')[1]
 
         // selected skeleton is a simplified mixamo skeleton. We need to map bone names
-        if (using_simplified_skeleton) {
+        if (this.skeleton_type === SkeletonType.BipedalSimple) {
           const is_mappping_found: boolean = MixamoToSimpleMapping[mixamo_bone_name]
           if (is_mappping_found) {
             track.name = MixamoToSimpleMapping[mixamo_bone_name] + '.' + keyframe_type
           }
         }
 
+        // my mixamo skeleton has an underscore character. Maybe need to replace
+        // this later so the skeleton doesn't have to do this replacing when importing
+        if (this.skeleton_type === SkeletonType.BipedalFull) {
+          track.name = mixamo_bone_name.replace('mixamorig', 'mixamorig_') + '.' + keyframe_type
+        }
         // Mixamo has 1 unit = 1cm. We need to scale position data to compensate for that
         // the 200 value is arbitrary, but the results seem to look good, so I went with that.
         if (keyframe_type === 'position') {
@@ -270,7 +275,7 @@ export class StepAnimationsListing extends EventTarget {
 
       // with the simple skeleton, there are many bones that are not used from the full mixamo animation
       // remove unmapped bones since they won't be used
-      if (using_simplified_skeleton) {
+      if (this.skeleton_type === SkeletonType.BipedalSimple) {
         animation_clip.tracks = animation_clip.tracks.filter(x => !x.name.includes('mixamorig'))
       }
     })
