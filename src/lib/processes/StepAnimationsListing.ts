@@ -2,11 +2,13 @@ import { UI } from '../UI.ts'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
+import { BVHLoader } from 'three/examples/jsm/loaders/BVHLoader.js'
 
 import { AnimationClip, AnimationMixer, Quaternion, Vector3, type SkinnedMesh, type QuaternionKeyframeTrack, type KeyframeTrack, type AnimationAction } from 'three'
 
 import { SkeletonType } from '../enums/SkeletonType.ts'
 import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js'
+import { BVHToSimpleMapping } from '../mapping/BVHToSimple.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepAnimationsListing extends EventTarget {
@@ -201,6 +203,8 @@ export class StepAnimationsListing extends EventTarget {
           this.load_fbx_animation_clips(file_info, file_name)
         } else if (file_extension === 'glb' || file_extension === 'gltf') {
           this.load_gltf_animation_clips(file_info)
+        } else if (file_extension === 'bvh') {
+          this.load_bvh_animation_clip(file_info)
         }
 
         // clear out the file input field in case we want to test by loading same file again
@@ -237,6 +241,60 @@ export class StepAnimationsListing extends EventTarget {
       this.append_animation_clips(animations_for_scene)
       this.ui.build_animation_clip_ui(this.animation_clips_loaded)
     })
+  }
+
+  private load_bvh_animation_clip (bvh_file: string): void {
+    const bvh_loader = new BVHLoader()
+
+    bvh_loader.load(bvh_file, (result) => {
+      let clip: AnimationClip = result.clip
+
+      clip = this.process_bvh_animation_clip(clip, 'bvh')
+
+      // add the animations to the animation_clips_loaded
+      // update the UI with the new animation clips
+      this.append_animation_clips([clip])
+      this.ui.build_animation_clip_ui(this.animation_clips_loaded)
+    })
+  }
+
+  private process_bvh_animation_clip (animation_clip: AnimationClip, file_name: string): AnimationClip {
+    // need to remove the position keyframes from the animation
+    // since we will be offsetting the root bone position
+    const cloned_track: AnimationClip = this.deep_clone_animation_clips([animation_clip])[0]
+
+    // only keep the rotation tracks...and the root bone position track
+    const rotation_tracks = cloned_track.tracks.filter(x => x.name.includes('quaternion'))
+    cloned_track.tracks = rotation_tracks
+
+    // keep the root bone position track
+    const root_position_track = animation_clip.tracks.filter(x => x.name === 'root.position')[0]
+    cloned_track.tracks.push(root_position_track)
+
+    // need to do bone mapping
+    // loop through each animation clip to update the tracks
+    cloned_track.tracks.forEach((track) => {
+      const bvh_bone_name: string = track.name.split('.')[0]
+      const keyframe_type: string = track.name.split('.')[1]
+
+      // selected skeleton is a simplified mixamo skeleton. We need to map bone names
+      if (this.skeleton_type === SkeletonType.BipedalSimple) {
+        const bone_from_mapping: boolean = BVHToSimpleMapping[bvh_bone_name]
+        if (bone_from_mapping) {
+          track.name = bone_from_mapping + '.' + keyframe_type
+        }
+      }
+
+      // BVH seems to have something like 1 unit = 1cm. We need to scale position data to compensate for that
+      // the 200 value is arbitrary, but the results seem to look good, so I went with that. FBX seems to be the same
+      if (keyframe_type === 'position') {
+        (track.values as Float32Array).forEach((value, index) => {
+          track.values[index] = value / 200
+        })
+      }
+    })
+
+    return cloned_track
   }
 
   private process_mixamo_animation_clips (animation_clips: AnimationClip[], file_name: string): void {
@@ -313,6 +371,7 @@ export class StepAnimationsListing extends EventTarget {
     // Don't use this for now. Maybe delete this function later
 
     const animation_clips = this.deep_clone_animation_clips(animation_clip_list)
+
     // const filtered_tracks = animation_clips.map((animation_clip) => {
     //   const filteredTracks = animation_clip.tracks.filter((track) => {
     //     return track.name.indexOf('quaternion') > 0
