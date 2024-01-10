@@ -269,11 +269,18 @@ export class StepAnimationsListing extends EventTarget {
 
     // keep the root bone position track
     const root_position_track = animation_clip.tracks.filter(x => x.name === 'root.position')[0]
-    cloned_track.tracks.push(root_position_track)
+
+    if (root_position_track !== undefined) {
+      cloned_track.tracks.push(root_position_track)
+    }
 
     // need to do bone mapping
     // loop through each animation clip to update the tracks
     cloned_track.tracks.forEach((track) => {
+      if (track === undefined) {
+        throw new Error('Error processing BVH animation clip. Track input is undefined')
+      }
+
       const bvh_bone_name: string = track.name.split('.')[0]
       const keyframe_type: string = track.name.split('.')[1]
 
