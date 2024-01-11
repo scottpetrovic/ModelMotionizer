@@ -9,6 +9,7 @@ import { AnimationClip, AnimationMixer, Quaternion, Vector3, type SkinnedMesh, t
 import { SkeletonType } from '../enums/SkeletonType.ts'
 import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js'
 import { BVHToSimpleMapping } from '../mapping/BVHToSimple.ts'
+import { CarnegieMellonUniversityToMixamoMapping } from '../mapping/CarnegieMellonUniversityToMixamo.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepAnimationsListing extends EventTarget {
@@ -21,6 +22,8 @@ export class StepAnimationsListing extends EventTarget {
   private skinned_meshes_to_animate: SkinnedMesh[] = []
   private current_playing_index: number = 0
   private skeleton_type: string = SkeletonType.BipedalSimple
+
+  private skeleton_type_trying_to_import: string = 'mixamo-skeleton' // manually importing animation file
 
   private has_added_event_listeners: boolean = false
 
@@ -184,7 +187,7 @@ export class StepAnimationsListing extends EventTarget {
       })
     }
 
-    this.ui.dom_import_animations_button?.addEventListener('change', (event) => {
+    this.ui.dom_import_animation_upload?.addEventListener('change', (event) => {
       const file = event.target?.files[0]
       const reader = new FileReader()
       reader.readAsDataURL(file)
@@ -208,7 +211,7 @@ export class StepAnimationsListing extends EventTarget {
         }
 
         // clear out the file input field in case we want to test by loading same file again
-        this.ui.dom_import_animations_button.value = ''
+        this.ui.dom_import_animation_upload.value = ''
       }
     })
 
@@ -227,7 +230,8 @@ export class StepAnimationsListing extends EventTarget {
       // handle clicking an animation type to import
       this.ui.dom_animation_import_options.addEventListener('click', (event) => {
         const animation_type = event.target.getAttribute('data-value')
-        console.log('clicked on an import animation option', animation_type)
+        this.skeleton_type_trying_to_import = animation_type
+        this.ui.dom_import_animation_upload.click() // initiate file upload
       })
     }
 
@@ -242,17 +246,58 @@ export class StepAnimationsListing extends EventTarget {
       const animations_for_scene: AnimationClip[] = fbx.animations // we only need the animations
 
       // check to see if the animation is a mixamo skeleton. we will need this later for potential mapping
-      const is_mixamo_animation: boolean = animations_for_scene[0].name === 'mixamo.com'
+      const is_mixamo_animation: boolean = animations_for_scene[0].name === 'mixamo.com' || this.skeleton_type_trying_to_import === 'mixamo'
+      const is_carnegie_mellon_skeleton = this.skeleton_type_trying_to_import === 'carnegie-skeleton'
 
       if (is_mixamo_animation) {
         // mutates animations_for_scene contents
         this.process_mixamo_animation_clips(animations_for_scene, file_name)
       }
 
+      if (is_carnegie_mellon_skeleton) {
+        // all these functions mutate animation data
+        this.process_carnegie_skeleton_clip(animations_for_scene, file_name)
+        this.reduce_position_keyframes(animations_for_scene)
+        console.log('animation clips after processing 2:', animations_for_scene)
+      }
+
       // add the animations to the animation_clips_loaded
       // update the UI with the new animation clips
       this.append_animation_clips(animations_for_scene)
       this.ui.build_animation_clip_ui(this.animation_clips_loaded)
+    })
+  }
+
+  private process_carnegie_skeleton_clip (animation_clips: AnimationClip[], file_name: string): void {
+    // Do bone mappings for the carnegie mellon skeleton
+    animation_clips.forEach((animation_clip, index) => {
+      animation_clip.tracks.forEach((track) => {
+        const original_bone_name: string = track.name.split('.')[0]
+        const keyframe_type: string = track.name.split('.')[1]
+
+        const bone_mapping_result: boolean = CarnegieMellonUniversityToMixamoMapping[original_bone_name]
+        if (bone_mapping_result) {
+          track.name = bone_mapping_result + '.' + keyframe_type
+        }
+      })
+    })
+
+    // use file name for animation clip name
+    animation_clips.forEach((animation_clip, index) => {
+      animation_clip.name = `${file_name} (${index.toString()})`
+    })
+  }
+
+  private reduce_position_keyframes (animation_clips: AnimationClip[]): void {
+    animation_clips.forEach((animation_clip, index) => {
+      animation_clip.tracks.forEach((track) => {
+        const keyframe_type: string = track.name.split('.')[1]
+        if (keyframe_type === 'position') {
+          (track.values as Float32Array).forEach((value, index) => {
+            track.values[index] = value / 200
+          })
+        }
+      })
     })
   }
 

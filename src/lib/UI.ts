@@ -36,6 +36,7 @@ export class UI {
   dom_build_version: Element | null = null
   dom_animation_import_options: Element | null = null
   dom_import_animations_buton: Element | null = null
+  dom_import_animation_upload: Element | null = null
 
   constructor () {
     this.initialize_dom_elements()
@@ -81,12 +82,13 @@ export class UI {
     this.dom_animation_clip_list = document.querySelector('#animations-items')
     this.dom_export_button = document.querySelector('#export-button')
     this.dom_info_panel = document.querySelector('#info-messaging')
-    this.dom_import_animations_button = document.querySelector('#import-animations-button')
 
     this.dom_extend_arm_input = document.querySelector('#extend-arm-input')
     this.dom_extend_arm_button = document.querySelector('#extend-arm-button')
 
     this.dom_build_version = document.querySelector('#build-version')
+
+    this.dom_import_animation_upload = document.querySelector('#import-animations-upload')
 
     this.dom_import_animations_buton = document.querySelector('#import-animations-button')
     this.dom_animation_import_options = document.querySelector('#animation-import-options')
