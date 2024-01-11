@@ -218,6 +218,19 @@ export class StepAnimationsListing extends EventTarget {
       this.play_animation(this.current_playing_index)
     })
 
+    if (this.ui.dom_import_animations_buton !== null && this.ui.dom_animation_import_options !== null) {
+      // toggle the Import button being shown/hidden
+      this.ui.dom_import_animations_buton.addEventListener('click', (event) => {
+        this.ui.dom_animation_import_options.classList.toggle('show')
+      })
+
+      // handle clicking an animation type to import
+      this.ui.dom_animation_import_options.addEventListener('click', (event) => {
+        const animation_type = event.target.getAttribute('data-value')
+        console.log('clicked on an import animation option', animation_type)
+      })
+    }
+
     // helps ensure we don't add event listeners multiple times
     this.has_added_event_listeners = true
   }

@@ -170,13 +170,41 @@
 
             <div style="display: flex; column-gap: 10px; justify-content: center;">
 
-                <label for="import-animations-button" class="button"  >
+
+                <!-- can import a different types of animations depending on skeleton it is associated with-->
+                <div class="animation-import-section">
+                    <button id="import-animations-button" class="button dropbtn">
+                        <span class="button-icon-group" style="pointer-events: none">
+                            <span>Import</span>
+                            <span class="material-symbols-outlined">arrow_drop_down</span>
+                        </span>
+                    </button>
+                    <div id="animation-import-options" class="dropdown-content">
+                      <a href="#" data-value="mixamo-animation">Mixamo Animation</a>
+                      <a href="#" data-value="carnegie-animation">Carnegie Mellon Animation</a>
+                    </div>
+                </div>
+
+
+                <!-- <div class="dropdown button">
+                    <span class="button-icon-group">
+                        <span>Import</span>
+                        <span class="material-symbols-outlined">arrow_drop_down</span>
+                    </span>
+                    <div class="animation-import-dropdown-content">
+                      <div id="mixamo-animation-import-option">Mixamo Animation</div>
+                      <div id="carnegie-mellon-animation-import-option">Carnegie Mellon Animation</div>
+                    </div>
+                  </div> -->
+
+              
+                <!-- <label for="import-animations-button" class="button"  >
                     <span class="button-icon-group">
                         <span class="material-symbols-outlined">add</span>
                         <span>Import</span>
                     </span>
                 </label>
-                <input id="import-animations-button" type="file" name="animation-upload" accept=".glb, .gltf, .fbx, .bvh" /> 
+                <input id="import-animations-button" type="file" name="animation-upload" accept=".glb, .gltf, .fbx, .bvh" />  -->
 
                 <button id="export-button">
                     <span class="button-icon-group">

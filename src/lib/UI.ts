@@ -34,6 +34,8 @@ export class UI {
   dom_extend_arm_button: Element | null = null
   dom_export_button_hidden_link: Element | null = null
   dom_build_version: Element | null = null
+  dom_animation_import_options: Element | null = null
+  dom_import_animations_buton: Element | null = null
 
   constructor () {
     this.initialize_dom_elements()
@@ -85,6 +87,9 @@ export class UI {
     this.dom_extend_arm_button = document.querySelector('#extend-arm-button')
 
     this.dom_build_version = document.querySelector('#build-version')
+
+    this.dom_import_animations_buton = document.querySelector('#import-animations-button')
+    this.dom_animation_import_options = document.querySelector('#animation-import-options')
 
     // UI for exporting the animation
     this.dom_export_button_hidden_link = document.querySelector('#download-hidden-link')

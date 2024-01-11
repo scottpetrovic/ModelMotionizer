@@ -336,7 +336,33 @@ export class Bootstrap {
         this.transform_controls.setMode('rotate')
       }
     })
+
+    window.addEventListener('click', (event: MouseEvent) => {
+      this.handle_closing_drop_down_ui(event)
+    }, false)
   } // end event listeners
+
+  private handle_closing_drop_down_ui (event: MouseEvent): void {
+    if (event?.target === null) {
+      return
+    }
+
+    const target_element = event.target as Element
+
+    const target_has_dropdown = target_element.matches('.dropbtn') // button object
+    const parent_class_has_dropdown = target_element.parentElement?.matches('.dropbtn') // text inside button
+
+    if (!target_has_dropdown && parent_class_has_dropdown === false) {
+      const drop_downs = document.getElementsByClassName('dropdown-content')
+      let i = 0
+      for (i = 0; i < drop_downs.length; i++) {
+        const open_drop_downs = drop_downs[i]
+        if (open_drop_downs.classList.contains('show')) {
+          open_drop_downs.classList.remove('show')
+        }
+      }
+    }
+  }
 
   private start_skin_weighting_step (): void {
     // we only need one binding skeleton. All skinned meshes will use this.
