@@ -166,7 +166,7 @@ export class StepAnimationsListing extends EventTarget {
   }
 
   private load_animation_clips (animation_clips: AnimationClip[]): void {
-    this.animation_clips_loaded = this.remove_position_and_scale_keyframes_from_animations(animation_clips)
+    this.animation_clips_loaded = this.deep_clone_animation_clips(animation_clips)
   }
 
   private add_event_listeners (): void {
@@ -371,22 +371,7 @@ export class StepAnimationsListing extends EventTarget {
       }
     })
 
-    this.animation_clips_loaded.push(...this.remove_position_and_scale_keyframes_from_animations(animation_clips))
-  }
-
-  private remove_position_and_scale_keyframes_from_animations (animation_clip_list: AnimationClip[]): AnimationClip[] {
-    // Don't use this for now. Maybe delete this function later
-
-    const animation_clips = this.deep_clone_animation_clips(animation_clip_list)
-
-    // const filtered_tracks = animation_clips.map((animation_clip) => {
-    //   const filteredTracks = animation_clip.tracks.filter((track) => {
-    //     return track.name.indexOf('quaternion') > 0
-    //   })
-    //   return new AnimationClip(animation_clip.name, animation_clip.duration, filteredTracks)
-    // })
-
-    return animation_clips
+    this.animation_clips_loaded.push(...this.deep_clone_animation_clips(animation_clips))
   }
 
   private deep_clone_animation_clips (animation_clips: AnimationClip[]): AnimationClip[] {
