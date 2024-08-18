@@ -1,7 +1,7 @@
 # ModelMotionizer
 Import a 3D Model and automatically assign and export animations. This is kind of similar to a web application like Mixamo, but I would like it to be more flexible in nature. 
 
-Live Demo from my github page: https://www.scottpetrovic.com/model-motionizer/
+Live Demo from my github page: https://scottpetrovic.github.io/model-motionizer/
 
 ![Screenshot](./readme.png)
 
