@@ -1,42 +1,42 @@
 import { type AnimationClip } from 'three'
 
 export class UI {
-  dom_current_step_index: Element | null = null
-  dom_current_step_element: Element | null = null
-  dom_transform_controls_switch: Element | null = null
-  dom_load_model_tools: Element | null = null
-  dom_upload_model_button: Element | null = null
-  dom_load_model_button: Element | null = null
-  dom_load_model_debug_checkbox: Element | null = null
-  dom_rotate_model_x_button: Element | null = null
-  dom_rotate_model_y_button: Element | null = null
-  dom_rotate_model_z_button: Element | null = null
-  dom_load_skeleton_tools: Element | null = null
-  dom_load_skeleton_button: Element | null = null
-  dom_skeleton_edit_tools: Element | null = null
-  dom_skeleton_drop_type: Element | null = null
-  dom_mirror_skeleton_checkbox: Element | null = null
-  dom_scale_skeleton_button: Element | null = null
-  dom_bind_pose_button: Element | null = null
-  dom_scale_skeleton_input_box: Element | null = null
-  dom_move_to_origin_button: Element | null = null
-  dom_skinning_algorithm_selection: Element | null = null
-  dom_skinned_mesh_tools: Element | null = null
-  dom_skinned_mesh_animation_tools: Element | null = null
-  dom_show_skeleton_checkbox: Element | null = null
-  dom_back_to_edit_skeleton_button: Element | null = null
-  dom_enable_skin_debugging: Element | null = null
-  dom_animation_clip_list: Element | null = null
-  dom_export_button: Element | null = null
-  dom_info_panel: Element | null = null
-  dom_import_animations_button: Element | null = null
-  dom_extend_arm_input: Element | null = null
-  dom_extend_arm_button: Element | null = null
-  dom_export_button_hidden_link: Element | null = null
-  dom_build_version: Element | null = null
-  dom_animation_import_options: Element | null = null
-  dom_import_animations_buton: Element | null = null
-  dom_import_animation_upload: Element | null = null
+  dom_current_step_index: HTMLElement | null = null
+  dom_current_step_element: HTMLElement | null = null
+  dom_transform_controls_switch: HTMLElement | null = null
+  dom_load_model_tools: HTMLElement | null = null
+  dom_upload_model_button: HTMLButtonElement | null = null
+  dom_load_model_button: HTMLButtonElement | null = null
+  dom_load_model_debug_checkbox: HTMLInputElement | null = null
+  dom_rotate_model_x_button: HTMLButtonElement | null = null
+  dom_rotate_model_y_button: HTMLButtonElement | null = null
+  dom_rotate_model_z_button: HTMLButtonElement | null = null
+  dom_load_skeleton_tools: HTMLElement | null = null
+  dom_load_skeleton_button: HTMLButtonElement | null = null
+  dom_skeleton_edit_tools: HTMLElement | null = null
+  dom_skeleton_drop_type: HTMLElement | null = null
+  dom_mirror_skeleton_checkbox: HTMLElement | null = null
+  dom_scale_skeleton_button: HTMLButtonElement | null = null
+  dom_bind_pose_button: HTMLButtonElement | null = null
+  dom_scale_skeleton_input_box: HTMLElement | null = null
+  dom_move_to_origin_button: HTMLButtonElement | null = null
+  dom_skinning_algorithm_selection: HTMLElement | null = null
+  dom_skinned_mesh_tools: HTMLElement | null = null
+  dom_skinned_mesh_animation_tools: HTMLElement | null = null
+  dom_show_skeleton_checkbox: HTMLElement | null = null
+  dom_back_to_edit_skeleton_button: HTMLButtonElement | null = null
+  dom_enable_skin_debugging: HTMLInputElement | null = null
+  dom_animation_clip_list: HTMLElement | null = null
+  dom_export_button: HTMLButtonElement | null = null
+  dom_info_panel: HTMLElement | null = null
+  dom_import_animations_button: HTMLButtonElement | null = null
+  dom_extend_arm_input: HTMLElement | null = null
+  dom_extend_arm_button: HTMLButtonElement | null = null
+  dom_export_button_hidden_link: HTMLElement | null = null
+  dom_build_version: HTMLElement | null = null
+  dom_animation_import_options: HTMLElement | null = null
+  dom_import_animations_buton: HTMLButtonElement | null = null
+  dom_import_animation_upload: HTMLElement | null = null
 
   constructor () {
     this.initialize_dom_elements()
@@ -131,6 +131,10 @@ export class UI {
     /// take the animation_clips_loaded, loop through them, and build out the UI
     this.dom_animation_clip_list.innerHTML = ''
     animation_clips_to_load.forEach((animation_clip, index) => {
+      if (this.dom_animation_clip_list == null) {
+        return
+      }
+
       this.dom_animation_clip_list.innerHTML +=
               `<div class="anim-item">
                   <div>
