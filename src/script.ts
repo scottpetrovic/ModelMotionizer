@@ -16,11 +16,13 @@ import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.ts'
-import { type Bone, Group, Scene, type Skeleton, type Vector3, type SkeletonHelper, type Points } from 'three'
+import { type Bone, Group, Scene, type Skeleton, type Vector3, type Points } from 'three'
 import type BoneTesterData from './lib/models/BoneTesterData.ts'
 
 import { build_version } from './environment.js'
 import { SkeletonType } from './lib/enums/SkeletonType.ts'
+
+import { CustomSkeletonHelper } from './lib/CustomSkeletonHelper.ts'
 
 export class Bootstrap {
   private readonly camera = Generators.create_camera()
@@ -41,7 +43,7 @@ export class Bootstrap {
   private readonly scene: Scene = new Scene()
 
   // for looking at specific bones
-  private skeleton_helper: SkeletonHelper | undefined = undefined
+  private skeleton_helper: CustomSkeletonHelper | undefined = undefined
   private debugging_visual_object: Group = new Group()
   private process_step: ProcessStep = ProcessStep.LoadModel
 
@@ -103,7 +105,7 @@ export class Bootstrap {
       this.scene.remove(this.skeleton_helper)
     }
 
-    this.skeleton_helper = new THREE.SkeletonHelper(new_skeleton.bones[0])
+    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { dashed: true, linewidth: 0.005, color: 0x00ff00 })
     this.skeleton_helper.name = helper_name
     this.scene.add(this.skeleton_helper)
   }

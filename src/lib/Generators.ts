@@ -1,9 +1,11 @@
 import {
   PerspectiveCamera, DoubleSide, DirectionalLight, GridHelper,
   Bone, Skeleton, AmbientLight, PlaneGeometry, Mesh,
-  SphereGeometry, SkeletonHelper, type MeshBasicMaterial, MeshPhongMaterial, AxesHelper,
+  SphereGeometry, type MeshBasicMaterial, MeshPhongMaterial, AxesHelper,
   Vector3, PointsMaterial, BufferGeometry, Points, type Object3D, WebGLRenderer
 } from 'three'
+
+import { CustomSkeletonHelper } from './CustomSkeletonHelper'
 
 import { Utility } from './Utilities'
 
@@ -74,9 +76,9 @@ export class Generators {
     return skeleton
   }
 
-  static create_skeleton_helper(skeleton: Skeleton): SkeletonHelper
-  {
-    const skeleton_helper = new SkeletonHelper(skeleton.bones[0])
+  static create_skeleton_helper (skeleton: Skeleton): CustomSkeletonHelper {
+    const skeleton_helper = new CustomSkeletonHelper(skeleton.bones[0], { lineWidth: 5, dashed: true })
+    skeleton_helper.setLineWidth(30)
     return skeleton_helper
   }
 
