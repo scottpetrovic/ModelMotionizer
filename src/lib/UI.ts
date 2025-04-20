@@ -14,7 +14,7 @@ export class UI {
   dom_load_skeleton_tools: HTMLElement | null = null
   dom_load_skeleton_button: HTMLButtonElement | null = null
   dom_skeleton_edit_tools: HTMLElement | null = null
-  dom_skeleton_drop_type: HTMLElement | null = null
+  dom_skeleton_drop_type: HTMLSelectElement | null = null
   dom_mirror_skeleton_checkbox: HTMLElement | null = null
   dom_scale_skeleton_button: HTMLButtonElement | null = null
   dom_bind_pose_button: HTMLButtonElement | null = null
