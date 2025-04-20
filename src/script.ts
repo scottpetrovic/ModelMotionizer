@@ -90,7 +90,7 @@ export class Bootstrap {
     // basic things in another group, to better isolate what we are working on
     this.environment_container.name = 'Setup objects'
     this.environment_container.add(...Generators.create_default_lights())
-    this.environment_container.add(...Generators.create_grid_helper())
+    this.environment_container.add(...Generators.create_grid_helper(0x4496a8))
     this.scene.add(this.environment_container)
 
     const fog_near = 0
@@ -105,7 +105,7 @@ export class Bootstrap {
       this.scene.remove(this.skeleton_helper)
     }
 
-    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { dashed: true, linewidth: 0.005, color: 0x00ff00 })
+    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { dashed: true, linewidth: 0.01, color: 0x4e7d58, jointColor: 0x00ff00 })
     this.skeleton_helper.name = helper_name
     this.scene.add(this.skeleton_helper)
   }

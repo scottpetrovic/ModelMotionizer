@@ -30,14 +30,15 @@ export class Generators {
     floor_mesh.receiveShadow = true
 
     // xyz axes helper display
-    const axes_helper = new AxesHelper(0.15)
+    const axes_helper = new AxesHelper(0.3)
     axes_helper.name = 'Axes Helper'
-    axes_helper.position.copy(new Vector3(0, 0.002, 0)) // offset a bit to avoid z-fighting
+    axes_helper.position.copy(new Vector3(0, 0.008, 0)) // offset a bit to avoid z-fighting
 
     // grid display on floor
     const size: number = 10
     const divisions: number = 10
     const grid_helper: GridHelper = new GridHelper(size, divisions, color, color)
+
 
     return [grid_helper, floor_mesh, axes_helper]
   }

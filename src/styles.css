@@ -166,7 +166,7 @@ option {
 
 #info-panel
 {
-    background: #0000003d;
+    background: #171d2d;
     overflow-y: auto;
     height: fit-content;
     bottom: 20px;
@@ -177,6 +177,7 @@ option {
     border-radius: 3px;
     border: 1px solid #3e4e51;
     max-height: calc(100% - 50px);
+    box-shadow: 3px 3px 9px #0c1016;
 }
 #info-messaging {
     padding: 0.5rem;

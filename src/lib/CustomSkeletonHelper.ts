@@ -3,7 +3,7 @@
 // and ideas from
 // https://discourse.threejs.org/t/extend-skeletonhelper-to-accommodate-fat-lines-perhaps-with-linesegments2/59436/2
 
-import { Color, Matrix4, Vector2, Vector3 } from 'three'
+import { Color, Matrix4, Vector2, Vector3, SphereGeometry, MeshBasicMaterial, Mesh } from 'three'
 import { Line2, LineGeometry, LineMaterial } from 'three/examples/jsm/Addons.js'
 
 const _vector = /*@__PURE__*/ new Vector3()
@@ -11,9 +11,10 @@ const _boneMatrix = /*@__PURE__*/ new Matrix4()
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4()
 
 class CustomSkeletonHelper extends Line2 {
+  private readonly joint_spheres: Mesh[] = []
+
   constructor (object: any, options = {}) {
     const bones = getBoneList(object)
-    // const geometry = new BufferGeometry();
     const geometry = new LineGeometry()
 
     const vertices = []
@@ -30,11 +31,6 @@ class CustomSkeletonHelper extends Line2 {
         colors.push(color.r, color.g, color.b)
       }
     }
-
-    // geometry.setAttribute(
-    //     'instanceStart', new Float32BufferAttribute(lineStart, 3));
-    // geometry.setAttribute(
-    //     'instanceEnd', new Float32BufferAttribute(lineStop, 3));
     geometry.setPositions(vertices)
     geometry.setColors(colors)
 
@@ -60,23 +56,17 @@ class CustomSkeletonHelper extends Line2 {
     this.matrixAutoUpdate = false
 
     window.addEventListener('resize', () => {this.updateResolution()})
-  }
 
-  // Method to dynamically update the line width
-  setLineWidth(newWidth: number): void {
-    this.material.linewidth = newWidth
-    this.material.needsUpdate = true // Trigger material update
-  }
+    // add sphere geometry for joints
+    const sphereGeometry = new SphereGeometry(0.01, 16, 16)
+    const joint_color: Color = new Color(options.jointColor || 0x0000ff)
+    const sphereMaterial = new MeshBasicMaterial({ color: joint_color, depthTest: false })
 
-  // Method to dynamically update dashed property
-  setDashed(isDashed: boolean): void {
-    this.material.dashed = isDashed
-    this.material.needsUpdate = true // Trigger material update
-  }
-
-  updateResolution (): void {
-    this.material.resolution.set(window.innerWidth, window.innerHeight);
-    console.log('Resolution updated:', this.material.resolution);
+    for (let i = 0; i < bones.length; i++) {
+      const sphere = new Mesh(sphereGeometry, sphereMaterial)
+      this.add(sphere)
+      this.joint_spheres.push(sphere)
+    }
   }
 
   updateMatrixWorld (force: boolean): void {
@@ -88,15 +78,22 @@ class CustomSkeletonHelper extends Line2 {
 
     _matrixWorldInv.copy(this.root.matrixWorld).invert()
 
-    for (const [index, bone] of bones.entries()) {
+    let lineIndex = 0
+    for (let i = 0; i < bones.length; i++) {
+      const bone = bones[i];
+      _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld)
+      _vector.setFromMatrixPosition(_boneMatrix)
+      this.joint_spheres[i].position.copy(_vector)
+    
       if (bone.parent && bone.parent.isBone) {
-        _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld)
-        _vector.setFromMatrixPosition(_boneMatrix)
-        lineStart.setXYZ(index, _vector.x, _vector.y, _vector.z)
-
         _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.parent.matrixWorld)
         _vector.setFromMatrixPosition(_boneMatrix)
-        lineEnd.setXYZ(index, _vector.x, _vector.y, _vector.z)
+        lineStart.setXYZ(lineIndex, _vector.x, _vector.y, _vector.z)
+    
+        _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld)
+        _vector.setFromMatrixPosition(_boneMatrix)
+        lineEnd.setXYZ(lineIndex, _vector.x, _vector.y, _vector.z)
+        lineIndex++
       }
     }
 
@@ -108,6 +105,11 @@ class CustomSkeletonHelper extends Line2 {
   dispose (): void {
     this.geometry.dispose()
     this.material.dispose()
+
+    this.joint_spheres.forEach(sphere => {
+      sphere.geometry.dispose()
+      sphere.material.dispose()
+    })
   }
 }
 
