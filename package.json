@@ -8,7 +8,6 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "@types/three": "^0.159.0",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "eslint": "^8.56.0",
     "eslint-config-standard-with-typescript": "^43.0.0",
@@ -19,7 +18,7 @@
     "vite": "^4.5.0"
   },
   "dependencies": {
-    "three": "^0.159.0",
+    "three": "0.175.0",
     "vite-plugin-glsl": "^1.1.2"
   }
 }

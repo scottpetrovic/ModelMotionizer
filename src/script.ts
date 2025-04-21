@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 
 import { Utility } from './lib/Utilities.ts'
 import { Generators } from './lib/Generators.ts'
 
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 
 import { UI } from './lib/UI.ts'
 
@@ -85,7 +85,7 @@ export class Bootstrap {
     this.controls.target.set(0, 0.9, 0)
     this.controls.update()
 
-    this.scene.add(this.transform_controls)
+    this.scene.add(this.transform_controls.getHelper())
 
     // basic things in another group, to better isolate what we are working on
     this.environment_container.name = 'Setup objects'
