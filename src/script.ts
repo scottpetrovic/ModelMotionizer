@@ -77,6 +77,11 @@ export class Bootstrap {
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.shadowMap.enabled = true
 
+    // Set default camera position for front view
+    // this will help because we first want the user to rotate the model to face the front
+    this.camera.position.set(0, 1.7, 15) // X:0 (centered), Y:1.7 (eye-level), Z:5 (front view)
+    this.camera.lookAt(0, 1.7, 0) // Look at center at eye-level
+
     Generators.create_window_resize_listener(this.renderer, this.camera)
     document.body.appendChild(this.renderer.domElement)
 
@@ -97,6 +102,8 @@ export class Bootstrap {
     const fog_far = 80
     const fog_color = 0x0d2525
     this.scene.fog = new THREE.Fog(fog_color, fog_near, fog_far)
+
+
   } // end setup_environment()
 
   private regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {

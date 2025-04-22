@@ -24,7 +24,7 @@ export class StepEditSkeleton extends EventTarget {
     }
 
     if (this.ui.dom_current_step_element != null) {
-      this.ui.dom_current_step_element.innerHTML = 'Edit Skeleton'
+      this.ui.dom_current_step_element.innerHTML = 'Move joints inside mesh'
     }
 
     if (this.ui.dom_transform_controls_switch != null) {

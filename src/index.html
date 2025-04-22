@@ -21,50 +21,60 @@
                 </div>
 
                 <div id="load-model-tools">
+
+                    <label for="model-upload" class="button"  >
+                        <span class="button-icon-group">
+                            <span class="material-symbols-outlined" >upload</span>
+                            <span>Upload GLTF</span>
+                        </span>
+                    </label>
+                    <input id="model-upload" type="file" name="file-upload" accept=".glb, .gltf" />
+
+                    <div style="text-align: center; font-size: 1.5rem">or</div>
                     
+                    <div style="background-color: #0f2f3d; padding: 1rem;">
+                        <label>Sample:</label>
                         <select id="model-selection">
                             <option value="models/human-simple.glb">Human Cartoon</option>
                             <option value="models/fox.glb">Fox</option>
                             <option value="models/mesh-x-bot.glb">X Bot</option>
                         </select>
                         <button id="load-model-button">Load</button>
+                    </div>
 
-                        <div style="text-align: center">or</div>
-
-                        <label for="model-upload" class="button"  >
-                            <span class="button-icon-group">
-                                <span class="material-symbols-outlined" >upload</span>
-                                <span>Upload GLTF</span>
-                            </span>
-                        </label>
-                        <input id="model-upload" type="file" name="file-upload" accept=".glb, .gltf" />
-                        
-                        <div style="display: flex; flex-direction: row">
-                            <input type="checkbox" id="load-model-debug-checkbox" name="load-model-debug-checkbox" >
-                            <label for="load-model-debug-checkbox">Debug</label>
-                        </div>
+                    
+                       
+                    <div style="display: flex; flex-direction: row">
+                        <input type="checkbox" id="load-model-debug-checkbox" name="load-model-debug-checkbox" >
+                        <label for="load-model-debug-checkbox">Debug (load model as normals)</label>
+                    </div>
 
                 </div>
 
                 <div id="load-skeleton-tools">
+                    <label>Skeleton Type to use:</label>
                         <select id="skeleton-selection">
                             <option value="bipedal-simple">Simplified Human</option>
                             <option value="quadraped">4 Leg Creature</option>
                             <option value="bipedal-full">Mixamo Human</option>
                         </select>
-                        <button id="load-skeleton-button">Load</button>
+
 
 
                         <hr />
 
                         <span>
-                            <span>Rotate Model</span>
+                            <span>Rotate Model to face front</span>
                             <div style="display: flex; flex-direction: row">                           
                                 <button id="rotate-model-x-button">X</button>
                                 <button id="rotate-model-y-button">Y</button>
                                 <button id="rotate-model-z-button">Z</button>
                             </div>
                         </span>
+
+                        <hr />
+
+                        <button id="load-skeleton-button">Load Skeleton</button>
 
 
                 </div>
@@ -88,7 +98,7 @@
  
                     <div style="display: flex; flex-direction: row">
                         <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
-                        <label for="mirror-skeleton">Mirror</label>
+                        <label for="mirror-skeleton">Mirror Left/Right</label>
                     </div>
 
                     <hr />
@@ -112,10 +122,11 @@
                 <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
                     <input type="number" id="scale-input" name="scale-input" value="-3" min="-90" max="90" step="1.0">
                     <span class="suffix-unit">%</span>
-                    <button id="scale-skeleton-button" class="secondary-button" >Scale</button>
+                    <button id="scale-skeleton-button" class="secondary-button" >Scale entire skeleton</button>
                 </div>
 
-                <button id="action_move_to_origin"  class="secondary-button" >Move to origin</button>
+                <!-- hide this move to origin for now as is it seems to cause more trouble than it helps -->
+                <!-- <button id="action_move_to_origin"  class="secondary-button" >Move to origin</button> -->
 
                 <hr />
 
@@ -139,7 +150,7 @@
             </span>
 
             <span id="skinned-step-tools">
-                <button id="action_back_to_edit_skeleton" >Edit skeleton</button>
+                <button id="action_back_to_edit_skeleton" >Back to edit skeleton</button>
 
                 <!-- checkbox option to show skeleton -->
                 <div style="display: flex; flex-direction: row">

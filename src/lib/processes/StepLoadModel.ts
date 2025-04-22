@@ -117,7 +117,7 @@ export class StepLoadModel extends EventTarget {
       <div>Select existing models or upload your own.</div>
               <ol>
                 <li>Only GLTF files can be loaded</li>
-                <li>Models with multiple objects won't be rigged correct</li>
+                <li>Models with multiple objects won't be rigged correct. I need to work on this.</li>
                 <li>Mouse primary drag to move view</li>
                 <li>Mouse context drag to pan view</li>
                 <li>Debugging allows you to test odd material artifacts by using a 'Normal' material instead of what is included in the mesh</li>
