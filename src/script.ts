@@ -97,8 +97,6 @@ export class Bootstrap {
     const fog_far = 80
     const fog_color = 0x0d2525
     this.scene.fog = new THREE.Fog(fog_color, fog_near, fog_far)
-    
-    this.add_view_switching_buttons();
   } // end setup_environment()
 
   private regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
@@ -341,6 +339,10 @@ export class Bootstrap {
       }
     })
 
+    this.ui.dom_view_front_change.addEventListener('click', () => this.switchToView('front'))
+    this.ui.dom_view_side_change.addEventListener('click', () => this.switchToView('side'))
+    this.ui.dom_view_top_change.addEventListener('click', () => this.switchToView('top'))
+
     window.addEventListener('click', (event: MouseEvent) => {
       this.handle_closing_drop_down_ui(event)
     }, false)
@@ -471,28 +473,6 @@ export class Bootstrap {
     this.controls.target.y += model_height / 2
 
     this.controls.update() // update the camera position
-  }
-
-  private add_view_switching_buttons(): void {
-    if (!this.ui.dom_view_buttons_container) return;
-    
-    // Create buttons for each view
-    const frontBtn = document.createElement('button');
-    frontBtn.textContent = 'Front';
-    frontBtn.addEventListener('click', () => this.switchToView('front'));
-    
-    const sideBtn = document.createElement('button');
-    sideBtn.textContent = 'Side';
-    sideBtn.addEventListener('click', () => this.switchToView('side'));
-    
-    const topBtn = document.createElement('button');
-    topBtn.textContent = 'Top';
-    topBtn.addEventListener('click', () => this.switchToView('top'));
-    
-    // Add buttons to container
-    this.ui.dom_view_buttons_container.appendChild(frontBtn);
-    this.ui.dom_view_buttons_container.appendChild(sideBtn);
-    this.ui.dom_view_buttons_container.appendChild(topBtn);
   }
 } // end Bootstrap class
 

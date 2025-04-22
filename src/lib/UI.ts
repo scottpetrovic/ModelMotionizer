@@ -37,8 +37,11 @@ export class UI {
   dom_animation_import_options: HTMLElement | null = null
   dom_import_animations_buton: HTMLButtonElement | null = null
   dom_import_animation_upload: HTMLElement | null = null
-  public readonly dom_transform_controls: HTMLElement | null = document.getElementById('transform-controls')
-  public readonly dom_view_buttons_container: HTMLElement | null = document.getElementById('view-buttons-container')
+
+  // changing views buttons when editing skeleton
+  dom_view_front_change: HTMLButtonElement | null = null
+  dom_view_side_change: HTMLButtonElement | null = null
+  dom_view_top_change: HTMLButtonElement | null = null
 
   constructor () {
     this.initialize_dom_elements()
@@ -72,6 +75,11 @@ export class UI {
     this.dom_scale_skeleton_input_box = document.querySelector('#scale-input')
     this.dom_move_to_origin_button = document.querySelector('#action_move_to_origin')
     this.dom_skinning_algorithm_selection = document.querySelector('#skinning-algorithm-options')
+
+    // UI controls for changing views
+    this.dom_view_front_change = document.querySelector('#front-view-button')
+    this.dom_view_side_change = document.querySelector('#side-view-button')
+    this.dom_view_top_change = document.querySelector('#top-view-button')
 
     // UI controls for working with skinned mesh
     this.dom_skinned_mesh_tools = document.querySelector('#skinned-step-tools')
