@@ -16,7 +16,7 @@ import { StepExportToFile } from './lib/processes/StepExportToFile.ts'
 import { StepWeightSkin } from './lib/processes/StepWeightSkin.ts'
 
 import { ProcessStep } from './lib/enums/ProcessStep.ts'
-import { type Bone, Group, Scene, type Skeleton, type Vector3, type Points } from 'three'
+import { type Bone, Group, Scene, type Skeleton, type Vector3 } from 'three'
 import type BoneTesterData from './lib/models/BoneTesterData.ts'
 
 import { build_version } from './environment.js'
@@ -118,9 +118,9 @@ export class Bootstrap {
   }
 
   private show_skin_failure_message (bone_names_with_errors: string[], error_point_positions: Vector3[]): void {
-    // add the bone vertices as sphere to debugging object
-    const sphere_failures: Points = Generators.create_spheres_for_points(error_point_positions, 0.08, 0xff0000)
-    this.debugging_visual_object.add(sphere_failures)
+    // add the bone vertices as X markers to debugging object
+    const error_markers: Group = Generators.create_x_markers(error_point_positions, 0.02, 0xff0000)
+    this.debugging_visual_object.add(error_markers)
 
     // add information to the info panel
     if (this.ui.dom_info_panel === null) {

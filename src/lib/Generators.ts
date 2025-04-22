@@ -2,8 +2,10 @@ import {
   PerspectiveCamera, DoubleSide, DirectionalLight, GridHelper,
   Bone, Skeleton, AmbientLight, PlaneGeometry, Mesh,
   SphereGeometry, type MeshBasicMaterial, MeshPhongMaterial, AxesHelper,
-  Vector3, PointsMaterial, BufferGeometry, Points, type Object3D, WebGLRenderer
+  Vector3, PointsMaterial, BufferGeometry, Points, type Object3D, WebGLRenderer,
+  Group, Line, LineBasicMaterial
 } from 'three'
+
 
 import { CustomSkeletonHelper } from './CustomSkeletonHelper'
 
@@ -79,16 +81,46 @@ export class Generators {
 
   static create_skeleton_helper (skeleton: Skeleton): CustomSkeletonHelper {
     const skeleton_helper = new CustomSkeletonHelper(skeleton.bones[0], { lineWidth: 5, dashed: true })
-    skeleton_helper.setLineWidth(30)
     return skeleton_helper
+  }
+
+  // create x markers at a location in space
+  static create_x_markers (points: Vector3[], size = 0.1, color = 0xff0000, name = ''): Group {
+    const group = new Group()
+    group.name = `X markers: ${name}`
+
+    const material = new LineBasicMaterial({
+      color,
+      depthTest: false
+    })
+
+    points.forEach(point => {
+      // Create first diagonal line (\ direction)
+      const geometry1 = new BufferGeometry().setFromPoints([
+        new Vector3(point.x - size, point.y - size, point.z),
+        new Vector3(point.x + size, point.y + size, point.z)
+      ])
+      const line1 = new Line(geometry1, material)
+
+      // Create second diagonal line (/ direction)
+      const geometry2 = new BufferGeometry().setFromPoints([
+        new Vector3(point.x - size, point.y + size, point.z),
+        new Vector3(point.x + size, point.y - size, point.z)
+      ])
+      const line2 = new Line(geometry2, material)
+
+      group.add(line1)
+      group.add(line2)
+    })
+
+    return group
   }
 
   static create_spheres_for_points (points: Vector3[], sphere_size = 0.01, color = 0x00ffff, name = ''): Points {
     const points_material: PointsMaterial = new PointsMaterial({ size: sphere_size, color })
     const points_geometry = new BufferGeometry().setFromPoints(points)
     const point_objects: Points = new Points(points_geometry, points_material)
-    point_objects.name = `Point display: ${name} `
-
+    point_objects.name = `Point display: ${name}`
     return point_objects
   }
 
