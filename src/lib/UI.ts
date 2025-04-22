@@ -37,6 +37,8 @@ export class UI {
   dom_animation_import_options: HTMLElement | null = null
   dom_import_animations_buton: HTMLButtonElement | null = null
   dom_import_animation_upload: HTMLElement | null = null
+  public readonly dom_transform_controls: HTMLElement | null = document.getElementById('transform-controls')
+  public readonly dom_view_buttons_container: HTMLElement | null = document.getElementById('view-buttons-container')
 
   constructor () {
     this.initialize_dom_elements()

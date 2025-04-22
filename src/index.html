@@ -71,7 +71,7 @@
 
                 <!-- radio buttons to toggle between rotation and translate -->
                 <div id="transform-controls">
-                    <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
+                    <!-- <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
                         <span>Bone Controls:</span>
                         
                         <input type="radio" id="translate-mode" name="tool-selection" value="translation" checked style="display: none">
@@ -83,10 +83,9 @@
                         <label for="rotation-mode">                            
                             <span class="material-symbols-outlined transform-icons" >refresh</span>
                         </label>
-                    </div>
+                    </div> -->
 
-                   
-
+ 
                     <div style="display: flex; flex-direction: row">
                         <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
                         <label for="mirror-skeleton">Mirror</label>
@@ -98,6 +97,12 @@
 
 
             <span id="skeleton-step-actions">
+
+                <!-- change camera to orthographic views to help position skeleton-->
+                <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
+                    <span>View:</span>
+                    <div id="view-buttons-container" style="display: flex; gap: 5px;"></div>
+                </div>
 
                 <!-- add number input for changing scale of skeleton-->
                 <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">

@@ -97,6 +97,8 @@ export class Bootstrap {
     const fog_far = 80
     const fog_color = 0x0d2525
     this.scene.fog = new THREE.Fog(fog_color, fog_near, fog_far)
+    
+    this.add_view_switching_buttons();
   } // end setup_environment()
 
   private regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
@@ -441,6 +443,56 @@ export class Bootstrap {
     }
 
     return true
+  }
+
+  private switchToView (view: 'front' | 'side' | 'top'): void {
+    if (this.controls === undefined) {
+      console.log('switching to view failed: controls are undefined')
+      return
+    }
+
+    const distance = 10
+    switch (view) {
+      case 'front':
+        this.camera.position.set(0, 0, distance)
+        break
+      case 'side':
+        this.camera.position.set(distance, 0, 0)
+        break
+      case 'top':
+        this.camera.position.set(0, distance, 0)
+        break
+    }
+    this.controls.target.set(0, 0, 0) // look at origin
+
+    // how to pan up 1/2 the height of the model?
+    const bounding_box = this.load_model_step.model_meshes().children[0].geometry.boundingBox
+    const model_height = bounding_box.max.y - bounding_box.min.y
+    this.controls.target.y += model_height / 2
+
+    this.controls.update() // update the camera position
+  }
+
+  private add_view_switching_buttons(): void {
+    if (!this.ui.dom_view_buttons_container) return;
+    
+    // Create buttons for each view
+    const frontBtn = document.createElement('button');
+    frontBtn.textContent = 'Front';
+    frontBtn.addEventListener('click', () => this.switchToView('front'));
+    
+    const sideBtn = document.createElement('button');
+    sideBtn.textContent = 'Side';
+    sideBtn.addEventListener('click', () => this.switchToView('side'));
+    
+    const topBtn = document.createElement('button');
+    topBtn.textContent = 'Top';
+    topBtn.addEventListener('click', () => this.switchToView('top'));
+    
+    // Add buttons to container
+    this.ui.dom_view_buttons_container.appendChild(frontBtn);
+    this.ui.dom_view_buttons_container.appendChild(sideBtn);
+    this.ui.dom_view_buttons_container.appendChild(topBtn);
   }
 } // end Bootstrap class
 
