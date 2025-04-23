@@ -196,7 +196,7 @@ option {
     height: fit-content;
     background: #0b1822;
     box-shadow: 1px 1px 8px 0px #000000bf;
-    top: 20px;
+    top: 70px;
     left: 20px;
     bottom: 0;
     border: 1px dotted #5b8792;
@@ -326,3 +326,17 @@ input[type="file"] {
   
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
+
+  #mouse-controls {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    padding: 0 8px;
+    height: 50px;
+    z-index: 100;
+}
