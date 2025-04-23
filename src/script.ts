@@ -281,7 +281,7 @@ export class Bootstrap {
     this.load_skeleton_step.addEventListener('skeletonLoaded', (event) => {
       // pass in our loaded armature to the edit skeleton for further editing
       // keep a reference to our initial skeleton data in case we want to revert
-      this.edit_skeleton_step.set_armature(this.load_skeleton_step.armature())
+      this.edit_skeleton_step.load_original_armature_from_model(this.load_skeleton_step.armature())
 
       this.regenerate_skeleton_helper(this.edit_skeleton_step.skeleton())
 

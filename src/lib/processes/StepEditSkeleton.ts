@@ -6,8 +6,12 @@ import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
 export class StepEditSkeleton extends EventTarget {
   private readonly ui: UI
+  // Original armature data from the model data. A Skeleton type object is not
+  // part of the original model data that is loaded
   private edited_armature: Object3D = new Object3D()
-  private edited_skeleton: Skeleton = new Skeleton()
+
+  // Skeleton created from the armature that Three.js uses
+  private threejs_skeleton: Skeleton = new Skeleton()
   private mirror_mode_enabled: boolean = true
   private skinning_algorithm: string | null = null
   private show_debug: boolean = true
@@ -78,8 +82,8 @@ export class StepEditSkeleton extends EventTarget {
     if (this.ui.dom_move_to_origin_button !== null) {
       this.ui.dom_move_to_origin_button.addEventListener('click', () => {
         // the base bone itself is not at the origin, but the parent is the armature object
-        this.edited_skeleton.bones[0].position.set(0, 0, 0)
-        this.edited_skeleton.bones[0].updateWorldMatrix(true, true) // update on renderer
+        this.threejs_skeleton.bones[0].position.set(0, 0, 0)
+        this.threejs_skeleton.bones[0].updateWorldMatrix(true, true) // update on renderer
       })
     }
 
@@ -146,21 +150,24 @@ export class StepEditSkeleton extends EventTarget {
     }
   }
 
-  public set_armature (armature: Object3D): void {
+  /*
+   * Take original armature that we are editing and create a skeleton that Three.js can use
+  */
+  public load_original_armature_from_model (armature: Object3D): void {
     this.edited_armature = armature.clone()
-    this.create_skeleton()
+    this.create_threejs_skeleton_object()
   }
 
-  private create_skeleton (): Skeleton {
+  private create_threejs_skeleton_object (): Skeleton {
     // create skeleton and helper to visualize
-    this.edited_skeleton = Generators.create_skeleton(this.edited_armature.children[0])
-    this.edited_skeleton.name = 'Editing Skeleton'
+    this.threejs_skeleton = Generators.create_skeleton(this.edited_armature.children[0])
+    this.threejs_skeleton.name = 'Editing Skeleton'
 
     // update the world matrix for the skeleton
     // without this the skeleton helper won't appear when the bones are first loaded
-    this.edited_skeleton.bones[0].updateWorldMatrix(true, true)
+    this.threejs_skeleton.bones[0].updateWorldMatrix(true, true)
 
-    return this.edited_skeleton
+    return this.threejs_skeleton
   }
 
   public armature (): Object3D {
@@ -168,7 +175,7 @@ export class StepEditSkeleton extends EventTarget {
   }
 
   public skeleton (): Skeleton {
-    return this.edited_skeleton
+    return this.threejs_skeleton
   }
 
   public apply_mirror_mode (selected_bone: Bone, transform_type: string): void {
@@ -184,7 +191,7 @@ export class StepEditSkeleton extends EventTarget {
     // that should be the mirror
     let mirror_bone: Bone | undefined
 
-    this.edited_skeleton.bones.forEach((bone) => {
+    this.threejs_skeleton.bones.forEach((bone) => {
       const bone_name_to_compare = Utility.calculate_bone_base_name(bone.name)
       if (bone_name_to_compare === base_bone_name && bone.name !== selected_bone.name) {
         mirror_bone = bone
