@@ -4,6 +4,14 @@ import { Utility } from '../Utilities.ts'
 import { Vector3, Euler, Object3D, Skeleton, type Bone } from 'three'
 import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
+/*
+ * StepEditSkeleton
+ * Handles editing the skeleton of the model
+ * Overview of workflow:
+ * 1. Load original armature from model
+ * 2. Create a skeleton that Three.js can use and we can manipulate
+ * 3. Allow user to edit the three.js skeleton
+ */
 export class StepEditSkeleton extends EventTarget {
   private readonly ui: UI
   // Original armature data from the model data. A Skeleton type object is not
@@ -49,7 +57,6 @@ export class StepEditSkeleton extends EventTarget {
 
     this.add_event_listeners()
   }
-
 
   private update_bind_button_text (): void {
     if (this.show_debug && this.ui.dom_bind_pose_button !== null) {
@@ -177,6 +184,7 @@ export class StepEditSkeleton extends EventTarget {
   public skeleton (): Skeleton {
     return this.threejs_skeleton
   }
+
 
   public apply_mirror_mode (selected_bone: Bone, transform_type: string): void {
     // if we are on the positive side mirror mode is enabled

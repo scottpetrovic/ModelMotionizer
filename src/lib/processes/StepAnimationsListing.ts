@@ -79,10 +79,15 @@ export class StepAnimationsListing extends EventTarget {
 
     this.gltf_animation_loader = new GLTFLoader()
     this.gltf_animation_loader.load(animations_to_load_filepath, (gltf) => {
-
-      // remove the animation position keyframes. That will mess up the skinning
+      // load the animation clips into a new array
+      // then, remove the animation position keyframes. That will mess up the skinning
       // process since we will be offsetting and moving the bone root positions
-      this.load_animation_clips(gltf.animations)
+      this.animation_clips_loaded = this.deep_clone_animation_clips(gltf.animations)
+
+      // only keep position tracks
+      this.remove_position_tracks(this.animation_clips_loaded)
+
+      console.log(this.animation_clips_loaded)
 
       // create user interface with all available animation clips
       this.ui.build_animation_clip_ui(this.animation_clips_loaded)
@@ -91,6 +96,14 @@ export class StepAnimationsListing extends EventTarget {
       this.animation_mixer = new AnimationMixer()
 
       this.play_animation(0)
+    })
+  }
+
+  // mutates the animation clips passed in and only keeps rotation/quaternion tracks
+  private remove_position_tracks (animation_clips: AnimationClip[]): void {
+    animation_clips.forEach((animation_clip: AnimationClip) => {
+      const rotation_tracks = animation_clip.tracks.filter(x => x.name.includes('quaternion'))
+      animation_clip.tracks = rotation_tracks
     })
   }
 
@@ -156,10 +169,6 @@ export class StepAnimationsListing extends EventTarget {
       anim_action.stop()
       anim_action.play()
     })
-  }
-
-  private load_animation_clips (animation_clips: AnimationClip[]): void {
-    this.animation_clips_loaded = this.deep_clone_animation_clips(animation_clips)
   }
 
   private add_event_listeners (): void {
@@ -278,6 +287,7 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
+  /* this will mutate the animation clips passed in by effectively removing the position keyframes */
   private reduce_position_keyframes (animation_clips: AnimationClip[]): void {
     animation_clips.forEach((animation_clip, index) => {
       animation_clip.tracks.forEach((track) => {
