@@ -115,11 +115,7 @@ export class StepLoadModel extends EventTarget {
   public instructions_text (): string {
     return `<div>Instructions</div> 
       <div>Select existing models or upload your own.</div>
-              <ol>
-                <li>Only GLTF files can be loaded</li>
-                <li>Models with multiple objects won't be rigged correct. I need to work on this.</li>             
-                <li>Debugging allows you to test odd material artifacts by using a 'Normal' material instead of what is included in the mesh</li>
-              </ol>`
+`
   }
 
   private load_model_file (model_file_path: string): void {

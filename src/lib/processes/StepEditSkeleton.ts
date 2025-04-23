@@ -46,14 +46,7 @@ export class StepEditSkeleton extends EventTarget {
 
   public instructions_text (): string {
     return `<div>Instructions</div> 
-        <div>Position skeleton into correct postion</div>
-                <ol>
-                  <li>Context clicking in model will select bones</li>
-                  <li>Move and rotate bones into position with transform controls</li>
-                  <li>Use the "Mirror" option to help position symmetrical bones</li>
-                  <li>Debug skinning allows you to preview skinning results for testing</li>
-                  <li>Try a different skinning algorithm if you aren't getting the results you like</li>
-                </ol>`
+        <div>Position skeleton into correct postion</div>`
   }
 
   private update_bind_button_text (): void {
@@ -215,7 +208,7 @@ export class StepEditSkeleton extends EventTarget {
       const euler = new Euler(
         selected_bone.rotation.x,
         -selected_bone.rotation.y,
-        -selected_bone.rotation.z,
+        -selected_bone.rotation.z
       )
       mirror_bone.quaternion.setFromEuler(euler)
     }

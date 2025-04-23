@@ -340,3 +340,43 @@ input[type="file"] {
     height: 50px;
     z-index: 100;
 }
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 4px;
+}
+
+
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #0b1822;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #5b8792;
+    
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.step-instructions {
+    max-width: 250px;
+}

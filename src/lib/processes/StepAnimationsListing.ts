@@ -54,12 +54,7 @@ export class StepAnimationsListing extends EventTarget {
 
   public instructions_text (): string {
     return `<div>Instructions</div> 
-        <div>Test and export animations to GLB format</div>
-                <ol>
-                  <li>Only GLB files can be exported</li>
-                  <li>Go back to edit skeleton if results don't look right</li>
-                  <li>Select animations you want to export by checking them by animation</li>
-                </ol>`
+        <div>Test and export animations to GLB format</div>`
   }
 
   public mixer (): AnimationMixer {

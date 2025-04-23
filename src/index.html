@@ -38,6 +38,8 @@
 
                 <div id="load-model-tools">
 
+                    <p class="step-instructions">Only GLTF files can be loaded. Models with multiple objects won't be rigged correct.</p>
+
                     <label for="model-upload" class="button"  >
                         <span class="button-icon-group">
                             <span class="material-symbols-outlined" >upload</span>
@@ -60,14 +62,21 @@
 
                     
                        
-                    <div style="display: flex; flex-direction: row">
-                        <input type="checkbox" id="load-model-debug-checkbox" name="load-model-debug-checkbox" >
-                        <label for="load-model-debug-checkbox">Debug (load model as normals)</label>
+                    <div style="display: flex; flex-direction: row; align-items: center;">
+                        <input type="checkbox" id="load-model-debug-checkbox" name="load-model-debug-checkbox">
+                        <label for="load-model-debug-checkbox">Debug</label>
+                        <div class="tooltip">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
+                            <span class="tooltiptext">Replaces all materials with normal shaders for debugging</span>
+                        </div>
                     </div>
 
                 </div>
 
                 <div id="load-skeleton-tools">
+
+                    <p class="step-instructions">Pick base skeleton type to work with. You will modify joints to fit mesh in next step.</p>
+
                     <label>Skeleton Type to use:</label>
                         <select id="skeleton-selection">
                             <option value="bipedal-simple">Simplified Human</option>
@@ -111,10 +120,12 @@
                         </label>
                     </div> -->
 
+                    <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
+
  
                     <div style="display: flex; flex-direction: row">
                         <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
-                        <label for="mirror-skeleton">Mirror Left/Right</label>
+                        <label for="mirror-skeleton">Mirror Left/Right Joints</label>
                     </div>
 
                     <hr />
@@ -160,12 +171,20 @@
                 <div style="display: flex; flex-direction: row">
                     <input type="checkbox" id="debug-skinning-checkbox" >
                     <label for="debug-skinning-checkbox">Debug Skinning</label>
+                    <div class="tooltip">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
+                        <span class="tooltiptext">Preview skinning cage with bone envelope</span>
+                    </div>
                 </div>
+
 
                 <button id="action_bind_pose" >Bind pose</button>
             </span>
 
             <span id="skinned-step-tools">
+
+                <p class="step-instructions">Select animations you want to export by checking them by animation</p>
+
                 <button id="action_back_to_edit_skeleton" >Back to edit skeleton</button>
 
                 <!-- checkbox option to show skeleton -->
@@ -247,7 +266,7 @@
                 <button id="export-button">
                     <span class="button-icon-group">
                         <span class="material-symbols-outlined">save_alt</span>
-                        <span>Download</span>
+                        <span>Download GLB</span>
                     </span>
                 </button>
                 <a id="download-hidden-link" href="#" style="display:none"></a>

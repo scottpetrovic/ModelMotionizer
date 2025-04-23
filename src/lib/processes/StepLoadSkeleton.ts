@@ -39,11 +39,7 @@ export class StepLoadSkeleton extends EventTarget {
   public instructions_text (): string {
     return `<div>Instructions</div> 
         <div>Select skeleton based off model type.</div>
-                <ol>
-                  <li>Mixamo human has more bones in hands</li>
-                  <li>Four leg creature has a tail</li>
-                  <li>You will be able to resize or move bones after importing</li>
-                </ol>`
+`
   }
 
   private add_event_listeners (): void {
