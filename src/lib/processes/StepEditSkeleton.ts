@@ -9,7 +9,7 @@ export class StepEditSkeleton extends EventTarget {
   private edited_armature: Object3D = new Object3D()
   private edited_skeleton: Skeleton = new Skeleton()
   private mirror_mode_enabled: boolean = true
-  private skinning_algorithm: string = SkinningFormula.Envelope
+  private skinning_algorithm: string | null = null
   private show_debug: boolean = true
 
   constructor () {
@@ -36,6 +36,12 @@ export class StepEditSkeleton extends EventTarget {
     }
 
     this.update_bind_button_text()
+
+    // set default skinning algorithm based on first option
+    if (this.ui.dom_skinning_algorithm_selection != null) {
+      const selection = this.ui.dom_skinning_algorithm_selection.value
+      this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
+    }
 
     this.add_event_listeners()
   }
@@ -95,14 +101,7 @@ export class StepEditSkeleton extends EventTarget {
     if (this.ui.dom_skinning_algorithm_selection !== null) {
       this.ui.dom_skinning_algorithm_selection.addEventListener('change', (event) => {
         const selection = event.target.value
-
-        if (selection === 'bone-envelope') {
-          this.skinning_algorithm = SkinningFormula.Envelope
-        } else if (selection === 'closest-bone') {
-          this.skinning_algorithm = SkinningFormula.Distance
-        } else if (selection === 'closest-bone-middle') {
-          this.skinning_algorithm = SkinningFormula.MedianDistance
-        }
+        this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
       })
     }
 
@@ -112,6 +111,17 @@ export class StepEditSkeleton extends EventTarget {
         this.update_bind_button_text()
       })
     }
+  }
+
+  private convert_skinning_algorithm_to_enum (value: string): SkinningFormula {
+    switch (value) {
+      case 'bone-envelope':
+        return SkinningFormula.Envelope
+      case 'closest-bone-middle':
+        return SkinningFormula.MedianDistance
+    }
+
+    return SkinningFormula.Distance // default if other two don't match
   }
 
   public remove_event_listeners (): void {
