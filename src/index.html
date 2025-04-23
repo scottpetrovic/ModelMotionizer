@@ -50,8 +50,8 @@
 
                     <div style="text-align: center; font-size: 1.5rem">or</div>
                     
-                    <div style="background-color: #0f2f3d; padding: 1rem;">
-                        <label>Sample:</label>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; background-color: #0f2f3d; padding: 1rem;">
+                        <p style="margin: 0">Upload sample model:</p>
                         <select id="model-selection">
                             <option value="models/human-simple.glb">Human Cartoon</option>
                             <option value="models/fox.glb">Fox</option>
@@ -104,36 +104,19 @@
 
                 </div>
 
-                <!-- radio buttons to toggle between rotation and translate -->
-                <div id="transform-controls">
-                    <!-- <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
-                        <span>Bone Controls:</span>
-                        
-                        <input type="radio" id="translate-mode" name="tool-selection" value="translation" checked style="display: none">
-                        <label for="translate-mode">
-                            <span class="material-symbols-outlined transform-icons">open_with</span>
-                        </label>
-
-                        <input type="radio" id="rotation-mode" name="tool-selection" value="rotation" style="display: none">
-                        <label for="rotation-mode">                            
-                            <span class="material-symbols-outlined transform-icons" >refresh</span>
-                        </label>
-                    </div> -->
-
-                    <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
-
- 
-                    <div style="display: flex; flex-direction: row">
-                        <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
-                        <label for="mirror-skeleton">Mirror Left/Right Joints</label>
-                    </div>
-
-                    <hr />
-
-                </div>
-
 
             <span id="skeleton-step-actions">
+
+
+                <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
+
+
+                <div style="display: flex; flex-direction: row">
+                    <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
+                    <label for="mirror-skeleton">Mirror Left/Right Joints</label>
+                </div>
+
+                <hr />
 
                 <!-- change camera to orthographic views to help position skeleton-->
                 <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
@@ -149,7 +132,7 @@
                 <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
                     <input type="number" id="scale-input" name="scale-input" value="-3" min="-90" max="90" step="1.0">
                     <span class="suffix-unit">%</span>
-                    <button id="scale-skeleton-button" class="secondary-button" >Scale entire skeleton</button>
+                    <button id="scale-skeleton-button" class="secondary-button" >Scale skeleton</button>
                 </div>
 
                 <!-- hide this move to origin for now as is it seems to cause more trouble than it helps -->
@@ -283,7 +266,6 @@
     <!-- info panel for messages and information-->
     <div id="info-panel">
         <div id="info-messaging"> </div>
-        
     </div>
 
 

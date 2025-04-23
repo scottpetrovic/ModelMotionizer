@@ -40,15 +40,6 @@ export class StepWeightSkin extends EventTarget {
     }
   }
 
-  public instructions_text (): string {
-    return `<div>Instructions</div> 
-            <div>Visualize the results of the skinning. Currently only supported for Bone Envelope</div>
-              <ol>
-                <li>Green vertices indicate vertex is inside a bone cage</li>
-                <li>Red vertex indicates there is no bone found, so relies on closest distance to bone.</li>
-                <li>Modifying the position of the bones to be closer to the middle of the mesh can improve results</li>
-              </ol>`
-  }
 
   public create_bone_formula_object (editable_armature: Object3D, skinning_formula: string, skeleton_type: SkeletonType): any {
     this.skinning_armature = editable_armature.clone()

@@ -52,11 +52,6 @@ export class StepAnimationsListing extends EventTarget {
     this.add_event_listeners()
   }
 
-  public instructions_text (): string {
-    return `<div>Instructions</div> 
-        <div>Test and export animations to GLB format</div>`
-  }
-
   public mixer (): AnimationMixer {
     return this.animation_mixer
   }

@@ -3,7 +3,6 @@ import { type AnimationClip } from 'three'
 export class UI {
   dom_current_step_index: HTMLElement | null = null
   dom_current_step_element: HTMLElement | null = null
-  dom_transform_controls_switch: HTMLElement | null = null
   dom_load_model_tools: HTMLElement | null = null
   dom_upload_model_button: HTMLButtonElement | null = null
   dom_load_model_button: HTMLButtonElement | null = null
@@ -28,7 +27,10 @@ export class UI {
   dom_enable_skin_debugging: HTMLInputElement | null = null
   dom_animation_clip_list: HTMLElement | null = null
   dom_export_button: HTMLButtonElement | null = null
+
+  dom_info_container: HTMLElement | null = null
   dom_info_panel: HTMLElement | null = null
+
   dom_import_animations_button: HTMLButtonElement | null = null
   dom_extend_arm_input: HTMLElement | null = null
   dom_extend_arm_button: HTMLButtonElement | null = null
@@ -51,7 +53,6 @@ export class UI {
     // grab all UI Elements from page that we need to interact with
     this.dom_current_step_index = document.querySelector('#current-step-index')
     this.dom_current_step_element = document.querySelector('#current-step-label')
-    this.dom_transform_controls_switch = document.querySelector('#transform-controls')
 
     // UI controls for loading the model
     this.dom_load_model_tools = document.querySelector('#load-model-tools')
@@ -91,6 +92,8 @@ export class UI {
     // UI Controls for working with animation list/selection and export
     this.dom_animation_clip_list = document.querySelector('#animations-items')
     this.dom_export_button = document.querySelector('#export-button')
+
+    this.dom_info_container = document.querySelector('#info-panel')
     this.dom_info_panel = document.querySelector('#info-messaging')
 
     this.dom_extend_arm_input = document.querySelector('#extend-arm-input')
@@ -113,9 +116,6 @@ export class UI {
   }
 
   public hide_all_elements (): void {
-    if (this.dom_transform_controls_switch != null) {
-      this.dom_transform_controls_switch.style.display = 'none'
-    }
     if (this.dom_load_model_tools != null) {
       this.dom_load_model_tools.style.display = 'none'
     }

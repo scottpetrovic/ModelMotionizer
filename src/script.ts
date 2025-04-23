@@ -125,6 +125,11 @@ export class Bootstrap {
   }
 
   private show_skin_failure_message (bone_names_with_errors: string[], error_point_positions: Vector3[]): void {
+    // show the DOM HTML container to see error messages for each bone that isn't inside the mesh
+    if (this.ui.dom_info_container !== null) {
+      this.ui.dom_info_container.style.display = 'block'
+    }
+
     // add the bone vertices as X markers to debugging object
     const error_markers: Group = Generators.create_x_markers(error_point_positions, 0.02, 0xff0000)
     this.debugging_visual_object.add(error_markers)
@@ -135,7 +140,7 @@ export class Bootstrap {
       return
     }
 
-    this.ui.dom_info_panel.innerHTML = 'Some bones are outside the mesh. Fix them up and try to bind again'
+    this.ui.dom_info_panel.innerHTML = 'Somebones are outside the mesh and are marked with red. Fix them and try again.'
     this.ui.dom_info_panel.innerHTML += '<br>'
 
     // display the bones names in an HTML list
@@ -155,35 +160,34 @@ export class Bootstrap {
     // clean up any event listeners from the previous steps
     this.edit_skeleton_step.remove_event_listeners()
 
+    // hide the info container by default
+    if (this.ui.dom_info_container !== null) {
+      this.ui.dom_info_container.style.display = 'none'
+    }
+
     switch (process_step) {
       case ProcessStep.LoadModel:
         process_step = ProcessStep.LoadModel
         this.load_model_step.begin()
-        this.ui.dom_info_panel.innerHTML = this.load_model_step.instructions_text()
         break
       case ProcessStep.LoadSkeleton:
         process_step = ProcessStep.LoadSkeleton
         this.load_skeleton_step.begin()
-        this.ui.dom_info_panel.innerHTML = this.load_skeleton_step.instructions_text()
         break
       case ProcessStep.EditSkeleton:
         process_step = ProcessStep.EditSkeleton
         this.edit_skeleton_step.begin()
         this.transform_controls.enabled = true
         this.transform_controls.setMode('translate')
-        this.ui.dom_transform_controls_switch.style.display = 'none' // hide the UI control until we have a bone selected
-        this.ui.dom_info_panel.innerHTML = this.edit_skeleton_step.instructions_text()
         break
       case ProcessStep.BindPose:
         this.process_step = ProcessStep.BindPose
-        this.ui.dom_info_panel.innerHTML = this.weight_skin_step.instructions_text()
         this.weight_skin_step.begin()
         this.transform_controls.enabled = false // shouldn't be editing bones
         this.start_skin_weighting_step()
         break
       case ProcessStep.AnimationsListing:
         this.process_step = ProcessStep.AnimationsListing
-        this.ui.dom_info_panel.innerHTML = this.animations_listing_step.instructions_text()
         this.animations_listing_step.begin()
         this.transform_controls.setMode('rotate')
         this.animations_listing_step.load_and_apply_default_animation_to_skinned_mesh(this.weight_skin_step.final_skinned_meshes(),
@@ -244,7 +248,6 @@ export class Bootstrap {
     if (closest_bone !== null) {
       this.transform_controls.attach(closest_bone)
       this.weight_skin_step.set_bone_index_to_test(closest_bone_index)
-      this.ui.dom_transform_controls_switch.style.display = 'flex'
     }
   }
 
@@ -330,20 +333,6 @@ export class Bootstrap {
       this.process_step = this.process_step_changed(ProcessStep.EditSkeleton)
       this.regenerate_skeleton_helper(this.edit_skeleton_step.skeleton())
       this.load_model_step.model_meshes().visible = true // show the unskinned mesh again
-    })
-
-    this.ui.dom_transform_controls_switch.addEventListener('click', function (event) {
-      const targetElement = event.target
-
-      if (targetElement.value === undefined) {
-        return // half of events for this are returning null for some reason
-      }
-
-      if (targetElement.value === 'translation') {
-        this.transform_controls.setMode('translate')
-      } else if (targetElement.value === 'rotation') {
-        this.transform_controls.setMode('rotate')
-      }
     })
 
     this.ui.dom_view_front_change.addEventListener('click', () => this.switchToView('front'))

@@ -112,11 +112,6 @@ export class StepLoadModel extends EventTarget {
     }
   }
 
-  public instructions_text (): string {
-    return `<div>Instructions</div> 
-      <div>Select existing models or upload your own.</div>
-`
-  }
 
   private load_model_file (model_file_path: string): void {
     const max_height = 1.5 // have 3d model scaled to be 1.5 units tall. helps normalize the models to work with

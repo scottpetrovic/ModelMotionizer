@@ -183,6 +183,7 @@ option {
     padding: 0.5rem;
     font-size: 13px;
     color: #d0c8c8;
+    border: 1px solid red;
 }
 
 #load-model-tools, #load-skeleton-tools, #transform-controls, #skeleton-step-actions {
@@ -378,5 +379,5 @@ input[type="file"] {
 }
 
 .step-instructions {
-    max-width: 250px;
+    max-width: 180px;
 }

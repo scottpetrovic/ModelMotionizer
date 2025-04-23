@@ -36,12 +36,6 @@ export class StepLoadSkeleton extends EventTarget {
     this.add_event_listeners()
   }
 
-  public instructions_text (): string {
-    return `<div>Instructions</div> 
-        <div>Select skeleton based off model type.</div>
-`
-  }
-
   private add_event_listeners (): void {
     if (this.ui.dom_load_skeleton_button !== null) {
       this.ui.dom_load_skeleton_button.addEventListener('click', () => {

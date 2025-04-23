@@ -24,11 +24,7 @@ export class StepEditSkeleton extends EventTarget {
     }
 
     if (this.ui.dom_current_step_element != null) {
-      this.ui.dom_current_step_element.innerHTML = 'Move joints inside mesh'
-    }
-
-    if (this.ui.dom_transform_controls_switch != null) {
-      this.ui.dom_transform_controls_switch.style.display = 'flex'
+      this.ui.dom_current_step_element.innerHTML = 'Position Joints'
     }
 
     if (this.ui.dom_skeleton_edit_tools != null) {
@@ -44,10 +40,6 @@ export class StepEditSkeleton extends EventTarget {
     this.add_event_listeners()
   }
 
-  public instructions_text (): string {
-    return `<div>Instructions</div> 
-        <div>Position skeleton into correct postion</div>`
-  }
 
   private update_bind_button_text (): void {
     if (this.show_debug && this.ui.dom_bind_pose_button !== null) {
