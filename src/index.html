@@ -38,12 +38,12 @@
 
                 <div id="load-model-tools">
 
-                    <p class="step-instructions">Only GLTF files can be loaded. Models with multiple objects won't be rigged correct.</p>
+                    <p class="step-instructions">Supports GLTF or GLB files. Models with multiple objects currently aren't supported.</p>
 
                     <label for="model-upload" class="button"  >
                         <span class="button-icon-group">
                             <span class="material-symbols-outlined" >upload</span>
-                            <span>Upload GLTF</span>
+                            <span>Upload GLTF/GLB</span>
                         </span>
                     </label>
                     <input id="model-upload" type="file" name="file-upload" accept=".glb, .gltf" />
@@ -53,9 +53,8 @@
                     <div style="display: flex; flex-direction: column; gap: 1rem; background-color: #0f2f3d; padding: 1rem;">
                         <p style="margin: 0">Upload sample model:</p>
                         <select id="model-selection">
-                            <option value="models/human-simple.glb">Human Cartoon</option>
+                            <option value="models/human-mannequin.glb">Human Mannequin</option>
                             <option value="models/fox.glb">Fox</option>
-                            <option value="models/mesh-x-bot.glb">X Bot</option>
                         </select>
                         <button id="load-model-button">Load</button>
                     </div>
