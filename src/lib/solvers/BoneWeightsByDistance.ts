@@ -11,7 +11,7 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
   private show_debug: boolean = false
   private bone_idx_test: number = -1
   private debugging_scene_object: Object3D = new Object3D()
-  private skeleton_type: SkeletonType = SkeletonType.BipedalSimple
+  private skeleton_type: SkeletonType | null = null
 
   constructor (bone_hier: Object3D, skeleton_type: SkeletonType) {
     this.set_skeleton_type(skeleton_type)
@@ -51,6 +51,13 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
       let closest_bone_index: number = 0
 
       this.bones_master_data.forEach((bone, idx) => {
+        // our human skeleton has a root controller bone that isn't in the mesh. Don't assign weights to this?
+        if (this.skeleton_type === SkeletonType.Human) {
+          if (bone.bone_object.name === 'root') {
+            return
+          }
+        }
+
         const distance: number = Utility.world_position_from_object(bone.bone_object).distanceTo(vertex_position)
 
         if (distance < closest_bone_distance) {

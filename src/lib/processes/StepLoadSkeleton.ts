@@ -55,22 +55,21 @@ export class StepLoadSkeleton extends EventTarget {
           case 'quadraped':
             this.skeleton_t = SkeletonType.Quadraped
             break
-          case 'bipedal-simple':
-            this.skeleton_t = SkeletonType.BipedalSimple
-            break
-          case 'bipedal-full':
-            this.skeleton_t = SkeletonType.BipedalFull
+          case 'human':
+            this.skeleton_t = SkeletonType.Human
             break
         }
 
         // load skeleton from GLB file
+        console.log('trying to load skeleton', this.skeleton_t)
         this.loader.load(this.skeleton_t, (gltf) => {
           // traverse scene and find first bone object
           // we will go to the parent and mark that as the original armature
           let armature_found = false
           let original_armature: Object3D = new Object3D()
 
-          gltf.scene.traverse((child) => {
+
+          gltf.scene.traverse((child: Object3D) => {
             if (child.type === 'Bone' && !armature_found) {
               armature_found = true
 
@@ -81,6 +80,9 @@ export class StepLoadSkeleton extends EventTarget {
               }
             }
           })
+
+          console.log('is armature found?', armature_found)
+          console.log(gltf)
 
           this.loaded_armature = original_armature.clone()
           this.loaded_armature.name = 'Loaded Armature'

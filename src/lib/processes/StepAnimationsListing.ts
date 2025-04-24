@@ -66,14 +66,11 @@ export class StepAnimationsListing extends EventTarget {
 
     let animations_to_load_filepath: string = ''
     switch (skeleton_type) {
-      case SkeletonType.BipedalSimple:
-        animations_to_load_filepath = 'animations/character-simple-multiple.glb'
+      case SkeletonType.Human:
+        animations_to_load_filepath = 'animations/human-base-animations.glb'
         break
       case SkeletonType.Quadraped:
         animations_to_load_filepath = 'animations/quad-creature-animations.glb'
-        break
-      case SkeletonType.BipedalFull:
-        animations_to_load_filepath = 'animations/animations-mixamo-default.glb'
         break
     }
 
@@ -85,9 +82,7 @@ export class StepAnimationsListing extends EventTarget {
       this.animation_clips_loaded = this.deep_clone_animation_clips(gltf.animations)
 
       // only keep position tracks
-      this.remove_position_tracks(this.animation_clips_loaded)
-
-      console.log(this.animation_clips_loaded)
+      this.remove_position_tracks(this.animation_clips_loaded, true)
 
       // create user interface with all available animation clips
       this.ui.build_animation_clip_ui(this.animation_clips_loaded)
@@ -100,10 +95,19 @@ export class StepAnimationsListing extends EventTarget {
   }
 
   // mutates the animation clips passed in and only keeps rotation/quaternion tracks
-  private remove_position_tracks (animation_clips: AnimationClip[]): void {
+  // also removes scale tracks
+  private remove_position_tracks (animation_clips: AnimationClip[], preserve_root_position: boolean = false): void {
     animation_clips.forEach((animation_clip: AnimationClip) => {
-      const rotation_tracks = animation_clip.tracks.filter(x => x.name.includes('quaternion'))
-      animation_clip.tracks = rotation_tracks
+      // remove all position nodes except root
+      let rotation_tracks: KeyframeTrack[] = []
+      if (preserve_root_position) {
+        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('root.position'))
+      } else {
+        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion'))
+      }
+
+      animation_clip.tracks = rotation_tracks // update track data
+      //console.log(animation_clip.tracks)
     })
   }
 
@@ -322,11 +326,11 @@ export class StepAnimationsListing extends EventTarget {
     const cloned_track: AnimationClip = this.deep_clone_animation_clips([animation_clip])[0]
 
     // only keep the rotation tracks...and the root bone position track
-    const rotation_tracks = cloned_track.tracks.filter(x => x.name.includes('quaternion'))
+    const rotation_tracks = cloned_track.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion'))
     cloned_track.tracks = rotation_tracks
 
     // keep the root bone position track
-    const root_position_track = animation_clip.tracks.filter(x => x.name === 'root.position')[0]
+    const root_position_track = animation_clip.tracks.filter((x: KeyframeTrack) => x.name === 'root.position')[0]
 
     if (root_position_track !== undefined) {
       cloned_track.tracks.push(root_position_track)
@@ -398,7 +402,7 @@ export class StepAnimationsListing extends EventTarget {
       // with the simple skeleton, there are many bones that are not used from the full mixamo animation
       // remove unmapped bones since they won't be used
       if (this.skeleton_type === SkeletonType.BipedalSimple) {
-        animation_clip.tracks = animation_clip.tracks.filter(x => !x.name.includes('mixamorig'))
+        animation_clip.tracks = animation_clip.tracks.filter((x: KeyframeTrack) => !x.name.includes('mixamorig'))
       }
     })
   }
