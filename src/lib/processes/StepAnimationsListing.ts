@@ -100,10 +100,12 @@ export class StepAnimationsListing extends EventTarget {
     animation_clips.forEach((animation_clip: AnimationClip) => {
       // remove all position nodes except root
       let rotation_tracks: KeyframeTrack[] = []
+
+
       if (preserve_root_position) {
-        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('root.position'))
+        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('hips.position'))
       } else {
-        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion'))
+        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('hips.position'))
       }
 
       animation_clip.tracks = rotation_tracks // update track data
