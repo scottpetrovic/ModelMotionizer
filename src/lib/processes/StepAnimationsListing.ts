@@ -4,7 +4,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import { BVHLoader } from 'three/examples/jsm/loaders/BVHLoader.js'
 
-import { AnimationClip, AnimationMixer, Quaternion, Vector3, type SkinnedMesh, type QuaternionKeyframeTrack, type KeyframeTrack, type AnimationAction } from 'three'
+import { AnimationClip, AnimationMixer, Quaternion, Vector3, type SkinnedMesh, type QuaternionKeyframeTrack, 
+  type KeyframeTrack, type AnimationAction, type Object3D, Bone } from 'three'
 
 import { SkeletonType } from '../enums/SkeletonType.ts'
 import { MixamoToSimpleMapping } from '../mapping/MixamoToSimple.js'
@@ -21,9 +22,37 @@ export class StepAnimationsListing extends EventTarget {
   private animation_mixer: AnimationMixer = new AnimationMixer()
   private skinned_meshes_to_animate: SkinnedMesh[] = []
   private current_playing_index: number = 0
-  private skeleton_type: string = SkeletonType.BipedalSimple
-
+  private skeleton_type: string = SkeletonType.Human
   private skeleton_type_trying_to_import: string = 'mixamo-skeleton' // manually importing animation file
+
+  // -z will bring hip bone down
+  private hip_bone_offset: Vector3 = new Vector3(0, 0, 0) // -z will bring hip bone down
+
+  // the human model has a hip bone that needs position changes applied
+  // This will be for animations like falling. We need to capture the offset between
+  // the original position and the new position from our edited armature
+  public calculate_hip_bone_offset (original_armature: Object3D, edited_armature: Object3D): void {
+    const original_hip_bone: Bone = this.find_bone_from_armature(original_armature, 'DEF-hips')
+    const edited_hip_bone: Bone = this.find_bone_from_armature(edited_armature, 'DEF-hips')
+    this.hip_bone_offset = this.calculate_position_offset(original_hip_bone.position, edited_hip_bone.position)
+
+    // small T-pose offset that somehow is getting lost
+    this.hip_bone_offset = this.hip_bone_offset.sub(new Vector3(0, 0, -0.04))
+  }
+
+  private find_bone_from_armature (armature: Object3D, bone_name: string): Bone | null {
+    let found_bone: Bone | null = null
+    armature.traverse((object: Object3D) => {
+      if (found_bone === null && object.name === bone_name && object instanceof Bone) {
+        found_bone = object
+      }
+    })
+    return found_bone
+  }
+
+  private calculate_position_offset (position_1: Vector3, position_2: Vector3): Vector3 {
+    return new Vector3(position_1.x - position_2.x, position_1.y - position_2.y, position_1.z - position_2.z)
+  }
 
   private has_added_event_listeners: boolean = false
 
@@ -84,6 +113,9 @@ export class StepAnimationsListing extends EventTarget {
       // only keep position tracks
       this.remove_position_tracks(this.animation_clips_loaded, true)
 
+      // apply hip bone offset
+      this.apply_hip_bone_offset(this.animation_clips_loaded)
+
       // create user interface with all available animation clips
       this.ui.build_animation_clip_ui(this.animation_clips_loaded)
 
@@ -110,6 +142,21 @@ export class StepAnimationsListing extends EventTarget {
 
       animation_clip.tracks = rotation_tracks // update track data
       //console.log(animation_clip.tracks)
+    })
+  }
+
+  private apply_hip_bone_offset (animation_clips: AnimationClip[]): void {
+    animation_clips.forEach((animation_clip: AnimationClip) => {
+      animation_clip.tracks.forEach((track: KeyframeTrack) => {
+        if (track.name.includes('hips.position')) {
+          const values = track.values
+          for (let i = 0; i < values.length; i += 3) {
+            values[i] -= this.hip_bone_offset.x
+            values[i + 1] -= this.hip_bone_offset.y
+            values[i + 2] -= this.hip_bone_offset.z
+          }
+        }
+      })
     })
   }
 

@@ -189,7 +189,13 @@ export class Bootstrap {
       case ProcessStep.AnimationsListing:
         this.process_step = ProcessStep.AnimationsListing
         this.animations_listing_step.begin()
-        this.transform_controls.setMode('rotate')
+
+        // calculate hip bone offset for human skeleton type
+        if (this.load_skeleton_step.skeleton_type() === SkeletonType.Human) {
+          this.animations_listing_step.calculate_hip_bone_offset(this.load_skeleton_step.armature(),
+            this.edit_skeleton_step.armature())
+        }
+
         this.animations_listing_step.load_and_apply_default_animation_to_skinned_mesh(this.weight_skin_step.final_skinned_meshes(),
           this.load_skeleton_step.skeleton_type())
         break
