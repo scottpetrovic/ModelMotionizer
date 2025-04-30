@@ -61,9 +61,11 @@
 
                     
                        
-                    <div style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="styled-checkbox">
+
                         <input type="checkbox" id="load-model-debug-checkbox" name="load-model-debug-checkbox">
                         <label for="load-model-debug-checkbox">Debug</label>
+
                         <div class="tooltip">
                             <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
                             <span class="tooltiptext">Replaces all materials with normal shaders for debugging</span>
@@ -109,7 +111,7 @@
                 <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
 
 
-                <div style="display: flex; flex-direction: row">
+                <div class="styled-checkbox">
                     <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>
                     <label for="mirror-skeleton">Mirror Left/Right Joints</label>
                 </div>
@@ -169,7 +171,7 @@
                 <button id="action_back_to_edit_skeleton" >Back to edit skeleton</button>
 
                 <!-- checkbox option to show skeleton -->
-                <div style="display: flex; flex-direction: row">
+                <div class="styled-checkbox">
                     <input type="checkbox" id="show-skeleton-checkbox" name="show-skeleton" value="show" checked>
                     <label for="show-skeleton-checkbox">Show skeleton</label>
                 </div>
@@ -186,7 +188,7 @@
         <div id="animations-listing">
             <div id="animations-listing-header">
                 <span>Animations</span>
-                <div>Export</div>
+                <div style="margin-right: 1rem;">Export</div>
             </div>
 
             <!-- javascript will populate this item with animations

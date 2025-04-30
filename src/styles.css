@@ -10,7 +10,7 @@
 
 #skinned-step-animation-export-options {
     position: fixed;
-    top: 20px;
+    top: 70px;
     right: 20px;
     background: #0b1822;
     padding: 1rem;
@@ -391,5 +391,24 @@ input[type="file"] {
 }
 
 .step-instructions {
-    max-width: 180px;
+    max-width: 220px;
+}
+
+/* style checkbox */
+.styled-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between checkbox and label */
+}
+
+.styled-checkbox input[type="checkbox"] {
+    width: 20px; /* Increase checkbox size */
+    height: 20px;
+    cursor: pointer;
+}
+
+.styled-checkbox label {
+    cursor: pointer; /* Make the label clickable */
+    padding: 0.2rem 0.5rem; /* Add padding for a larger clickable area */
+    font-size: 1rem; /* Adjust font size for better readability */
 }

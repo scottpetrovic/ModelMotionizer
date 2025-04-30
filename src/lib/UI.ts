@@ -151,7 +151,7 @@ export class UI {
                       <button class="secondary-button play" data-index="${index}">&#9658;</button>
                       <span style="align-self: center">${animation_clip.name}</span>
                   </div>
-                  <div>
+                  <div class="styled-checkbox">
                       <input type="checkbox" name="${animation_clip.name}" value="${index}">
                   </div>
               </div>`
