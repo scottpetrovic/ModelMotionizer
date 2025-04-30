@@ -209,8 +209,8 @@ export class Utility {
 
   static calculate_bone_base_name (bone_name: string): string {
     return bone_name
-      .replace('mixamorig_', '')
-      .replace(/(Right|Right_|R_|_Right|_R|Left|Left_|_Left|L_)/g, '')
+      .replace('DEF-', '')
+      .replace(/(R|L)/g, '')
   }
 
   static raycast_closest_bone_test (camera: PerspectiveCamera, mouse_event: MouseEvent, skeleton: Skeleton): Array<number | null> {
