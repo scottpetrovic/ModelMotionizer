@@ -26,7 +26,8 @@ export class StepAnimationsListing extends EventTarget {
   private skeleton_type_trying_to_import: string = 'mixamo-skeleton' // manually importing animation file
 
   // -z will bring hip bone down
-  private hip_bone_offset: Vector3 = new Vector3(0, 0, 0) // -z will bring hip bone down
+  private hip_bone_offset: Vector3 = new Vector3(0, 0, 0) // -z will bring hip bone down. Helps set new base hip position
+  private hip_bone_scale_factor_z: number = 1.0 // this is used to scale the hip bone position for animations
 
   // the human model has a hip bone that needs position changes applied
   // This will be for animations like falling. We need to capture the offset between
@@ -35,6 +36,12 @@ export class StepAnimationsListing extends EventTarget {
     const original_hip_bone: Bone = this.find_bone_from_armature(original_armature, 'DEF-hips')
     const edited_hip_bone: Bone = this.find_bone_from_armature(edited_armature, 'DEF-hips')
     this.hip_bone_offset = this.calculate_position_offset(original_hip_bone.position, edited_hip_bone.position)
+
+    // calculate the scale factor for the animation clips
+    // this should take the distance between the original and edited armature
+    // and divide it by the original armature hip bone position
+    this.hip_bone_scale_factor_z = edited_hip_bone.position.z / original_hip_bone.position.z
+    //console.log('hip bone scale factor:', this.hip_bone_scale_factor) // should be 1 if no change
 
     // small T-pose offset that somehow is getting lost
     this.hip_bone_offset = this.hip_bone_offset.sub(new Vector3(0, 0, -0.04))
@@ -147,14 +154,16 @@ export class StepAnimationsListing extends EventTarget {
   }
 
   private apply_hip_bone_offset (animation_clips: AnimationClip[]): void {
+    // update the position keyframes for the hips bone
+    // this will be used for animations like falling
     animation_clips.forEach((animation_clip: AnimationClip) => {
       animation_clip.tracks.forEach((track: KeyframeTrack) => {
         if (track.name.includes('hips.position')) {
           const values = track.values
           for (let i = 0; i < values.length; i += 3) {
-            values[i] -= this.hip_bone_offset.x
-            values[i + 1] -= this.hip_bone_offset.y
-            values[i + 2] -= this.hip_bone_offset.z
+            values[i] = values[i] - this.hip_bone_offset.x
+            values[i + 1] = values[i + 1] - this.hip_bone_offset.y
+            values[i + 2] = values[i + 2] * this.hip_bone_scale_factor_z
           }
         }
       })
