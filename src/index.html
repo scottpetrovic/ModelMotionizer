@@ -38,7 +38,7 @@
 
                 <div id="load-model-tools">
 
-                    <p class="step-instructions">Supports GLTF or GLB files. Models with multiple objects currently aren't supported.</p>
+                    <p class="step-instructions">Supports GLTF or GLB files. Models must be in T-Pose. A-Pose has issues for now.</p>
 
                     <label for="model-upload" class="button"  >
                         <span class="button-icon-group">
@@ -142,21 +142,21 @@
                 <label for="skinning-algorithm-options">Skinning algorithm:</label>
                 <select id="skinning-algorithm-options">
                     <option value="closest-bone">Closest Bone</option>
-                    <option value="bone-envelope">Bone Envelope</option> 
-                    <option value="closest-bone-middle">Closest Middle Bone</option>
+                    <!-- <option value="bone-envelope">Bone Envelope</option> 
+                    <option value="closest-bone-middle">Closest Middle Bone</option> -->
                 </select>
 
                 <hr />
 
-                <!-- checkbox for enabling weight skin debug mode -->
-                <div style="display: flex; flex-direction: row">
+                <!-- checkbox for enabling weight skin debug mode. Hide for now since only bone envelope works-->
+                <!-- <div style="display: flex; flex-direction: row">
                     <input type="checkbox" id="debug-skinning-checkbox" >
                     <label for="debug-skinning-checkbox">Debug Skinning</label>
                     <div class="tooltip">
                         <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
                         <span class="tooltiptext">Preview skinning cage with bone envelope</span>
                     </div>
-                </div>
+                </div> -->
 
 
                 <button id="action_bind_pose" >Bind pose</button>

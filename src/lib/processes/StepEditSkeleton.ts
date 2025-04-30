@@ -46,6 +46,9 @@ export class StepEditSkeleton extends EventTarget {
     if (this.ui.dom_enable_skin_debugging != null) {
       this.show_debug = this.ui.dom_enable_skin_debugging.checked
     }
+    else {
+      this.show_debug = false
+    }
 
     this.update_bind_button_text()
 
