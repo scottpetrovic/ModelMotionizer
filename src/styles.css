@@ -97,6 +97,13 @@ button:active, .button:active {
     transform: scale(0.98);
 }
 
+button:disabled {
+    background: #2b3d4a;
+    opacity: 0.5;
+    cursor: not-allowed;
+    border: none;
+}
+
 
 
 .button-icon-group {

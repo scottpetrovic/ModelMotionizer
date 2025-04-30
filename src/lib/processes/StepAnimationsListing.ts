@@ -79,6 +79,7 @@ export class StepAnimationsListing extends EventTarget {
     }
 
     this.add_event_listeners()
+    this.update_download_button_enabled()
   }
 
   public mixer (): AnimationMixer {
@@ -224,6 +225,15 @@ export class StepAnimationsListing extends EventTarget {
     })
   }
 
+  private update_download_button_enabled (): void {
+    // see if any of the "export" checkboxes are active. if not we need to disable the "Download" button
+    const animation_checkboxes = this.ui.get_animated_selected_elements()
+    const is_any_checkbox_checked: boolean = Array.from(animation_checkboxes).some((checkbox) => {
+      return checkbox.checked === true
+    })
+    this.ui.dom_export_button.disabled = !is_any_checkbox_checked
+  }
+
   private add_event_listeners (): void {
     if (this.has_added_event_listeners) {
       return
@@ -232,6 +242,8 @@ export class StepAnimationsListing extends EventTarget {
     // event listener for animation clip list with changing the current animation
     if (this.ui.dom_animation_clip_list != null) {
       this.ui.dom_animation_clip_list.addEventListener('click', (event) => {
+        this.update_download_button_enabled()
+
         if ((event.target != null) && event.target.tagName === 'BUTTON') {
           const animation_index: number = event.target.getAttribute('data-index')
           this.play_animation(animation_index)
