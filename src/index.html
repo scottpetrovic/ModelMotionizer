@@ -38,7 +38,7 @@
 
                 <div id="load-model-tools">
 
-                    <p class="step-instructions">Supports GLTF or GLB files. Models must be in T-Pose. A-Pose has issues for now.</p>
+                    <p class="step-instructions">Supports GLTF or GLB files. Models must be in T-Pose.</p>
 
                     <label for="model-upload" class="button"  >
                         <span class="button-icon-group">
@@ -68,7 +68,7 @@
 
                         <div class="tooltip">
                             <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
-                            <span class="tooltiptext">Replaces all materials with normal shaders for debugging</span>
+                            <span class="tooltiptext">Replaces all materials with a 'normal' shader for debugging</span>
                         </div>
                     </div>
 
@@ -91,15 +91,15 @@
                         <span>
                             <span>Rotate Model to face front</span>
                             <div style="display: flex; flex-direction: row">                           
-                                <button id="rotate-model-x-button">X</button>
-                                <button id="rotate-model-y-button">Y</button>
-                                <button id="rotate-model-z-button">Z</button>
+                                <button class="secondary-button" id="rotate-model-x-button">X</button>
+                                <button class="secondary-button" id="rotate-model-y-button">Y</button>
+                                <button class="secondary-button" id="rotate-model-z-button">Z</button>
                             </div>
                         </span>
 
                         <hr />
 
-                        <button id="load-skeleton-button">Load Skeleton</button>
+                        <button id="load-skeleton-button">Load Skeleton &nbsp;&#x203a;</button>
 
 
                 </div>
@@ -122,9 +122,9 @@
                 <div style="display: flex; flex-direction: row; align-items: center; column-gap: 5px; ">
                     <span>View:</span>
                     <div id="view-buttons-container" style="display: flex; gap: 5px;">
-                        <button id="front-view-button">Front</button>
-                        <button id="side-view-button">Side</button>
-                        <button id="top-view-button">Top</button>
+                        <button class="secondary-button" id="front-view-button">Front</button>
+                        <button class="secondary-button" id="side-view-button">Side</button>
+                        <button class="secondary-button" id="top-view-button">Top</button>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
 
                 <p class="step-instructions">Select animations you want to export by checking them by animation</p>
 
-                <button id="action_back_to_edit_skeleton" >Back to edit skeleton</button>
+                <button id="action_back_to_edit_skeleton" >&#x2039; Back to edit skeleton</button>
 
                 <!-- checkbox option to show skeleton -->
                 <div class="styled-checkbox">
@@ -193,11 +193,19 @@
         
         
                     <!-- slider to control arm extension (hide this feature until the base functionality is more stable) -->
-                    <!-- <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
+                    <div style="display: flex; flex-direction: row; align-items: center;">
+                        <label style="display:inline-flex">A-Pose Correction</label>
+                        <span class="tooltip">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">help</span>
+                            <span class="tooltiptext">If your model uses an A-Pose, this will help expand/contract arms for all animations</span>
+                        </span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: row; gap: 1rem; justify-content: flex-start; align-items: center;">
                         <input type="number" id="extend-arm-input" name="arm-extend-input" value="3" min="-25" max="25" step="1">
                         <span class="suffix-unit">%</span>
                         <button id="extend-arm-button" class="secondary-button" >Open Arms</button>
-                    </div> -->
+                    </div>
         
                     <hr />
         

@@ -26,7 +26,7 @@
 hr {
     border:1px solid #1f405a;
     width: 100%;
-    margin: 0.3rem 0rem;
+    margin: 1rem 0rem;
 }
 
 li{
@@ -232,9 +232,9 @@ option {
 
 
 /* width */
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     width: 14px;
-  }
+  } */
   
   /* Track */
   ::-webkit-scrollbar-track {
@@ -352,7 +352,7 @@ input[type="file"] {
 .tooltip {
     position: relative;
     display: inline-block;
-    margin-left: 4px;
+
 }
 
 
@@ -392,7 +392,7 @@ input[type="file"] {
 .styled-checkbox {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Space between checkbox and label */
+    gap: 0; /* Space between checkbox and label */
 }
 
 .styled-checkbox input[type="checkbox"] {

@@ -171,6 +171,7 @@ export class StepAnimationsListing extends EventTarget {
   }
 
   private extend_arm_animations_by_percentage (percentage: number): void {
+
     // loop through each animation clip to update the tracks
     this.animation_clips_loaded.forEach((animation_clip: AnimationClip) => {
       animation_clip.tracks.forEach((track: KeyframeTrack) => {
@@ -183,8 +184,10 @@ export class StepAnimationsListing extends EventTarget {
         const quaterion_track: QuaternionKeyframeTrack = track
 
         // if the track is an upper arm bone, then modify that
-        const track_name_to_match: string = '_Arm' // for simplified human skeleton
-        if (quaterion_track.name.indexOf(track_name_to_match) > -1) {
+        const is_right_arm_track_match: boolean = quaterion_track.name.indexOf('upper_armR') > -1
+        const is_left_arm_track_match: boolean = quaterion_track.name.indexOf('upper_armL') > -1
+
+        if (is_right_arm_track_match || is_left_arm_track_match) {
           const new_track_values: Float32Array = quaterion_track.values.slice() // clone array
 
           const track_count: number = quaterion_track.times.length
@@ -192,7 +195,14 @@ export class StepAnimationsListing extends EventTarget {
             // get correct value since it is a quaternion
             const units_in_quaternions: number = 4
             const quaternion: Quaternion = new Quaternion()
-            quaternion.setFromAxisAngle(new Vector3(1, 0, 0), percentage / 100)
+
+            // rotate the upper arms in opposite directions to rise/lower arms
+            if (is_right_arm_track_match) {
+              quaternion.setFromAxisAngle(new Vector3(0, 0, -1), percentage / 100)
+            }
+            if (is_left_arm_track_match) {
+              quaternion.setFromAxisAngle(new Vector3(0, 0, 1), percentage / 100)
+            }
 
             // get the existing quaternion
             const existing_quaternion: Quaternion = new Quaternion(

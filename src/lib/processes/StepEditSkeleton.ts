@@ -68,7 +68,7 @@ export class StepEditSkeleton extends EventTarget {
     }
 
     if (this.ui.dom_bind_pose_button !== null) {
-      this.ui.dom_bind_pose_button.innerHTML = 'Skin Model'
+      this.ui.dom_bind_pose_button.innerHTML = 'Skin Model &nbsp;&#x203a;'
     }
   }
 
