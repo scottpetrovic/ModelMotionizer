@@ -1,18 +1,13 @@
 import { UI } from '../UI.ts'
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js'
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js'
-
-// import scene from three.js
-import { type AnimationClip, Scene, type SkinnedMesh } from 'three'
+import { type AnimationClip, Scene, type SkinnedMesh, type Object3D } from 'three'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepExportToFile extends EventTarget {
   private readonly ui: UI = new UI()
   private animation_clips_to_export: AnimationClip[] = []
 
-  public set_animation_clips_to_export(all_animations_clips: AnimationClip[]): void {
+  public set_animation_clips_to_export (all_animations_clips: AnimationClip[]): void {
     this.animation_clips_to_export = []
     const animation_checkboxes = this.ui.get_animated_selected_elements()
     animation_checkboxes.forEach((checkbox) => {
@@ -33,43 +28,67 @@ export class StepExportToFile extends EventTarget {
 
     const export_scene = new Scene()
 
+    // When exporting to a file, we need to temporarily move the skinned mesh to a new scene
+    // skinned meshes can only be part of one scene at a time, so we must move it back to
+    // its original parent after exporting
+    const original_parents = new Map<SkinnedMesh, Object3D | null>()
+
     skinned_meshes.forEach((final_skinned_mesh) => {
-      export_scene.add(SkeletonUtils.clone(final_skinned_mesh))
+    // Save the original parent
+      original_parents.set(final_skinned_mesh, final_skinned_mesh.parent)
+      export_scene.add(final_skinned_mesh)
     })
 
     this.export_glb(export_scene, this.animation_clips_to_export, filename)
+      .then(() => {
+        // Move the skinned meshes back to their original parents
+        skinned_meshes.forEach((final_skinned_mesh) => {
+          const original_par = original_parents.get(final_skinned_mesh)
+          if (original_par != null) {
+            original_par.add(final_skinned_mesh)
+          } else {
+            // If there was no original parent, remove it from the scene
+            export_scene.remove(final_skinned_mesh)
+            console.log('ERROR: No original parent found for skinned mesh when exporting and re-parenting to original scene')
+          }
+        })
+      })
+      .catch((error) => { console.log('Error exporting GLB:', error) })
   }
 
-  public export_glb(exported_scene: Scene, animations_to_export: AnimationClip[], file_name: string): void {
-    const gltf_exporter = new GLTFExporter()
+  public async export_glb (exported_scene: Scene, animations_to_export: AnimationClip[], file_name: string): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      const gltf_exporter = new GLTFExporter()
 
-    const export_options =
-        {
-          binary: true,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          onlyVisible: false,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          embedImages: true,
-          animations: animations_to_export
-        }
-
-    gltf_exporter.parse(exported_scene, (result) => {
-      // I have tried casting this as an ArrayBuffer...but there are problems for some reason
-      // doing this. Maybe come back later to see what is going on
-      if (result) {
-        this.save_array_buffer(result, `${file_name}.glb`)
-      } else {
-        console.log('ERROR: result is not an instance of ArrayBuffer')
+      const export_options = {
+        binary: true,
+        onlyVisible: false,
+        embedImages: true,
+        animations: animations_to_export
       }
-    },
-    (error) => {
-      console.log('An error happened during parsing', error)
-    },
-    export_options
-    )
-  };
 
-  private save_file(blob: Blob, filename: string): void {
+      gltf_exporter.parse(
+        exported_scene,
+        (result: ArrayBuffer) => {
+          // Handle the result of the export
+          if (result !== null) {
+            this.save_array_buffer(result, `${file_name}.glb`)
+            resolve() // Resolve the promise when the export is complete
+          } else {
+            console.log('ERROR: result is not an instance of ArrayBuffer')
+            reject(new Error('Export result is not an ArrayBuffer'))
+          }
+        },
+        (error: any) => {
+          console.log('An error happened during parsing', error)
+          reject(error) // Reject the promise if an error occurs
+        },
+        export_options
+      )
+    })
+  }
+
+  private save_file (blob: Blob, filename: string): void {
     if (this.ui.dom_export_button_hidden_link != null) {
       this.ui.dom_export_button_hidden_link.href = URL.createObjectURL(blob)
       this.ui.dom_export_button_hidden_link.download = filename
@@ -80,7 +99,7 @@ export class StepExportToFile extends EventTarget {
   }
 
   // used for GLB to turn content into a byte array for saving
-  private save_array_buffer(buffer: ArrayBuffer, filename: string): void {
+  private save_array_buffer (buffer: ArrayBuffer, filename: string): void {
     this.save_file(new Blob([buffer], { type: 'application/octet-stream' }), filename)
   }
 }
