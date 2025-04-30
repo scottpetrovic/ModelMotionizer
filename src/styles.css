@@ -40,8 +40,13 @@ li{
     font-size: 13px;
 }
 
+html {
+    height: 100%;
+}
+
 body {
-    background: #0d2525;
+    background: #314F64;
+    background: linear-gradient(180deg, rgba(49, 79, 100, 1) 41%, rgba(22, 51, 71, 1) 100%);
 }
 
 #tool-selection-group {

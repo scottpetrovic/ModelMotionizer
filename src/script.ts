@@ -97,13 +97,6 @@ export class Bootstrap {
     this.environment_container.add(...Generators.create_default_lights())
     this.environment_container.add(...Generators.create_grid_helper(0x4496a8))
     this.scene.add(this.environment_container)
-
-    const fog_near = 0
-    const fog_far = 80
-    const fog_color = 0x0d2525
-    this.scene.fog = new THREE.Fog(fog_color, fog_near, fog_far)
-
-
   } // end setup_environment()
 
   private regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
@@ -112,7 +105,7 @@ export class Bootstrap {
       this.scene.remove(this.skeleton_helper)
     }
 
-    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { dashed: true, linewidth: 0.01, color: 0x4e7d58, jointColor: 0x00ff00 })
+    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { linewidth: 0.02, color: 0x4e7d58, jointColor: 0x00ff00 })
     this.skeleton_helper.name = helper_name
     this.scene.add(this.skeleton_helper)
   }

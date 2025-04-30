@@ -21,8 +21,8 @@ export class Generators {
 
   static create_grid_helper (color = 0x111155): any[] {
     // create floor mesh and add to scene to help with shadows
-    const floor_geometry = new PlaneGeometry(100, 100, 10, 10)
-    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, opacity: 0.8, transparent: true })
+    const floor_geometry = new PlaneGeometry(30, 30, 30, 30)
+    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, transparent: false })
     floor_material.side = DoubleSide // helps us see that we are below the character
 
     const floor_mesh = new Mesh(floor_geometry, floor_material)
@@ -37,8 +37,8 @@ export class Generators {
     axes_helper.position.copy(new Vector3(0, 0.008, 0)) // offset a bit to avoid z-fighting
 
     // grid display on floor
-    const size: number = 10
-    const divisions: number = 10
+    const size: number = 30
+    const divisions: number = 30
     const grid_helper: GridHelper = new GridHelper(size, divisions, color, color)
 
     return [grid_helper, floor_mesh, axes_helper]
@@ -153,7 +153,7 @@ export class Generators {
   }
 
   static create_camera (): PerspectiveCamera {
-    const field_of_view = 10 // in millimeters. Lower makes the camera more isometric
+    const field_of_view = 15 // in millimeters. Lower makes the camera more isometric
     const camera = new PerspectiveCamera(field_of_view, window.innerWidth / window.innerHeight, 0.1, 1000)
     camera.position.z = 10
     camera.position.y = 5
