@@ -147,10 +147,12 @@ export class UI {
 
       this.dom_animation_clip_list.innerHTML +=
               `<div class="anim-item">
-                  <div>
-                      <button class="secondary-button play" data-index="${index}">&#9658;</button>
-                      <span style="align-self: center">${animation_clip.name}</span>
-                  </div>
+
+                    <button class="secondary-button play" data-index="${index}">
+                    &#9658;
+                    ${animation_clip.name}
+                    </button>
+
                   <div class="styled-checkbox">
                       <input type="checkbox" name="${animation_clip.name}" value="${index}">
                   </div>

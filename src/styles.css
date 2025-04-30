@@ -9,14 +9,10 @@
 
 
 #skinned-step-animation-export-options {
-    position: fixed;
     top: 70px;
     right: 20px;
     background: #0b1822;
-    padding: 1rem;
-    width: 20rem;
-    box-shadow: 1px 1px 8px 0px #000000bf;
-    border: 1px dotted #5b8792;
+    width: 18rem;
 }
 
 #skinned-step-tools
@@ -80,7 +76,12 @@ button.secondary-button:hover {
 
 button.secondary-button.play
 {
-    padding: 0.2rem 0.5rem; /* play has much smaller padding */
+    padding: 0.2rem 0.5rem;
+    display: inline-flex;
+    flex-grow: 1;
+    align-items: center;
+    border: none;
+    border-radius: 0;
 }
 
 button, .button {
@@ -209,11 +210,12 @@ option {
     height: fit-content;
     background: #0b1822;
     box-shadow: 1px 1px 8px 0px #000000bf;
-    top: 70px;
-    left: 20px;
-    bottom: 0;
+    top: 0;
+    right: 0;
+    /* bottom: 0; */
     border: 1px dotted #5b8792;
     padding: 1rem;
+    height: 100%;
 }
 
 #animations-listing {
@@ -279,6 +281,7 @@ option {
     justify-content: space-between;
 }
 
+
 input[type="file"] {
     display: none;
 }
@@ -341,17 +344,8 @@ input[type="file"] {
   .show {display:block;}
 
   #mouse-controls {
-    position: fixed;
-    top: 10px;
-    left: 0;
-    right: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
     gap: 24px;
-    padding: 0 8px;
-    height: 50px;
-    z-index: 100;
 }
 
 /* Tooltip container */
