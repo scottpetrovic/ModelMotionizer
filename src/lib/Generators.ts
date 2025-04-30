@@ -22,7 +22,7 @@ export class Generators {
   static create_grid_helper (color = 0x111155): any[] {
     // create floor mesh and add to scene to help with shadows
     const floor_geometry = new PlaneGeometry(100, 100, 10, 10)
-    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, opacity: 0.2, transparent: true })
+    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, opacity: 0.8, transparent: true })
     floor_material.side = DoubleSide // helps us see that we are below the character
 
     const floor_mesh = new Mesh(floor_geometry, floor_material)
@@ -41,9 +41,9 @@ export class Generators {
     const divisions: number = 10
     const grid_helper: GridHelper = new GridHelper(size, divisions, color, color)
 
-
     return [grid_helper, floor_mesh, axes_helper]
   }
+
 
   static create_bone_hierarchy (): Bone {
     // offset root bone down to move entire bone structure
