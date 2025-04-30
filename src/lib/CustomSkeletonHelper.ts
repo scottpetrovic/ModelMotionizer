@@ -99,6 +99,12 @@ class CustomSkeletonHelper extends Line2 {
 
     geometry.getAttribute('instanceStart').needsUpdate = true
     geometry.getAttribute('instanceEnd').needsUpdate = true
+
+    // Update bounding box and bounding sphere
+    // otherwise the skeleton will be hidden when root bone on ground is off camera
+    geometry.computeBoundingBox()
+    geometry.computeBoundingSphere()
+
     super.updateMatrixWorld(force)
   }
 
