@@ -9,8 +9,7 @@ export default class BoneCalculationData
   public assigned_vertices: number[]
   public use_minimum_envelope_expand: boolean
 
-  constructor(name = '', bone: Bone, supports_envelope = false, has_child_bone = false, assigned_vertices = [], use_minimum_distance = false)
-  {
+  constructor (name = '', bone: Bone, supports_envelope = false, has_child_bone = false, assigned_vertices = [], use_minimum_distance = false) {
     this.name = name
     this.bone_object = bone
     this.supports_envelope_calculation = supports_envelope

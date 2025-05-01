@@ -9,16 +9,16 @@ import { SkinningFormula } from '../enums/SkinningFormula.ts'
 import { Generators } from '../Generators.ts'
 
 import { type BufferGeometry, type Material, type Object3D, type Skeleton, SkinnedMesh, type Scene } from 'three'
-import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
 import BoneTesterData from '../models/BoneTesterData.ts'
 import { type SkeletonType } from '../enums/SkeletonType.ts'
 import BoneWeightsByDistanceChild from '../solvers/BoneWeightsByDistanceChild.ts'
+import { type AbstractAutoSkinSolver } from '../solvers/AbstractAutoSkinSolver.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepWeightSkin extends EventTarget {
   private readonly ui: UI = new UI()
   private skinning_armature: Object3D | undefined
-  private bone_skinning_formula: IAutoSkinSolver | undefined
+  private bone_skinning_formula: AbstractAutoSkinSolver | undefined
   private binding_skeleton: Skeleton | undefined
   private skinned_meshes: SkinnedMesh[] = []
 
@@ -41,21 +41,22 @@ export class StepWeightSkin extends EventTarget {
     }
   }
 
-
   public create_bone_formula_object (editable_armature: Object3D, skinning_formula: string, skeleton_type: SkeletonType): any {
     this.skinning_armature = editable_armature.clone()
     this.skinning_armature.name = 'Armature for skinning'
 
     // Swap out formulas to see different results
-    if (skinning_formula === SkinningFormula.Envelope) {
-      this.bone_skinning_formula = new BoneWeightsByEnvelope(this.skinning_armature.children[0], skeleton_type)
-    } else if (skinning_formula === SkinningFormula.Distance) {
+    if (skinning_formula === SkinningFormula.Distance) {
       this.bone_skinning_formula = new BoneWeightsByDistance(this.skinning_armature.children[0], skeleton_type)
-    } else if (skinning_formula === SkinningFormula.MedianDistance) {
-      this.bone_skinning_formula = new BoneWeightsByMedianDistance(this.skinning_armature.children[0], skeleton_type)
-    } else if (skinning_formula === SkinningFormula.DistanceChild) {
+    }
+
+    if (skinning_formula === SkinningFormula.DistanceChild) {
       this.bone_skinning_formula = new BoneWeightsByDistanceChild(this.skinning_armature.children[0], skeleton_type)
     }
+
+    // if (skinning_formula === SkinningFormula.Envelope) {
+    //   this.bone_skinning_formula = new BoneWeightsByEnvelope(this.skinning_armature.children[0], skeleton_type)
+    // }
 
     return this.bone_skinning_formula
   }

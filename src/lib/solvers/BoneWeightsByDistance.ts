@@ -1,56 +1,24 @@
-import { type Bone, BufferGeometry, Object3D, Vector3 } from 'three'
+import { Vector3 } from 'three'
 import { Utility } from '../Utilities.js'
-import BoneCalculationData from '../models/BoneCalculationData.js'
-import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
-import BoneTesterData from '../models/BoneTesterData.js'
 import { SkeletonType } from '../enums/SkeletonType.js'
+import { AbstractAutoSkinSolver } from './AbstractAutoSkinSolver.js'
 
-export default class BoneWeightsByDistance implements IAutoSkinSolver {
-  private readonly bones_master_data: BoneCalculationData[] = []
-  private geometry: BufferGeometry = new BufferGeometry()
-  private show_debug: boolean = false
-  private bone_idx_test: number = -1
-  private debugging_scene_object: Object3D = new Object3D()
-  private skeleton_type: SkeletonType | null = null
-
-  constructor (bone_hier: Object3D, skeleton_type: SkeletonType) {
-    this.set_skeleton_type(skeleton_type)
-    this.init_bone_weights_data_structure(bone_hier)
-  }
-
-  public set_debugging_scene_object (scene_object: Object3D): void {
-    this.debugging_scene_object = scene_object
-  }
-
-  public set_geometry (geom: BufferGeometry): void {
-    this.geometry = geom
-  }
-
-  public set_skeleton_type (skinning_type: SkeletonType): void {
-    this.skeleton_type = skinning_type
-  }
-
-  public set_show_debug (debug_value: boolean): void {
-    this.show_debug = debug_value
-  }
-
-  public set_bone_index_to_test (bone_idx: number): void {
-    this.bone_idx_test = bone_idx
-  }
-
+export default class BoneWeightsByDistance extends AbstractAutoSkinSolver {
   public calculate_indexes_and_weights (): number[][] {
+    // There can be multiple objects that need skinning, so
+    // this will make sure we have a clean slate by putting it in function
     const skin_indices: number[] = []
     const skin_weights: number[] = []
 
     // loop through each vertex and find the closest bone
     // then assign the closest vertices to that bone in the assigned_vertices property
-    for (let i = 0; i < this.get_vertex_count(); i++) {
+    for (let i = 0; i < this.geometry_vertex_count(); i++) {
       const vertex_position: Vector3 = new Vector3().fromBufferAttribute(this.geometry.attributes.position, i)
       // let closest_bone: Bone = this.bones_master_data[0].bone_object
       let closest_bone_distance: number = 10000
       let closest_bone_index: number = 0
 
-      this.bones_master_data.forEach((bone, idx) => {
+      this.get_bone_master_data().forEach((bone, idx) => {
         // our human skeleton has a root controller bone that isn't in the mesh. Don't assign weights to this?
         if (this.skeleton_type === SkeletonType.Human) {
           if (bone.bone_object.name === 'root') {
@@ -67,7 +35,7 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
         }
       })
 
-      this.bones_master_data[closest_bone_index].assigned_vertices.push(i)
+      this.get_bone_master_data()[closest_bone_index].assigned_vertices.push(i)
 
       // assign to final weights. closest bone is always 100% weight
       skin_indices.push(closest_bone_index, 0, 0, 0)
@@ -75,33 +43,9 @@ export default class BoneWeightsByDistance implements IAutoSkinSolver {
     }
 
     if (this.show_debug) {
-      console.log('Assigned all the bones to vertices: ', this.bones_master_data)
+      console.log('Assigned all the bones to vertices: ', this.get_bone_master_data())
     }
 
     return [skin_indices, skin_weights]
-  }
-
-  public test_bones_outside_in_mesh (): BoneTesterData {
-    // don't do test for now and just return success
-    return new BoneTesterData([], [])
-  }
-
-  private init_bone_weights_data_structure (bone_hier: Object3D): void {
-    const bones_list: Bone[] = Utility.bone_list_from_hierarchy(bone_hier)
-    bones_list.forEach((bone) => {
-      const has_child_bone: boolean = bone.children.length > 0
-      const supports_envelope: boolean = false
-      const new_bone_object: BoneCalculationData =
-          new BoneCalculationData(bone.name, bone, supports_envelope, has_child_bone)
-      this.bones_master_data.push(new_bone_object)
-    })
-  }
-
-  private get_vertex_count (): number {
-    if (this.geometry === null) {
-      return -1
-    }
-
-    return this.geometry.attributes.position.array.length / 3
   }
 }

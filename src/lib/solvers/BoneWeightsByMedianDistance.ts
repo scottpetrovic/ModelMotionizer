@@ -1,7 +1,7 @@
 import { Utility } from '../Utilities.js'
 import { type Bone, BufferGeometry, Object3D, type Scene, Vector3 } from 'three'
 import BoneCalculationData from '../models/BoneCalculationData.js'
-import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js'
+import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.js' //unused...delete to abstract class
 import BoneTesterData from '../models/BoneTesterData.js'
 import { SkeletonType } from '../enums/SkeletonType.js'
 

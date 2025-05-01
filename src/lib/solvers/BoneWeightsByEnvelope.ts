@@ -4,7 +4,7 @@ import { Generators } from '../Generators.js'
 import { Utility } from '../Utilities.ts'
 import BoneCalculationData from '../models/BoneCalculationData.ts'
 import { BufferGeometry, type Bone, Object3D, Mesh, Vector3, Raycaster, type Intersection } from 'three'
-import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
+import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts' // unused...delete
 import type IntersectionPointData from '../models/IntersectionPointData.ts'
 import IntersectionGeometryData from '../models/IntersectionGeometryData.ts'
 import BoneTesterData from '../models/BoneTesterData.ts'
