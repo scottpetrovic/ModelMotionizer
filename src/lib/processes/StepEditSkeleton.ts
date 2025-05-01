@@ -63,7 +63,7 @@ export class StepEditSkeleton extends EventTarget {
 
   private update_bind_button_text (): void {
     if (this.show_debug && this.ui.dom_bind_pose_button !== null) {
-      this.ui.dom_bind_pose_button.innerHTML = 'Test Skinning'
+      this.ui.dom_bind_pose_button.innerHTML = 'Test Skinning Algorithm &nbsp;&#x203a;'
       return
     }
 
