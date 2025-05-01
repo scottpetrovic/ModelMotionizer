@@ -12,6 +12,7 @@ import { type BufferGeometry, type Material, type Object3D, type Skeleton, Skinn
 import { type IAutoSkinSolver } from '../interfaces/IAutoSkinSolver.ts'
 import BoneTesterData from '../models/BoneTesterData.ts'
 import { type SkeletonType } from '../enums/SkeletonType.ts'
+import BoneWeightsByDistanceChild from '../solvers/BoneWeightsByDistanceChild.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepWeightSkin extends EventTarget {
@@ -52,6 +53,8 @@ export class StepWeightSkin extends EventTarget {
       this.bone_skinning_formula = new BoneWeightsByDistance(this.skinning_armature.children[0], skeleton_type)
     } else if (skinning_formula === SkinningFormula.MedianDistance) {
       this.bone_skinning_formula = new BoneWeightsByMedianDistance(this.skinning_armature.children[0], skeleton_type)
+    } else if (skinning_formula === SkinningFormula.DistanceChild) {
+      this.bone_skinning_formula = new BoneWeightsByDistanceChild(this.skinning_armature.children[0], skeleton_type)
     }
 
     return this.bone_skinning_formula
