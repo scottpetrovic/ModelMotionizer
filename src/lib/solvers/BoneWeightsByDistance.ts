@@ -1,4 +1,4 @@
-import { Vector3, type Points } from 'three'
+import { Vector3, type Group } from 'three'
 import { Utility } from '../Utilities.js'
 import { SkeletonType } from '../enums/SkeletonType.js'
 import { AbstractAutoSkinSolver } from './AbstractAutoSkinSolver.js'
@@ -50,25 +50,22 @@ export default class BoneWeightsByDistance extends AbstractAutoSkinSolver {
     return [skin_indices, skin_weights]
   }
 
-  private objects_to_show_for_debugging (): Points {
-    const debug_sphere_size: number = 0.2
-    const debug_color = 0xff0000 // vertices that are part of envelope
-
+  private objects_to_show_for_debugging (): Group {
     const vertex_points_to_show: Vector3[] = []
 
-    // Create a 10 random points to test that are hard-coded
-    for (let i = 0; i < 10; i++) {
-      const random_point: Vector3 = new Vector3(
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1
-      ).normalize().multiplyScalar(0.5)
+    // get a list of all the vertices assigned to bones
+    this.get_bone_master_data().forEach(bone => {
+      const assigned_vertices: number[] = bone.assigned_vertices
 
-      vertex_points_to_show.push(random_point)
-    }
+      assigned_vertices.forEach(vertex_index => {
+        const vertex_position: Vector3 = new Vector3().fromBufferAttribute(this.geometry.attributes.position, vertex_index)
+        vertex_points_to_show.push(vertex_position)
+      })
+    })
 
-    const debug_assigned_points: Points = Generators.create_spheres_for_points(vertex_points_to_show,
-      debug_sphere_size, debug_color, 'Vertices assigned to bone')
+    const debug_color = 0xff0000 // vertices that are part of envelope
+    const debug_assigned_points: Group = Generators.create_spheres_for_points(vertex_points_to_show,
+      debug_color, 'Vertices assigned to bone')
 
     return debug_assigned_points
   }

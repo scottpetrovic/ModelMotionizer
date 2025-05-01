@@ -1,4 +1,4 @@
-import { Vector3, type Points } from 'three'
+import { Vector3, type Group } from 'three'
 import { Utility } from '../Utilities.js'
 import { SkeletonType } from '../enums/SkeletonType.js'
 import { AbstractAutoSkinSolver } from './AbstractAutoSkinSolver.js'
@@ -122,12 +122,10 @@ export default class BoneWeightsByDistanceChild extends AbstractAutoSkinSolver {
     }
   }
 
-  private objects_to_show_for_debugging (): Points {
-    const debug_sphere_size: number = 0.07
+  private objects_to_show_for_debugging (): Group {
     const debug_color = 0xff00ff // vertices that are part of envelope
-
-    const debug_assigned_points: Points = Generators.create_spheres_for_points(this.points_to_show_for_debugging,
-      debug_sphere_size, debug_color, 'Vertices assigned to bone')
+    const debug_assigned_points: Group = Generators.create_spheres_for_points(this.points_to_show_for_debugging,
+      debug_color, 'Vertices assigned to bone')
 
     return debug_assigned_points
   }

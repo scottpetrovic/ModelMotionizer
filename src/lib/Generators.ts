@@ -1,7 +1,7 @@
 import {
   PerspectiveCamera, DoubleSide, DirectionalLight, GridHelper,
-  Bone, Skeleton, AmbientLight, PlaneGeometry, Mesh,
-  SphereGeometry, type MeshBasicMaterial, MeshPhongMaterial, AxesHelper,
+  Bone, MeshBasicMaterial, Skeleton, AmbientLight, PlaneGeometry, Mesh,
+  SphereGeometry, MeshPhongMaterial, AxesHelper,
   Vector3, PointsMaterial, BufferGeometry, Points, type Object3D, WebGLRenderer,
   Group, Line, LineBasicMaterial
 } from 'three'
@@ -116,13 +116,22 @@ export class Generators {
     return group
   }
 
-  static create_spheres_for_points (points: Vector3[], sphere_size = 0.005, color = 0x00ffff, name = ''): Points {
-    const points_material: PointsMaterial = new PointsMaterial({ size: sphere_size, color, depthTest: false })
-    const points_geometry = new BufferGeometry().setFromPoints(points)
-    const point_objects: Points = new Points(points_geometry, points_material)
-    point_objects.name = `Point display: ${name}`
-    return point_objects
-  }
+  static create_spheres_for_points (points: Vector3[], color = 0x00ffff, name = ''): Group {
+    const debug_sphere_size: number = 0.006
+    const group = new Group()
+    group.name = `Point display: ${name}`
+
+    const sphere_geometry = new SphereGeometry(debug_sphere_size, 10, 10)
+    const sphere_material = new MeshBasicMaterial({ color, depthTest: false })
+
+    points.forEach(point => {
+      const sphere = new Mesh(sphere_geometry, sphere_material)
+      sphere.position.copy(point) // Position the sphere at the point
+      group.add(sphere)
+    })
+
+    return group
+}
 
   static create_test_plane_mesh (size: number = 0.08, color: number = 0x0000ff): Mesh {
     const plane_width = size
