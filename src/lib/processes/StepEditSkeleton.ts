@@ -131,8 +131,6 @@ export class StepEditSkeleton extends EventTarget {
     switch (value) {
       case 'bone-envelope':
         return SkinningFormula.Envelope
-      case 'closest-bone-middle':
-        return SkinningFormula.MedianDistance
       case 'closest-bone-child':
         return SkinningFormula.DistanceChild
     }

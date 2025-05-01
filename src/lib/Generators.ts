@@ -116,8 +116,8 @@ export class Generators {
     return group
   }
 
-  static create_spheres_for_points (points: Vector3[], sphere_size = 0.01, color = 0x00ffff, name = ''): Points {
-    const points_material: PointsMaterial = new PointsMaterial({ size: sphere_size, color })
+  static create_spheres_for_points (points: Vector3[], sphere_size = 0.005, color = 0x00ffff, name = ''): Points {
+    const points_material: PointsMaterial = new PointsMaterial({ size: sphere_size, color, depthTest: false })
     const points_geometry = new BufferGeometry().setFromPoints(points)
     const point_objects: Points = new Points(points_geometry, points_material)
     point_objects.name = `Point display: ${name}`
