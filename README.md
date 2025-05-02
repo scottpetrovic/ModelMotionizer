@@ -1,7 +1,7 @@
-# ModelMotionizer
-Import a 3D Model and automatically assign and export animations. This is kind of similar to a web application like Mixamo, but I would like it to be more flexible in nature. 
+# Mesh2Motion App
+Import a 3D Model and automatically assign and export animations. This is kind of similar to a web application like Mixamo, but I would like it to be more flexible so it can support other model types. Hopefully the open source nature means it can be expanded on and evolve more than that tool did. 
 
-Live Demo from my github page: https://scottpetrovic.github.io/model-motionizer/
+Try it live: https://app.mesh2motion.org/
 
 ![Screenshot](./readme.png)
 
