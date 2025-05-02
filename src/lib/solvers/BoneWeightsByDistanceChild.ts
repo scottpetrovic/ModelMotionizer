@@ -67,8 +67,10 @@ export default class BoneWeightsByDistanceChild extends AbstractAutoSkinSolver {
       // Compare directions using dot product
       const similarity = direction_to_current_bone.dot(direction_to_parent_bone)
 
-      // If the directions are similar (e.g., dot product > 0.8), reassign to the parent bone
-      if (similarity < -0.3) {
+      // If the directions are similar (e.g., dot product < 0.0), reassign to the parent bone
+      // this means the vertex is closer to the parent bone than the current bone
+      // and the direction is similar to the parent bone, so we can assign it to the parent
+      if (similarity < 0.0) {
         const parent_bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === parent_bone)
         if (parent_bone_index !== -1) {
           // Update skin indices and weights
