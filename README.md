@@ -17,6 +17,10 @@ There are instructions built into the web application, but this is the general f
     npm install
     node run dev
 
+## Creating a production build for the web
+We mostly just have typescript for this project, which web browsers cannot just read, so we need to do a build step to get everything ready for deploying. This project uses Vite for the web server and builder. See the vite.config.js for more info. This command will create a "dist" folder with all the files to serve to the web:
+
+    npm run build
 
 ## Vision/TODO
 These are some ideas and directions I would like to go with this for the future:

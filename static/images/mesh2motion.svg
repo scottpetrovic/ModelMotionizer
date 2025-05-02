@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1507 198" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Artboard1" transform="matrix(0.735627,0,0,0.128605,0,0)">
+        <rect x="0" y="0" width="2048" height="1536" style="fill:none;"/>
+        <g transform="matrix(1.30352,0,0,7.77578,-477.213,-5037.29)">
+            <path d="M1924.28,707.297L1924.28,798.342C1924.28,801.133 1921.92,803.4 1919.01,803.4L1629.05,803.4C1626.14,803.4 1623.78,801.133 1623.78,798.342L1623.78,707.297C1623.78,704.506 1626.14,702.239 1629.05,702.239L1919.01,702.239C1921.92,702.239 1924.28,704.506 1924.28,707.297Z" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1.35938,0,0,7.77578,116.004,-3149.13)">
+            <g transform="matrix(155.762,0,0,155.762,1085.8,559.729)">
+            </g>
+            <text x="481.007px" y="559.729px" style="font-family:'Boldfinger';font-size:155.762px;fill:white;">motion</text>
+        </g>
+        <g transform="matrix(1.35938,0,0,7.77578,1027.41,-3345.52)">
+            <g transform="matrix(82,0,0,82,706.427,559.729)">
+            </g>
+            <text x="481.007px" y="559.729px" style="font-family:'Consolas-Bold', 'Consolas';font-weight:700;font-size:82px;fill:rgb(66,66,66);">ALPHA</text>
+        </g>
+        <g transform="matrix(2.29493,0,0,13.1271,-534.876,-5878.96)">
+            <g transform="matrix(155.762,0,0,155.762,563.25,559.729)">
+            </g>
+            <text x="481.007px" y="559.729px" style="font-family:'DynaPuff-Regular', 'DynaPuff';font-size:155.762px;fill:white;">2</text>
+        </g>
+        <g transform="matrix(1.35938,0,0,7.77578,-628.942,-3164.4)">
+            <g transform="matrix(155.762,0,0,155.762,881.441,559.729)">
+            </g>
+            <text x="481.007px" y="559.729px" style="font-family:'Boldfinger';font-size:155.762px;fill:white;">Mesh</text>
+        </g>
+    </g>
+</svg>
