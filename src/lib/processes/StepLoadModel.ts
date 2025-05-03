@@ -165,7 +165,10 @@ export class StepLoadModel extends EventTarget {
 
     // strip out stuff that we are not bringing into the model step
     const clean_scene_with_only_models = this.strip_out_all_unecessary_model_data(this.original_model_data)
-    this.scale_model_on_import(clean_scene_with_only_models, max_height) // if we have multiple objects, we want to scale them all the same
+
+    // Some objects come in very large, which makes it harder to work with
+    // scale everything down to a max height
+    this.scale_model_on_import(clean_scene_with_only_models, max_height)
 
     // loop through each child in scene and reset rotation
     // if we don't the skinning process doesn't take rotation into account

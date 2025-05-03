@@ -80,7 +80,6 @@ export class Bootstrap {
     // Set default camera position for front view
     // this will help because we first want the user to rotate the model to face the front
     this.camera.position.set(0, 1.7, 15) // X:0 (centered), Y:1.7 (eye-level), Z:5 (front view)
-    this.camera.lookAt(0, 1.7, 0) // Look at center at eye-level
 
     Generators.create_window_resize_listener(this.renderer, this.camera)
     document.body.appendChild(this.renderer.domElement)
@@ -449,25 +448,41 @@ export class Bootstrap {
     }
 
     const distance = 10
+    const target_position = new THREE.Vector3()
     switch (view) {
       case 'front':
-        this.camera.position.set(0, 0, distance)
+        target_position.set(0, 0, distance)
         break
       case 'side':
-        this.camera.position.set(distance, 0, 0)
+        target_position.set(distance, 0, 0)
         break
       case 'top':
-        this.camera.position.set(0, distance, 0)
+        target_position.set(0, distance, 0)
         break
     }
-    this.controls.target.set(0, 0, 0) // look at origin
 
-    // how to pan up 1/2 the height of the model?
     const bounding_box = this.load_model_step.model_meshes().children[0].geometry.boundingBox
     const model_height = bounding_box.max.y - bounding_box.min.y
-    this.controls.target.y += model_height / 2
+    const target = new THREE.Vector3(0, model_height / 2, 0) // look at origin, adjusted for model height
 
-    this.controls.update() // update the camera position
+    const start_position = this.camera.position.clone()
+    const start_time = performance.now()
+    const duration = 0.25 // seconds
+
+    const animate = (current_time: number) => {
+      const elapsed_time = (current_time - start_time) / 1000
+      const t = Math.min(elapsed_time / duration, 1) // normalize time to [0, 1]
+
+      this.camera.position.lerpVectors(start_position, target_position, t)
+      this.controls.target.lerp(target, t)
+      this.controls.update()
+
+      if (t < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
   }
 } // end Bootstrap class
 

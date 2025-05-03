@@ -16,13 +16,15 @@ export class Generators {
   static create_material (wireframe_value = true, color_hex = 0x00ff00): MeshPhongMaterial {
     const material = new MeshPhongMaterial({ color: color_hex, wireframe: wireframe_value })
     material.side = DoubleSide
+    material.specular = 0.0
+    material.shininess = 0.0
     return material
   }
 
   static create_grid_helper (color = 0x111155): any[] {
     // create floor mesh and add to scene to help with shadows
     const floor_geometry = new PlaneGeometry(30, 30, 30, 30)
-    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, transparent: false })
+    const floor_material = new MeshPhongMaterial({ color: 0x4e4e7a, wireframe: false, transparent: false, shininess: 0.0, specular: 0.0 })
     floor_material.side = DoubleSide // helps us see that we are below the character
 
     const floor_mesh = new Mesh(floor_geometry, floor_material)
