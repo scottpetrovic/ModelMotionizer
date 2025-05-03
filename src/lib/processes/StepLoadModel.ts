@@ -1,6 +1,7 @@
 import { UI } from '../UI.ts'
 import { Box3 } from 'three/src/math/Box3.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 
 import { Scene } from 'three/src/scenes/Scene.js'
 import { Mesh } from 'three/src/objects/Mesh.js'
@@ -12,6 +13,7 @@ import { type BufferGeometry, type Material, type Object3D, type SkinnedMesh } f
 // Note: EventTarget is a built-ininterface and do not need to import it
 export class StepLoadModel extends EventTarget {
   private readonly gltf_loader = new GLTFLoader()
+  private readonly fbx_loader = new FBXLoader()
   private readonly ui: UI = new UI()
   private original_model_data: Scene = new Scene()
   private final_mesh_data: Scene = new Scene()
@@ -42,7 +44,7 @@ export class StepLoadModel extends EventTarget {
     this.objects_count = this.models_geometry_list().length
   }
 
-  private calculate_geometry_list(): void {
+  private calculate_geometry_list (): void {
     if (this.final_mesh_data === undefined) {
       console.error('original model not loaded yet. Cannot do calculations')
     }
@@ -83,11 +85,13 @@ export class StepLoadModel extends EventTarget {
     if (this.ui.dom_upload_model_button !== null) {
       this.ui.dom_upload_model_button.addEventListener('change', (event: Event) => {
         const file = event.target.files[0]
+        const file_extension: string = this.get_file_extension(file.name)
+
         const reader = new FileReader()
         reader.readAsDataURL(file)
-
         reader.onload = () => {
-          this.load_model_file(reader.result)
+          console.log('File reader loaded', reader)
+          this.load_model_file(reader.result, file_extension)
         }
       })
     }
@@ -105,47 +109,79 @@ export class StepLoadModel extends EventTarget {
         const model_selection = document.querySelector('#model-selection')
 
         if (model_selection !== null) {
-          const selected_model = model_selection.options[model_selection.selectedIndex].value
-          this.load_model_file(selected_model)
+          const file_name = model_selection.options[model_selection.selectedIndex].value
+          const file_extension: string = this.get_file_extension(file_name)
+          this.load_model_file(file_name, file_extension)
         }
       })
     }
   }
 
+  private get_file_extension (file_path: string): string {
+    const file_name: string | undefined = file_path.split('/').pop() // remove the directory path
 
-  private load_model_file (model_file_path: string): void {
+    if (file_name === undefined) {
+      console.error('Critical Error: Undefined file extension when loading model')
+      return 'UNDEFINED'
+    }
+
+    const file_extension: string | undefined = file_name?.split('.').pop() // just get last part of the file name
+
+    if (file_extension === undefined) {
+      console.error('Critical Error: File does not have a "." symbol in the name')
+      return 'UNDEFINED'
+    }
+
+    return file_extension
+  }
+
+  private load_model_file (model_file_path: string, file_extension: string): void {
     const max_height = 1.5 // have 3d model scaled to be 1.5 units tall. helps normalize the models to work with
 
-    this.gltf_loader.load(model_file_path, (gltf) => {
-      const loaded_scene: Scene = gltf.scene
-
-      this.original_model_data = loaded_scene.clone()
-      this.original_model_data.name = 'Cloned Scene'
-
-      this.original_model_data.traverse((child) => {
-        child.castShadow = true
+    if (file_extension === 'fbx') {
+      console.log('Loading FBX model:', model_file_path)
+      this.fbx_loader.load(model_file_path, (fbx) => {
+        const loaded_scene: Scene = new Scene()
+        loaded_scene.add(fbx)
+        this.process_loaded_scene(loaded_scene, max_height)
       })
-
-      // strip out stuff that we are not bringing into the model step
-      const clean_scene_with_only_models = this.strip_out_all_unecessary_model_data(this.original_model_data)
-      this.scale_model_on_import(clean_scene_with_only_models, max_height) // if we have multiple objects, we want to scale them all the same
-
-      // loop through each child in scene and reset rotation
-      // if we don't the skinning process doesn't take rotation into account
-      // and creates odd results
-      clean_scene_with_only_models.traverse((child) => {
-        child.rotation.set(0, 0, 0)
+    } else if (file_extension === 'gltf' || file_extension === 'glb') {
+      this.gltf_loader.load(model_file_path, (gltf) => {
+        const loaded_scene: Scene = gltf.scene
+        this.process_loaded_scene(loaded_scene, max_height)
       })
+    } else {
+      console.error('Unsupported file format to load. Only acccepts FBX, GLTF, GLB:', model_file_path)
+    }
+  }
 
-      console.log('Model loaded', clean_scene_with_only_models)
+  private process_loaded_scene(loaded_scene: Scene, max_height: number): void {
+    this.original_model_data = loaded_scene.clone()
+    this.original_model_data.name = 'Cloned Scene'
 
-      // assign the final cleaned up model to the original model data
-      this.final_mesh_data = clean_scene_with_only_models
-
-      this.calculate_geometry_list()
-
-      this.dispatchEvent(new CustomEvent('modelLoaded'))
+    this.original_model_data.traverse((child) => {
+      child.castShadow = true
     })
+
+    // strip out stuff that we are not bringing into the model step
+    const clean_scene_with_only_models = this.strip_out_all_unecessary_model_data(this.original_model_data)
+    this.scale_model_on_import(clean_scene_with_only_models, max_height) // if we have multiple objects, we want to scale them all the same
+
+    // loop through each child in scene and reset rotation
+    // if we don't the skinning process doesn't take rotation into account
+    // and creates odd results
+    clean_scene_with_only_models.traverse((child) => {
+      child.rotation.set(0, 0, 0)
+    })
+
+    console.log('Model loaded', clean_scene_with_only_models)
+
+    // assign the final cleaned up model to the original model data
+    this.final_mesh_data = clean_scene_with_only_models
+
+    this.calculate_geometry_list()
+
+    this.dispatchEvent(new CustomEvent('modelLoaded'))
   }
 
   private strip_out_all_unecessary_model_data (model_data: Scene): Scene {
