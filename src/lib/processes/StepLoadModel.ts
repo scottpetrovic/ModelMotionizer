@@ -155,25 +155,25 @@ export class StepLoadModel extends EventTarget {
     }
   }
 
-  private process_loaded_scene (loaded_scene: Scene, max_height: number): void {
+  private process_loaded_scene(loaded_scene: Scene, max_height: number): void {
     this.original_model_data = loaded_scene.clone()
     this.original_model_data.name = 'Cloned Scene'
 
+    this.original_model_data.traverse((child) => {
+      child.castShadow = true
+    })
+
     // strip out stuff that we are not bringing into the model step
     const clean_scene_with_only_models = this.strip_out_all_unecessary_model_data(this.original_model_data)
-    // this.scale_model_on_import(clean_scene_with_only_models, max_height) // if we have multiple objects, we want to scale them all the same
+    this.scale_model_on_import(clean_scene_with_only_models, max_height) // if we have multiple objects, we want to scale them all the same
 
-    // additional data cleanup and normalization
+    // loop through each child in scene and reset rotation
+    // if we don't the skinning process doesn't take rotation into account
+    // and creates odd results
     clean_scene_with_only_models.traverse((child) => {
-      // make sure all the meshes can cast shadow onto the ground
-      child.castShadow = true
-
-      // make sure all the meshes have a scale of 1,1,1
-      // this should also update the buffer geometry data
-      if (child.type === 'Mesh') {
-        child.scale.set(1, 1, 1)
-      }
+      child.rotation.set(0, 0, 0)
     })
+
     console.log('Model loaded', clean_scene_with_only_models)
 
     // assign the final cleaned up model to the original model data
@@ -216,7 +216,6 @@ export class StepLoadModel extends EventTarget {
     return new_scene
   }
 
-  // unused for now until I figure out what to do with this...or even if we need it
   private scale_model_on_import (scene_object: Scene, max_height = 1.0): void {
     let scale_factor: number = 1.0
 
