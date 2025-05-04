@@ -70,7 +70,19 @@ export default class BoneWeightsByDistanceChild extends AbstractAutoSkinSolver {
       // If the directions are similar (e.g., dot product < 0.0), reassign to the parent bone
       // this means the vertex is closer to the parent bone than the current bone
       // and the direction is similar to the parent bone, so we can assign it to the parent
-      if (similarity < 0.0) {
+      let similarity_threshold = 0.0 // Adjust this threshold as needed
+
+      // upper arms on humans need to have a higher threshold
+      // 0.0 is 50% between the parent and the child bone directions
+      // 0.6 will mean we will assign more to the parent bone (shoulder), and less to the upper arm
+      // this will help reduce distortions in the upper torso area when arms rotate
+      if (this.skeleton_type === SkeletonType.Human) {
+        if (current_bone.name.includes('upper_arm') === true) {
+          similarity_threshold = 0.6 // strong affinity to parent bone
+        }
+      }
+
+      if (similarity < similarity_threshold) {
         const parent_bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === parent_bone)
         if (parent_bone_index !== -1) {
           // Update skin indices and weights
