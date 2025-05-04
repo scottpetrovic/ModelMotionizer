@@ -55,7 +55,9 @@ class CustomSkeletonHelper extends Line2 {
     this.matrix = object.matrixWorld
     this.matrixAutoUpdate = false
 
-    window.addEventListener('resize', () => {this.updateResolution()})
+    // The custom skeleton helper originally had this
+    // not sure if it is actually needed or provides any benefit
+    // window.addEventListener('resize', () => {this.updateResolution()})
 
     // add sphere geometry for joints
     const sphereGeometry = new SphereGeometry(0.01, 16, 16)
