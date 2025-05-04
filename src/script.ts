@@ -5,7 +5,6 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { Utility } from './lib/Utilities.ts'
 import { Generators } from './lib/Generators.ts'
 
-
 import { UI } from './lib/UI.ts'
 
 import { StepLoadModel } from './lib/processes/StepLoadModel.ts'
@@ -23,44 +22,46 @@ import { build_version } from './environment.js'
 import { SkeletonType } from './lib/enums/SkeletonType.ts'
 
 import { CustomSkeletonHelper } from './lib/CustomSkeletonHelper.ts'
+import { EventListeners } from './lib/EventListeners.ts'
 
 export class Bootstrap {
   private readonly camera = Generators.create_camera()
-  private readonly renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-  private controls: OrbitControls | undefined = undefined
+  public readonly renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  public controls: OrbitControls | undefined = undefined
 
-  private readonly transform_controls: TransformControls = new TransformControls(this.camera, this.renderer.domElement)
-  private is_transform_controls_dragging: boolean = false
+  public readonly transform_controls: TransformControls = new TransformControls(this.camera, this.renderer.domElement)
+  public is_transform_controls_dragging: boolean = false
 
   // has UI elements on the HTML page that we will reference/use
-  private readonly ui = new UI()
-  private readonly load_model_step = new StepLoadModel()
-  private readonly load_skeleton_step = new StepLoadSkeleton()
-  private readonly edit_skeleton_step = new StepEditSkeleton()
-  private readonly weight_skin_step = new StepWeightSkin()
-  private readonly animations_listing_step = new StepAnimationsListing()
-  private readonly file_export_step = new StepExportToFile()
-  private readonly scene: Scene = new Scene()
+  public readonly ui = new UI()
+  public readonly load_model_step = new StepLoadModel()
+  public readonly load_skeleton_step = new StepLoadSkeleton()
+  public readonly edit_skeleton_step = new StepEditSkeleton()
+  public readonly weight_skin_step = new StepWeightSkin()
+  public readonly animations_listing_step = new StepAnimationsListing()
+  public readonly file_export_step = new StepExportToFile()
+  public readonly scene: Scene = new Scene()
 
   // for looking at specific bones
-  private skeleton_helper: CustomSkeletonHelper | undefined = undefined
-  private debugging_visual_object: Group = new Group()
-  private process_step: ProcessStep = ProcessStep.LoadModel
+  public process_step: ProcessStep = ProcessStep.LoadModel
+  public skeleton_helper: CustomSkeletonHelper | undefined = undefined
+  public debugging_visual_object: Group = new Group()
 
   private readonly clock = new THREE.Clock()
 
   private readonly environment_container: Group = new Group()
+  private readonly eventListeners: EventListeners
 
   public initialize (): void {
     this.setup_environment()
-    this.add_event_listeners()
-
+    this.eventListeners.addEventListeners()
     this.process_step = this.process_step_changed(ProcessStep.LoadModel)
     this.animate()
     this.inject_build_version()
   } // end initialize()
 
   constructor () {
+    this.eventListeners = new EventListeners(this)
     // helps resolve requestAnimationFrame calling animate() with wrong context
     this.animate = this.animate.bind(this)
   }
@@ -98,7 +99,7 @@ export class Bootstrap {
     this.scene.add(this.environment_container)
   } // end setup_environment()
 
-  private regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
+  public regenerate_skeleton_helper (new_skeleton: Skeleton, helper_name = 'Skeleton Helper'): void {
     // if skeleton helper exists...remove it
     if (this.skeleton_helper !== undefined) {
       this.scene.remove(this.skeleton_helper)
@@ -109,7 +110,7 @@ export class Bootstrap {
     this.scene.add(this.skeleton_helper)
   }
 
-  private handle_transform_controls_moving (): void {
+  public handle_transform_controls_moving (): void {
     if (this.edit_skeleton_step.is_mirror_mode_enabled()) {
       const selected_bone: Bone = this.transform_controls.object as Bone
       this.edit_skeleton_step.apply_mirror_mode(selected_bone, this.transform_controls.getMode())
@@ -145,7 +146,7 @@ export class Bootstrap {
     this.ui.dom_info_panel.innerHTML += bones_error_list
   }
 
-  private process_step_changed (process_step: ProcessStep): ProcessStep {
+  public process_step_changed (process_step: ProcessStep): ProcessStep {
     // we will have the current step turn on the UI elements it needs
     this.ui.hide_all_elements()
 
@@ -207,7 +208,7 @@ export class Bootstrap {
     this.renderer.render(this.scene, this.camera)
   }
 
-  private handle_transform_controls_mouse_down (mouse_event: MouseEvent): void {
+  public handle_transform_controls_mouse_down (mouse_event: MouseEvent): void {
     // primary click is made for rotating around 3d scene
     const is_primary_button_click = mouse_event.button === 0
 
@@ -246,121 +247,6 @@ export class Bootstrap {
     if (closest_bone !== null) {
       this.transform_controls.attach(closest_bone)
       this.weight_skin_step.set_bone_index_to_test(closest_bone_index)
-    }
-  }
-
-  private add_event_listeners (): void {
-    this.renderer.domElement.addEventListener('mousemove', (event: MouseEvent) => {
-      if (this.is_transform_controls_dragging) {
-        this.handle_transform_controls_moving()
-      }
-    })
-
-    this.renderer.domElement.addEventListener('mousedown', (event: MouseEvent) => {
-      this.handle_transform_controls_mouse_down(event)
-    }, false)
-
-    if (this.transform_controls !== undefined) {
-      this.transform_controls.addEventListener('dragging-changed', (event) => {
-        console.log(this.is_transform_controls_dragging)
-        this.is_transform_controls_dragging = event.value // monitor the dragging state for transform control
-      })
-
-      this.transform_controls.addEventListener('dragging-changed', (event) => {
-        this.controls.enabled = !event.value
-      })
-    }
-
-    this.load_model_step.addEventListener('modelLoaded', (event) => {
-      this.scene.add(this.load_model_step.model_meshes())
-      this.process_step = this.process_step_changed(ProcessStep.LoadSkeleton)
-    })
-
-    this.load_skeleton_step.addEventListener('skeletonLoaded', (event) => {
-      // pass in our loaded armature to the edit skeleton for further editing
-      // keep a reference to our initial skeleton data in case we want to revert
-      this.edit_skeleton_step.load_original_armature_from_model(this.load_skeleton_step.armature())
-
-      this.regenerate_skeleton_helper(this.edit_skeleton_step.skeleton())
-
-      this.process_step = this.process_step_changed(ProcessStep.EditSkeleton)
-    })
-
-    if (this.ui.dom_bind_pose_button !== null) {
-      this.ui.dom_bind_pose_button.addEventListener('click', () => {
-        // make sure we have a valid bone position before we try to do any weighting
-        // this test validates that bones are inside the mesh
-        const passed_bone_skinning_test = this.test_bone_weighting_success()
-        if (passed_bone_skinning_test) {
-          this.process_step_changed(ProcessStep.BindPose)
-        }
-      })
-    }
-
-    this.ui.dom_rotate_model_x_button.addEventListener('click', () => {
-      this.load_model_step.rotate_model_by_axis('x', 90)
-    })
-
-    this.ui.dom_rotate_model_y_button.addEventListener('click', () => {
-      this.load_model_step.rotate_model_by_axis('y', 90)
-    })
-
-    this.ui.dom_show_skeleton_checkbox.addEventListener('click', (event) => {
-      if (this.skeleton_helper !== undefined) {
-        this.skeleton_helper.visible = event.target.checked
-      } else {
-        console.warn('Skeleton helper is undefined, so we cannot show it')
-      }
-    })
-
-    this.ui.dom_export_button.addEventListener('click', () => {
-      const all_clips = this.animations_listing_step.animation_clips()
-      this.file_export_step.set_animation_clips_to_export(all_clips)
-      this.file_export_step.export(this.weight_skin_step.final_skinned_meshes(), 'exported-model')
-    })
-
-    this.ui.dom_back_to_edit_skeleton_button.addEventListener('click', () => {
-      // clear existing skinned mesh if it exists
-      const existing_skinned_meshes = this.scene.children.filter((child) => child.name === 'Skinned Mesh')
-
-      existing_skinned_meshes.forEach((existing_skinned_mesh) => {
-        Utility.remove_object_with_children(existing_skinned_mesh)
-      })
-
-      this.debugging_visual_object = Utility.regenerate_debugging_scene(this.scene) // clear out the debugging scene
-      this.process_step = this.process_step_changed(ProcessStep.EditSkeleton)
-      this.regenerate_skeleton_helper(this.edit_skeleton_step.skeleton())
-      this.load_model_step.model_meshes().visible = true // show the unskinned mesh again
-    })
-
-    this.ui.dom_view_front_change.addEventListener('click', () => this.switchToView('front'))
-    this.ui.dom_view_side_change.addEventListener('click', () => this.switchToView('side'))
-    this.ui.dom_view_top_change.addEventListener('click', () => this.switchToView('top'))
-
-    window.addEventListener('click', (event: MouseEvent) => {
-      this.handle_closing_drop_down_ui(event)
-    }, false)
-  } // end event listeners
-
-  private handle_closing_drop_down_ui (event: MouseEvent): void {
-    if (event?.target === null) {
-      return
-    }
-
-    const target_element = event.target as Element
-
-    const target_has_dropdown = target_element.matches('.dropbtn') // button object
-    const parent_class_has_dropdown = target_element.parentElement?.matches('.dropbtn') // text inside button
-
-    if (!target_has_dropdown && parent_class_has_dropdown === false) {
-      const drop_downs = document.getElementsByClassName('dropdown-content')
-      let i = 0
-      for (i = 0; i < drop_downs.length; i++) {
-        const open_drop_downs = drop_downs[i]
-        if (open_drop_downs.classList.contains('show')) {
-          open_drop_downs.classList.remove('show')
-        }
-      }
     }
   }
 
@@ -407,7 +293,7 @@ export class Bootstrap {
     this.process_step_changed(ProcessStep.AnimationsListing)
   }
 
-  private test_bone_weighting_success (): boolean {
+  public test_bone_weighting_success (): boolean {
     this.debugging_visual_object = Utility.regenerate_debugging_scene(this.scene) // clear out the debugging scene
 
     this.weight_skin_step.create_bone_formula_object(this.edit_skeleton_step.armature(), this.edit_skeleton_step.algorithm(),
@@ -441,7 +327,7 @@ export class Bootstrap {
     return true
   }
 
-  private switchToView (view: 'front' | 'side' | 'top'): void {
+  public switchToView (view: 'front' | 'side' | 'top'): void {
     if (this.controls === undefined) {
       console.log('switching to view failed: controls are undefined')
       return
