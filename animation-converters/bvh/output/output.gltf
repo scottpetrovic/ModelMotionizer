@@ -1,0 +1,128 @@
+{
+    "extensions": {},
+    "extras": {},
+    "accessors": [
+        {
+            "extensions": {},
+            "extras": {},
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": null,
+            "normalized": false,
+            "count": 2752,
+            "type": "SCALAR",
+            "sparse": null,
+            "max": [],
+            "min": [],
+            "name": null
+        },
+        {
+            "extensions": {},
+            "extras": {},
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": null,
+            "normalized": false,
+            "count": 2752,
+            "type": "VEC3",
+            "sparse": null,
+            "max": [],
+            "min": [],
+            "name": null
+        }
+    ],
+    "animations": [
+        {
+            "extensions": {},
+            "extras": {},
+            "name": null,
+            "channels": [],
+            "samplers": [
+                {
+                    "extensions": {},
+                    "extras": {},
+                    "input": 0,
+                    "interpolation": "LINEAR",
+                    "output": 1
+                }
+            ]
+        }
+    ],
+    "asset": {
+        "extensions": {},
+        "extras": {},
+        "generator": "",
+        "copyright": "",
+        "version": "2.0",
+        "minVersion": null
+    },
+    "bufferViews": [
+        {
+            "extensions": {},
+            "extras": {},
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 11008,
+            "byteStride": null,
+            "target": null,
+            "name": null
+        },
+        {
+            "extensions": {},
+            "extras": {},
+            "buffer": 1,
+            "byteOffset": 0,
+            "byteLength": 33024,
+            "byteStride": null,
+            "target": null,
+            "name": null
+        }
+    ],
+    "buffers": [
+        {
+            "extensions": {},
+            "extras": {},
+            "uri": "output.bin",
+            "byteLength": 11008
+        },
+        {
+            "extensions": {},
+            "extras": {},
+            "uri": "output.bin",
+            "byteLength": 33024
+        }
+    ],
+    "cameras": [],
+    "images": [],
+    "materials": [],
+    "meshes": [],
+    "nodes": [
+        {
+            "extensions": {},
+            "extras": {},
+            "mesh": null,
+            "skin": null,
+            "rotation": null,
+            "translation": null,
+            "scale": null,
+            "children": [],
+            "matrix": null,
+            "camera": null,
+            "name": "Hips"
+        }
+    ],
+    "samplers": [],
+    "scene": null,
+    "scenes": [
+        {
+            "extensions": {},
+            "extras": {},
+            "name": null,
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "skins": [],
+    "textures": []
+}
