@@ -143,15 +143,14 @@
                 <hr />
 
                 <!-- option to change out skinning algorithm -->
-                <label for="skinning-algorithm-options">Skinning algorithm:</label>
-                <select id="skinning-algorithm-options">
+                <label style="display: none" for="skinning-algorithm-options">Skinning algorithm:</label>
+                <select style="display: none" id="skinning-algorithm-options">
+                    <option value="closest-distance-targeting">Closest Distance Targeting</option>
                     <option value="closest-bone">Closest Bone</option>
                     <option value="closest-bone-child">Closest Distance Child</option>
-                    <!-- <option value="bone-envelope">Bone Envelope</option> 
-                    <option value="closest-bone-middle">Closest Middle Bone</option> -->
                 </select>
 
-                <hr />
+                <!-- <hr /> -->
 
                 <!-- checkbox for enabling weight skin debug mode. -->
                 <div class="styled-checkbox">

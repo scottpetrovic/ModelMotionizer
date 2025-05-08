@@ -1,8 +1,10 @@
 import { UI } from '../UI.ts'
 
-import { BoneWeightsByEnvelope } from '../solvers/BoneWeightsByEnvelope.ts'
+// import { BoneWeightsByEnvelope } from '../solvers/BoneWeightsByEnvelope.ts'
+// import BoneWeightsByMedianDistance from '../solvers/BoneWeightsByMedianDistance.ts'
 import BoneWeightsByDistance from '../solvers/BoneWeightsByDistance.ts'
-import BoneWeightsByMedianDistance from '../solvers/BoneWeightsByMedianDistance.ts'
+import BoneWeightsByDistanceChild from '../solvers/BoneWeightsByDistanceChild.ts'
+import SolverDistanceChildTargeting from '../solvers/SolverDistanceChildTargeting.ts'
 
 import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
@@ -11,7 +13,7 @@ import { Generators } from '../Generators.ts'
 import { type BufferGeometry, type Material, type Object3D, type Skeleton, SkinnedMesh, type Scene } from 'three'
 import BoneTesterData from '../models/BoneTesterData.ts'
 import { type SkeletonType } from '../enums/SkeletonType.ts'
-import BoneWeightsByDistanceChild from '../solvers/BoneWeightsByDistanceChild.ts'
+
 import { type AbstractAutoSkinSolver } from '../solvers/AbstractAutoSkinSolver.ts'
 
 // Note: EventTarget is a built-ininterface and do not need to import it
@@ -54,9 +56,9 @@ export class StepWeightSkin extends EventTarget {
       this.bone_skinning_formula = new BoneWeightsByDistanceChild(this.skinning_armature.children[0], skeleton_type)
     }
 
-    // if (skinning_formula === SkinningFormula.Envelope) {
-    //   this.bone_skinning_formula = new BoneWeightsByEnvelope(this.skinning_armature.children[0], skeleton_type)
-    // }
+    if (skinning_formula === SkinningFormula.DistanceChildTargeting) {
+      this.bone_skinning_formula = new SolverDistanceChildTargeting(this.skinning_armature.children[0], skeleton_type)
+    }
 
     return this.bone_skinning_formula
   }
