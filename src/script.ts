@@ -105,7 +105,7 @@ export class Bootstrap {
       this.scene.remove(this.skeleton_helper)
     }
 
-    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { linewidth: 0.02, color: 0x4e7d58, jointColor: 0x00ff00 })
+    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { linewidth: 3, color: 0x4e7d58, jointColor: 0x00ff00 })
     this.skeleton_helper.name = helper_name
     this.scene.add(this.skeleton_helper)
   }

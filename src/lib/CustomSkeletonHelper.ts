@@ -36,7 +36,7 @@ class CustomSkeletonHelper extends Line2 {
 
     const material = new LineMaterial({
       linewidth: options.linewidth || 0.005,
-      worldUnits: true,
+      worldUnits: false, // Set to false to make the line width constant in screen space
       vertexColors: true,
       dashed: options.dashed || false, // this doesn't seem to do anything
       alphaToCoverage: true,
