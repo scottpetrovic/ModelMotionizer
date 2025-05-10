@@ -346,9 +346,10 @@ input[type="file"] {
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
 
-  #mouse-controls {
+#header-ui {
     display: flex;
-    gap: 24px;
+    gap: 2px;
+    flex-direction: column;
 }
 
 /* Tooltip container */
