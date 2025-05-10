@@ -349,7 +349,7 @@ input[type="file"] {
 #header-ui {
     display: flex;
     gap: 2px;
-    flex-direction: column;
+    flex-direction: row;
 }
 
 /* Tooltip container */
