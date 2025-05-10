@@ -24,6 +24,8 @@ export class StepEditSkeleton extends EventTarget {
   private skinning_algorithm: string | null = null
   private show_debug: boolean = true
 
+  private currently_selected_bone: Bone | null = null
+
   constructor () {
     super()
     this.ui = new UI()
@@ -74,6 +76,19 @@ export class StepEditSkeleton extends EventTarget {
 
   public show_debugging (): boolean {
     return this.show_debug
+  }
+
+  /**
+   * @param bone The currently selected bone
+   * @description This is the bone that is currently selected in the UI while editing
+   * the skeleton.
+   */
+  public set_currently_selected_bone (bone: Bone): void {
+    this.currently_selected_bone = bone
+  }
+
+  public get_currently_selected_bone (): Bone | null {
+    return this.currently_selected_bone
   }
 
   public set_mirror_mode_enabled (value: boolean): void {

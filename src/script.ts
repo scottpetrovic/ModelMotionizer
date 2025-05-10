@@ -246,7 +246,10 @@ export class Bootstrap {
 
     if (closest_bone !== null) {
       this.transform_controls.attach(closest_bone)
+      this.edit_skeleton_step.set_currently_selected_bone(closest_bone)
       this.weight_skin_step.set_bone_index_to_test(closest_bone_index)
+    } else {
+      this.edit_skeleton_step.set_currently_selected_bone(null)
     }
   }
 

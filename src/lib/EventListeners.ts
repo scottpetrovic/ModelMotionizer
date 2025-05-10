@@ -15,6 +15,12 @@ export class EventListeners {
 
     this.bootstrap.renderer.domElement.addEventListener('mousedown', (event: MouseEvent) => {
       this.bootstrap.handle_transform_controls_mouse_down(event)
+
+      // update UI with current bone name
+      if (this.bootstrap.ui.dom_selected_bone_label !== null) {
+        this.bootstrap.ui.dom_selected_bone_label.innerHTML =
+          this.bootstrap.edit_skeleton_step.get_currently_selected_bone().name
+      }
     }, false)
 
     if (this.bootstrap.transform_controls !== undefined) {
@@ -77,6 +83,10 @@ export class EventListeners {
       this.bootstrap.process_step = this.bootstrap.process_step_changed(ProcessStep.EditSkeleton)
       this.bootstrap.regenerate_skeleton_helper(this.bootstrap.edit_skeleton_step.skeleton())
       this.bootstrap.load_model_step.model_meshes().visible = true
+
+      // reset current bone selection for edit skeleton step
+      this.bootstrap.edit_skeleton_step.set_currently_selected_bone(null)
+      this.bootstrap.ui.dom_selected_bone_label.innerHTML = 'None'
     })
 
     if (this.bootstrap.ui.dom_view_front_change !== null) {

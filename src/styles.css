@@ -410,3 +410,11 @@ input[type="file"] {
     padding: 0.2rem 0.5rem; /* Add padding for a larger clickable area */
     font-size: 1rem; /* Adjust font size for better readability */
 }
+
+#bone-selection-section {
+    margin: 0;
+    background: #223031;
+    padding: 0.5rem;
+    border-radius: 3px;
+    color: #d5d5d5;
+}
