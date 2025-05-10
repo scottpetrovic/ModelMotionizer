@@ -17,7 +17,8 @@ export class EventListeners {
       this.bootstrap.handle_transform_controls_mouse_down(event)
 
       // update UI with current bone name
-      if (this.bootstrap.ui.dom_selected_bone_label !== null) {
+      if (this.bootstrap.ui.dom_selected_bone_label !== null && 
+        this.bootstrap.edit_skeleton_step.get_currently_selected_bone() !== null) {
         this.bootstrap.ui.dom_selected_bone_label.innerHTML =
           this.bootstrap.edit_skeleton_step.get_currently_selected_bone().name
       }
