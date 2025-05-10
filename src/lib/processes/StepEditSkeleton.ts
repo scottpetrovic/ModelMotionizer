@@ -129,8 +129,8 @@ export class StepEditSkeleton extends EventTarget {
 
   private convert_skinning_algorithm_to_enum (value: string): SkinningFormula {
     switch (value) {
-      case 'bone-envelope':
-        return SkinningFormula.Envelope
+      case 'closest-distance-targeting':
+        return SkinningFormula.DistanceChildTargeting
       case 'closest-bone-child':
         return SkinningFormula.DistanceChild
     }
