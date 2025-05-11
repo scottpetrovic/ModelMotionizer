@@ -1,7 +1,9 @@
 import { UI } from '../UI.ts'
 import { Generators } from '../Generators.ts'
 import { Utility } from '../Utilities.ts'
-import { Vector3, Euler, Object3D, Skeleton, type Bone } from 'three'
+import { Vector3, Euler, Object3D, Skeleton, type Scene, type Bone, BufferGeometry, 
+  PointsMaterial, Points, Float32BufferAttribute, TextureLoader,
+  Raycaster, type Intersection, type Camera, SphereGeometry, MeshBasicMaterial, Mesh } from 'three'
 import { SkinningFormula } from '../enums/SkinningFormula.ts'
 
 /*
@@ -26,10 +28,19 @@ export class StepEditSkeleton extends EventTarget {
 
   private currently_selected_bone: Bone | null = null
 
+  private joint_hover_point: Object3D | null = null  
+  private _main_scene_ref: Scene | null = null
+
   constructor () {
     super()
     this.ui = new UI()
   }
+
+  public setup_scene (main_scene: Scene): void {
+    // add the skeleton to the scene
+    this._main_scene_ref = main_scene
+  }
+
 
   public begin (): void {
     // show UI elemnents for editing mesh
@@ -203,7 +214,6 @@ export class StepEditSkeleton extends EventTarget {
     return this.threejs_skeleton
   }
 
-
   public apply_mirror_mode (selected_bone: Bone, transform_type: string): void {
     // if we are on the positive side mirror mode is enabled
     // we need to change the position of the bone on the other side of the mirror
@@ -249,5 +259,65 @@ export class StepEditSkeleton extends EventTarget {
     }
 
     mirror_bone.updateWorldMatrix(true, true)
+  }
+
+  /**
+   * @param event This will be called every mouse move event
+   * the event listener was originally setup in the EventListener.ts file
+   * it is needed for the edit skeleton step, so I added logic here
+   */
+  public calculate_bone_hover_effect (event: MouseEvent, camera: Camera): void {
+    // create a raycaster to detect the bone that is being hovered over
+    // we will only have a hover effect if the mouse is close enough to the bone
+    const [closest_bone, closest_bone_index, closest_distance] =
+      Utility.raycast_closest_bone_test(camera, event, this.threejs_skeleton)
+
+    // only do selection if we are close
+    // the orbit controls also have panning with alt-click, so we don't want to interfere with that
+    if (closest_distance === null || closest_distance > 0.1) {
+      this.update_bone_hover_point_position(null)
+      return
+    }
+
+    this.update_bone_hover_point_position(closest_bone)
+  }
+
+  /**
+   * Create a hover effect for the bone that would be selected for bone editing
+   * @param bone 
+   * @param camera 
+   */
+  private update_bone_hover_point_position (bone: Bone | null): void {
+    // create hover point sphere for when our mouse gets close to a bone joint
+    if (this.joint_hover_point === null) {
+      // Create the hover point if it doesn't exist
+      const geometry = new BufferGeometry()
+      geometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0], 3)) // Single vertex at origin
+
+      const material = new PointsMaterial({
+        color: 0x69a1d0, // Blue color
+        size: 20, // Size of the point in pixels
+        sizeAttenuation: false, // Disable size attenuation
+        depthTest: false, // always render on top
+        map: new TextureLoader().load('images/skeleton-joint-point.png'), // Use a circular texture
+        transparent: true // Enable transparency for the circular texture
+      })
+
+      this.joint_hover_point = new Points(geometry, material)
+      this.joint_hover_point.renderOrder = 100 // render on top of everything else
+      this.joint_hover_point.name = 'Joint Hover Point'
+      this._main_scene_ref?.add(this.joint_hover_point)
+    }
+
+    if (bone !== null) {
+      // update the position of the hover point
+      const world_position = Utility.world_position_from_object(bone)
+      this.joint_hover_point.position.copy(world_position)
+      this.joint_hover_point.updateWorldMatrix(true, true)
+    } else {
+      // remove the hover point if we are not hovering over a bone
+      this._main_scene_ref?.remove(this.joint_hover_point)
+      this.joint_hover_point = null
+    }
   }
 }

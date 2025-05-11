@@ -11,13 +11,18 @@ export class EventListeners {
       if (this.bootstrap.is_transform_controls_dragging) {
         this.bootstrap.handle_transform_controls_moving()
       }
+
+      // edit skeleton step logic that deals with hovering over bones
+      if (this.bootstrap.process_step === ProcessStep.EditSkeleton) {
+        this.bootstrap.edit_skeleton_step.calculate_bone_hover_effect(event, this.bootstrap.camera)
+      }
     })
 
     this.bootstrap.renderer.domElement.addEventListener('mousedown', (event: MouseEvent) => {
       this.bootstrap.handle_transform_controls_mouse_down(event)
 
       // update UI with current bone name
-      if (this.bootstrap.ui.dom_selected_bone_label !== null && 
+      if (this.bootstrap.ui.dom_selected_bone_label !== null &&
         this.bootstrap.edit_skeleton_step.get_currently_selected_bone() !== null) {
         this.bootstrap.ui.dom_selected_bone_label.innerHTML =
           this.bootstrap.edit_skeleton_step.get_currently_selected_bone().name

@@ -25,7 +25,7 @@ import { CustomSkeletonHelper } from './lib/CustomSkeletonHelper.ts'
 import { EventListeners } from './lib/EventListeners.ts'
 
 export class Bootstrap {
-  private readonly camera = Generators.create_camera()
+  public readonly camera = Generators.create_camera()
   public readonly renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
   public controls: OrbitControls | undefined = undefined
 
@@ -170,6 +170,7 @@ export class Bootstrap {
       case ProcessStep.EditSkeleton:
         process_step = ProcessStep.EditSkeleton
         this.edit_skeleton_step.begin()
+        this.edit_skeleton_step.setup_scene(this.scene)
         this.transform_controls.enabled = true
         this.transform_controls.setMode('translate')
         break
