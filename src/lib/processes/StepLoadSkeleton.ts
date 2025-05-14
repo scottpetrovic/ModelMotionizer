@@ -90,17 +90,6 @@ export class StepLoadSkeleton extends EventTarget {
           this.loaded_armature = original_armature.clone()
           this.loaded_armature.name = 'Loaded Armature'
 
-          // scale geometry for skeleton
-          const skeleton_geometry = this.buffer_geometry_from_armature(this.loaded_armature)
-          const temp_skeleton_mesh = new Mesh(skeleton_geometry, new MeshBasicMaterial({ color: 0x00ff00 }))
-          const bounding_box = new Box3().setFromObject(temp_skeleton_mesh)
-          const height = bounding_box.max.y - bounding_box.min.y
-          const max_height = 1.5
-          const scale_factor = max_height / height
-
-          // try to scale each bone down instead of the whole armature object
-          Utility.scale_armature_by_scalar(this.loaded_armature, scale_factor)
-
           // reset the armature to 0,0,0 in case it is off for some reason
           this.loaded_armature.position.set(0, 0, 0)
           this.loaded_armature.updateWorldMatrix(true, true)

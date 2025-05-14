@@ -136,26 +136,24 @@ export class StepLoadModel extends EventTarget {
   }
 
   private load_model_file (model_file_path: string, file_extension: string): void {
-    const max_height = 1.5 // have 3d model scaled to be 1.5 units tall. helps normalize the models to work with
-
     if (file_extension === 'fbx') {
       console.log('Loading FBX model:', model_file_path)
       this.fbx_loader.load(model_file_path, (fbx) => {
         const loaded_scene: Scene = new Scene()
         loaded_scene.add(fbx)
-        this.process_loaded_scene(loaded_scene, max_height)
+        this.process_loaded_scene(loaded_scene)
       })
     } else if (file_extension === 'gltf' || file_extension === 'glb') {
       this.gltf_loader.load(model_file_path, (gltf) => {
         const loaded_scene: Scene = gltf.scene
-        this.process_loaded_scene(loaded_scene, max_height)
+        this.process_loaded_scene(loaded_scene)
       })
     } else {
       console.error('Unsupported file format to load. Only acccepts FBX, GLTF, GLB:', model_file_path)
     }
   }
 
-  private process_loaded_scene(loaded_scene: Scene, max_height: number): void {
+  private process_loaded_scene (loaded_scene: Scene): void {
     this.original_model_data = loaded_scene.clone()
     this.original_model_data.name = 'Cloned Scene'
 
@@ -168,7 +166,7 @@ export class StepLoadModel extends EventTarget {
 
     // Some objects come in very large, which makes it harder to work with
     // scale everything down to a max height
-    this.scale_model_on_import(clean_scene_with_only_models, max_height)
+    this.scale_model_on_import_if_extreme(clean_scene_with_only_models)
 
     // loop through each child in scene and reset rotation
     // if we don't the skinning process doesn't take rotation into account
@@ -219,14 +217,22 @@ export class StepLoadModel extends EventTarget {
     return new_scene
   }
 
-  private scale_model_on_import (scene_object: Scene, max_height = 1.0): void {
+  private scale_model_on_import_if_extreme (scene_object: Scene): void {
     let scale_factor: number = 1.0
 
     // calculate all the meshes to find out the max height
     const bounding_box = this.calculate_bounding_box(scene_object)
-
     const height = bounding_box.max.y - bounding_box.min.y
-    scale_factor = max_height / height
+
+    // if model is very large, or very small, scale it to 1.0 to help with application
+    if (height > 0.1 && height < 4) {
+      console.log('Model a reasonable size, so no scaling applied: ', height, ' height')
+      return
+    } else {
+      console.log('Model is very large or small, so scaling applied: ', height, ' height')
+    }
+
+    scale_factor = 1.0 / height // goal is to scale the model to 1.0 height
 
     // scale all the meshes down by the calculated amount
     scene_object.traverse((child) => {
