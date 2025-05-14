@@ -109,6 +109,9 @@ export class StepAnimationsListing extends EventTarget {
       case SkeletonType.Quadraped:
         animations_to_load_filepath = 'animations/quad-creature-animations.glb'
         break
+      case SkeletonType.Bird:
+        animations_to_load_filepath = 'animations/bird-animations.glb'
+        break
     }
 
     this.gltf_animation_loader = new GLTFLoader()

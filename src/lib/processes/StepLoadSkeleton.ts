@@ -58,6 +58,9 @@ export class StepLoadSkeleton extends EventTarget {
           case 'human':
             this.skeleton_t = SkeletonType.Human
             break
+          case 'bird':
+            this.skeleton_t = SkeletonType.Bird
+            break
         }
 
         // load skeleton from GLB file
