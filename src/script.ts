@@ -25,7 +25,7 @@ import { CustomSkeletonHelper } from './lib/CustomSkeletonHelper.ts'
 import { EventListeners } from './lib/EventListeners.ts'
 
 export class Bootstrap {
-  private readonly camera = Generators.create_camera()
+  public readonly camera = Generators.create_camera()
   public readonly renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
   public controls: OrbitControls | undefined = undefined
 
@@ -105,7 +105,7 @@ export class Bootstrap {
       this.scene.remove(this.skeleton_helper)
     }
 
-    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { linewidth: 0.02, color: 0x4e7d58, jointColor: 0x00ff00 })
+    this.skeleton_helper = new CustomSkeletonHelper(new_skeleton.bones[0], { linewidth: 4, color: 0x4e7d58 })
     this.skeleton_helper.name = helper_name
     this.scene.add(this.skeleton_helper)
   }
@@ -170,6 +170,7 @@ export class Bootstrap {
       case ProcessStep.EditSkeleton:
         process_step = ProcessStep.EditSkeleton
         this.edit_skeleton_step.begin()
+        this.edit_skeleton_step.setup_scene(this.scene)
         this.transform_controls.enabled = true
         this.transform_controls.setMode('translate')
         break
@@ -246,7 +247,10 @@ export class Bootstrap {
 
     if (closest_bone !== null) {
       this.transform_controls.attach(closest_bone)
+      this.edit_skeleton_step.set_currently_selected_bone(closest_bone)
       this.weight_skin_step.set_bone_index_to_test(closest_bone_index)
+    } else {
+      this.edit_skeleton_step.set_currently_selected_bone(null)
     }
   }
 

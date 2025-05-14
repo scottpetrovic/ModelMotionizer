@@ -12,20 +12,22 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <!-- Top toolbar with mouse controls -->
-    <div id="mouse-controls">
+    <div id="header-ui">
+
 
         <div>
-            <span><a href="https://mesh2motion.org"><img src="images/mesh2motion.svg" width="200" style="vertical-align: middle;"/></a></span>
+            <a href="https://mesh2motion.org"><img src="images/mesh2motion.svg" width="200" style="vertical-align: middle;"/></a>
         </div>
 
         <div>
-            <span><img src="images/mouse-left.svg" height="35" width="35" style="vertical-align: middle;"/> Rotate (Left drag)</span>
+            <img src="images/mouse-left.svg" height="35" width="35" style="vertical-align: middle;"/> Rotate (Left drag)
+        </div>
+
+        <div>
+            <img src="images/mouse-right.svg" height="35" width="35" style="vertical-align: middle;"/> Pan (Right drag)
         </div>
         <div>
-            <span><img src="images/mouse-right.svg" height="35" width="35" style="vertical-align: middle;"/> Pan (Right drag)</span>
-        </div>
-        <div>
-            <span><img src="images/mouse-middle.svg" height="35" width="35" style="vertical-align: middle;"/> Zoom (Middle scroll)</span>
+            <img src="images/mouse-middle.svg" height="35" width="35" style="vertical-align: middle;"/> Zoom (Middle scroll)
         </div>
     </div>
 
@@ -114,6 +116,7 @@
 
                 <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
 
+                <p id="bone-selection-section">Selected Bone: <span id="edit-selected-bone-label">None</span></p>
 
                 <div class="styled-checkbox">
                     <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>

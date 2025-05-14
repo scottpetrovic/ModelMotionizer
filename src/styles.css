@@ -346,9 +346,10 @@ input[type="file"] {
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
 
-  #mouse-controls {
+#header-ui {
     display: flex;
-    gap: 24px;
+    gap: 2px;
+    flex-direction: row;
 }
 
 /* Tooltip container */
@@ -408,4 +409,12 @@ input[type="file"] {
     cursor: pointer; /* Make the label clickable */
     padding: 0.2rem 0.5rem; /* Add padding for a larger clickable area */
     font-size: 1rem; /* Adjust font size for better readability */
+}
+
+#bone-selection-section {
+    margin: 0;
+    background: #223031;
+    padding: 0.5rem;
+    border-radius: 3px;
+    color: #d5d5d5;
 }

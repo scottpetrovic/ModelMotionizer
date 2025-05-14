@@ -3,7 +3,7 @@
 // and ideas from
 // https://discourse.threejs.org/t/extend-skeletonhelper-to-accommodate-fat-lines-perhaps-with-linesegments2/59436/2
 
-import { Color, Matrix4, Vector2, Vector3, SphereGeometry, MeshBasicMaterial, Mesh } from 'three'
+import { Color, Matrix4, Vector2, Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, TextureLoader } from 'three'
 import { Line2, LineGeometry, LineMaterial } from 'three/examples/jsm/Addons.js'
 
 const _vector = /*@__PURE__*/ new Vector3()
@@ -11,7 +11,7 @@ const _boneMatrix = /*@__PURE__*/ new Matrix4()
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4()
 
 class CustomSkeletonHelper extends Line2 {
-  private readonly joint_spheres: Mesh[] = []
+  private readonly joint_points: Points
 
   constructor (object: any, options = {}) {
     const bones = getBoneList(object)
@@ -36,9 +36,9 @@ class CustomSkeletonHelper extends Line2 {
 
     const material = new LineMaterial({
       linewidth: options.linewidth || 0.005,
-      worldUnits: true,
+      worldUnits: false,
       vertexColors: true,
-      dashed: options.dashed || false, // this doesn't seem to do anything
+      dashed: options.dashed || false,
       alphaToCoverage: true,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       depthTest: false
@@ -55,24 +55,27 @@ class CustomSkeletonHelper extends Line2 {
     this.matrix = object.matrixWorld
     this.matrixAutoUpdate = false
 
-    // The custom skeleton helper originally had this
-    // not sure if it is actually needed or provides any benefit
-    // window.addEventListener('resize', () => {this.updateResolution()})
+    // Add points for joints
+    const pointsGeometry = new BufferGeometry()
+    const pointsMaterial = new PointsMaterial({
+      size: 14, // Size of the joint circles on skeleton
+      color: options.jointColor || 0xffffff,
+      depthTest: false,
+      sizeAttenuation: false, // Disable size attenuation to keep size constant in screen space
+      map: new TextureLoader().load('images/skeleton-joint-point.png'), // Use a circular texture
+      transparent: true // Enable transparency for the circular texture
+    })
 
-    // add sphere geometry for joints
-    const sphereGeometry = new SphereGeometry(0.01, 16, 16)
-    const joint_color: Color = new Color(options.jointColor || 0x0000ff)
-    const sphereMaterial = new MeshBasicMaterial({ color: joint_color, depthTest: false })
+    const pointPositions = new Float32BufferAttribute(bones.length * 3, 3)
+    pointsGeometry.setAttribute('position', pointPositions)
 
-    for (let i = 0; i < bones.length; i++) {
-      const sphere = new Mesh(sphereGeometry, sphereMaterial)
-      this.add(sphere)
-      this.joint_spheres.push(sphere)
-    }
+    this.joint_points = new Points(pointsGeometry, pointsMaterial)
+    this.add(this.joint_points)
   }
 
   updateMatrixWorld (force: boolean): void {
-    const bones = this.bones;
+    const bones = this.bones
+    const pointPositions = this.joint_points.geometry.getAttribute('position')
 
     const geometry = this.geometry
     const lineStart = geometry.getAttribute('instanceStart')
@@ -82,16 +85,16 @@ class CustomSkeletonHelper extends Line2 {
 
     let lineIndex = 0
     for (let i = 0; i < bones.length; i++) {
-      const bone = bones[i];
+      const bone = bones[i]
       _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld)
       _vector.setFromMatrixPosition(_boneMatrix)
-      this.joint_spheres[i].position.copy(_vector)
-    
+      pointPositions.setXYZ(i, _vector.x, _vector.y, _vector.z) // Update point position
+
       if (bone.parent && bone.parent.isBone) {
         _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.parent.matrixWorld)
         _vector.setFromMatrixPosition(_boneMatrix)
         lineStart.setXYZ(lineIndex, _vector.x, _vector.y, _vector.z)
-    
+
         _boneMatrix.multiplyMatrices(_matrixWorldInv, bone.matrixWorld)
         _vector.setFromMatrixPosition(_boneMatrix)
         lineEnd.setXYZ(lineIndex, _vector.x, _vector.y, _vector.z)
@@ -99,6 +102,7 @@ class CustomSkeletonHelper extends Line2 {
       }
     }
 
+    pointPositions.needsUpdate = true
     geometry.getAttribute('instanceStart').needsUpdate = true
     geometry.getAttribute('instanceEnd').needsUpdate = true
 
@@ -113,11 +117,8 @@ class CustomSkeletonHelper extends Line2 {
   dispose (): void {
     this.geometry.dispose()
     this.material.dispose()
-
-    this.joint_spheres.forEach(sphere => {
-      sphere.geometry.dispose()
-      sphere.material.dispose()
-    })
+    this.joint_points.geometry.dispose()
+    this.joint_points.material.dispose()
   }
 }
 
