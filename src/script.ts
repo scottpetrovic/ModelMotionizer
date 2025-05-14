@@ -205,7 +205,13 @@ export class Bootstrap {
   private animate (): void {
     requestAnimationFrame(this.animate)
     const delta_time = this.clock.getDelta()
-    this.animations_listing_step.mixer().update(delta_time)
+
+    // if we are in the animation listing step, we can call 
+    // render/update functions in that
+    if (this.process_step === ProcessStep.AnimationsListing) {
+      this.animations_listing_step.frame_change(delta_time)
+    }
+
     this.renderer.render(this.scene, this.camera)
   }
 

@@ -93,6 +93,35 @@ export class StepAnimationsListing extends EventTarget {
     return this.animation_mixer
   }
 
+  // setup in the bootstrap.ts file and only called if we are actively
+  // on this step
+  public frame_change (delta_time: number): void {
+    this.mixer().update(delta_time)
+    this.update_active_animation_css_progress(delta_time)
+  }
+
+  // show a progress bar for teh current animation clip in the form of a gradient background
+  // on the button that is playing the animation
+  private update_active_animation_css_progress (delta_time: number): void {
+    if (this.animation_mixer === null || this.animation_clips_loaded.length === 0) { return }
+
+    this.skinned_meshes_to_animate.forEach((skinned_mesh) => {
+      const clip_to_play: AnimationClip = this.animation_clips_loaded[this.current_playing_index]
+      const anim_action: AnimationAction = this.animation_mixer.clipAction(clip_to_play, skinned_mesh)
+
+      const progress = Math.min(anim_action.time / clip_to_play.duration, 1)
+      const progress_percent: number = progress * 100 // returns 0-100
+
+      // background gradient to simulate a progress bar for the animation
+      if (this.ui.dom_animation_clip_list === null) { return }
+
+      const animation_button: HTMLButtonElement | null = this.ui.dom_animation_clip_list.querySelector(`button[data-index="${this.current_playing_index}"]`)
+      if (animation_button !== null) {
+        animation_button.style.background = `linear-gradient(to right,rgba(50, 94, 114, 0.42) ${progress_percent}%, rgba(50, 94, 113, 0) ${progress_percent}%)`
+      }
+    })
+  }
+
   public animation_clips (): AnimationClip[] {
     return this.animation_clips_loaded
   }
@@ -262,6 +291,14 @@ export class StepAnimationsListing extends EventTarget {
       anim_action.stop()
       anim_action.play()
     })
+
+    // reset all the animation button background styles. This will remove the 
+    // progress bar effect from whatever was animating before
+    if (this.ui.dom_animation_clip_list === null) { return }
+    const all_buttons = this.ui.dom_animation_clip_list.querySelectorAll('button[data-index]');
+    all_buttons.forEach((btn: HTMLButtonElement) => {
+      btn.style.background = '' // or set to your default, e.g. ''
+    })
   }
 
   private update_download_button_enabled (): void {
@@ -290,6 +327,7 @@ export class StepAnimationsListing extends EventTarget {
       })
     }
 
+    // manually uploading an animation file with button (not used right now)
     this.ui.dom_import_animation_upload?.addEventListener('change', (event) => {
       const file = event.target?.files[0]
       const reader = new FileReader()
@@ -318,6 +356,7 @@ export class StepAnimationsListing extends EventTarget {
       }
     })
 
+    // A-Pose arm extension event listner
     this.ui.dom_extend_arm_button?.addEventListener('click', (event) => {
       const extend_arm_value: number = this.ui.dom_extend_arm_input?.value
       this.extend_arm_animations_by_percentage(extend_arm_value)
