@@ -217,7 +217,7 @@ export class Utility {
 
     // animal rig
     return bone_name
-      .replace(/(Right|Right_|R_|_Right|_R|Left|Left_|_Left|L_)/g, '')
+      .replace(/(Right|Right_|R_|_Right|_R|Left|Left_|_Left|L_|_R|_L)/g, '')
   }
 
   static raycast_closest_bone_test (camera: PerspectiveCamera, mouse_event: MouseEvent, skeleton: Skeleton): Array<number | null> {
