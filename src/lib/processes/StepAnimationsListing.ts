@@ -101,40 +101,57 @@ export class StepAnimationsListing extends EventTarget {
     this.skinned_meshes_to_animate = final_skinned_meshes
     this.skeleton_type = skeleton_type
 
-    let animations_to_load_filepath: string = ''
+    let animations_to_load_filepaths: string[] = []
     switch (skeleton_type) {
       case SkeletonType.Human:
-        animations_to_load_filepath = 'animations/human-base-animations.glb'
+        animations_to_load_filepaths = ['animations/human-base-animations.glb', 'animations/human-addon-animations.glb']
         break
       case SkeletonType.Quadraped:
-        animations_to_load_filepath = 'animations/quad-creature-animations.glb'
+        animations_to_load_filepaths = ['animations/quad-creature-animations.glb']
         break
       case SkeletonType.Bird:
-        animations_to_load_filepath = 'animations/bird-animations.glb'
+        animations_to_load_filepaths = ['animations/bird-animations.glb']
         break
     }
 
     this.gltf_animation_loader = new GLTFLoader()
-    this.gltf_animation_loader.load(animations_to_load_filepath, (gltf) => {
-      // load the animation clips into a new array
-      // then, remove the animation position keyframes. That will mess up the skinning
-      // process since we will be offsetting and moving the bone root positions
-      this.animation_clips_loaded = this.deep_clone_animation_clips(gltf.animations)
 
-      // only keep position tracks
-      this.remove_position_tracks(this.animation_clips_loaded, true)
+    // The GLTF loader doesn't return a promise, so we need some way
+    // to know when all the animations are loaded
+    let remaining_loads: number = animations_to_load_filepaths.length
 
-      // apply hip bone offset
-      this.apply_hip_bone_offset(this.animation_clips_loaded)
+    this.animation_clips_loaded = [] // reset the animation clips loaded
+    // Create an animation mixer to do the playback. Play the first by default
+    this.animation_mixer = new AnimationMixer()
 
-      // create user interface with all available animation clips
-      this.ui.build_animation_clip_ui(this.animation_clips_loaded)
+    animations_to_load_filepaths.forEach((filepath) => {
+      this.gltf_animation_loader.load(filepath, (gltf: any) => {
+        // load the animation clips into a new array
+        // then, remove the animation position keyframes. That will mess up the skinning
+        // process since we will be offsetting and moving the bone root positions
+        const cloned_anims: AnimationClip[] = this.deep_clone_animation_clips(gltf.animations)
+        this.animation_clips_loaded.push(...cloned_anims)
 
-      // create an animation mixer to do the playback. play the first by by default
-      this.animation_mixer = new AnimationMixer()
+        // only keep position tracks
+        this.remove_position_tracks(this.animation_clips_loaded, true)
 
-      this.play_animation(0)
+        // apply hip bone offset
+        this.apply_hip_bone_offset(this.animation_clips_loaded)
+
+        remaining_loads--
+        if (remaining_loads === 0) {
+          this.onAllAnimationsLoaded()
+        }
+      })
     })
+  }
+
+  private onAllAnimationsLoaded (): void {
+    console.log('all animations loaded:', this.animation_clips_loaded)
+
+    // create user interface with all available animation clips
+    this.ui.build_animation_clip_ui(this.animation_clips_loaded)
+    this.play_animation(0) // play the first animation by default
   }
 
   // mutates the animation clips passed in and only keeps rotation/quaternion tracks
