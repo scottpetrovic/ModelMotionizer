@@ -42,7 +42,7 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
 
       // keep the original weights for hips. the parent is the root which never rotates
       // and shouldn't be affected. A better solution would be to assign to upper legs somehow.
-      if (current_bone.name === 'DEF-hips' && this.skeleton_type === SkeletonType.Human) {
+      if (current_bone.name.includes('hips') === true) {
         // skip the hip bone because the parent is the root which never rotates/moves
         continue
       }
@@ -106,11 +106,9 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
       let closest_bone_index: number = 0
 
       this.get_bone_master_data().forEach((bone, idx) => {
-        // our human skeleton has a root controller bone that isn't in the mesh. Don't assign weights to this?
-        if (this.skeleton_type === SkeletonType.Human) {
-          if (bone.bone_object.name === 'root') {
-            return // skip the root bone and continue to the next bone
-          }
+        // The root bone is only for global transform changes, so we won't assign it to any vertices
+        if (bone.bone_object.name === 'root') {
+          return // skip the root bone and continue to the next bone
         }
 
         // hip bones should have custom logic for distance. If the distance is too far away we should ignore it
