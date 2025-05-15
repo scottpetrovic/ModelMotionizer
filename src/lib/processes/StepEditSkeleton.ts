@@ -31,6 +31,9 @@ export class StepEditSkeleton extends EventTarget {
   private joint_hover_point: Object3D | null = null
   private _main_scene_ref: Scene | null = null
 
+  private readonly joint_texture = new TextureLoader().load('images/skeleton-joint-point.png')
+
+
   constructor () {
     super()
     this.ui = new UI()
@@ -64,10 +67,9 @@ export class StepEditSkeleton extends EventTarget {
     this.update_bind_button_text()
 
     // set default skinning algorithm based on first option
-    if (this.ui.dom_skinning_algorithm_selection != null) {
-      const selection = this.ui.dom_skinning_algorithm_selection.value
-      this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
-    }
+    const selection = this.ui.dom_skinning_algorithm_selection?.value
+    this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
+
 
     this.add_event_listeners()
   }
@@ -293,7 +295,7 @@ export class StepEditSkeleton extends EventTarget {
         size: 20, // Size of the point in pixels
         sizeAttenuation: false, // Disable size attenuation
         depthTest: false, // always render on top
-        map: new TextureLoader().load('images/skeleton-joint-point.png'), // Use a circular texture
+        map: this.joint_texture, // Use a circular texture
         transparent: true // Enable transparency for the circular texture
       })
 

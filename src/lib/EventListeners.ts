@@ -29,12 +29,10 @@ export class EventListeners {
       }
     }, false)
 
-    if (this.bootstrap.transform_controls !== undefined) {
-      this.bootstrap.transform_controls.addEventListener('dragging-changed', (event: any) => {
-        this.bootstrap.is_transform_controls_dragging = event.value
-        this.bootstrap.controls.enabled = !event.value
-      })
-    }
+    this.bootstrap.transform_controls?.addEventListener('dragging-changed', (event: any) => {
+      this.bootstrap.is_transform_controls_dragging = event.value
+      this.bootstrap.controls.enabled = !event.value
+    })
 
     this.bootstrap.load_model_step.addEventListener('modelLoaded', () => {
       this.bootstrap.scene.add(this.bootstrap.load_model_step.model_meshes())
@@ -47,14 +45,13 @@ export class EventListeners {
       this.bootstrap.process_step = this.bootstrap.process_step_changed(ProcessStep.EditSkeleton)
     })
 
-    if (this.bootstrap.ui.dom_bind_pose_button !== null) {
-      this.bootstrap.ui.dom_bind_pose_button.addEventListener('click', () => {
-        const passed_bone_skinning_test = this.bootstrap.test_bone_weighting_success()
-        if (passed_bone_skinning_test) {
-          this.bootstrap.process_step_changed(ProcessStep.BindPose)
-        }
-      })
-    }
+    this.bootstrap.ui.dom_bind_pose_button?.addEventListener('click', () => {
+      const passed_bone_skinning_test = this.bootstrap.test_bone_weighting_success()
+      if (passed_bone_skinning_test) {
+        this.bootstrap.process_step_changed(ProcessStep.BindPose)
+      }
+    })
+
 
     this.bootstrap.ui.dom_rotate_model_x_button?.addEventListener('click', () => {
       this.bootstrap.load_model_step.rotate_model_by_axis('x', 90)
@@ -78,10 +75,12 @@ export class EventListeners {
       this.bootstrap.file_export_step.export(this.bootstrap.weight_skin_step.final_skinned_meshes(), 'exported-model')
     })
 
-    this.bootstrap.ui.dom_back_to_edit_skeleton_button.addEventListener('click', () => {
+    // going back to edit skeleton step after skinning
+    // this will do a lot of resetting
+    this.bootstrap.ui.dom_back_to_edit_skeleton_button?.addEventListener('click', () => {
       const existing_skinned_meshes = this.bootstrap.scene.children.filter((child: Object3D) => child.name === 'Skinned Mesh')
       console.log(existing_skinned_meshes)
-      existing_skinned_meshes.forEach((existing_skinned_mesh) => {
+      existing_skinned_meshes.forEach((existing_skinned_mesh: Object3D) => {
         Utility.remove_object_with_children(existing_skinned_mesh)
       })
 
@@ -92,7 +91,10 @@ export class EventListeners {
 
       // reset current bone selection for edit skeleton step
       this.bootstrap.edit_skeleton_step.set_currently_selected_bone(null)
-      this.bootstrap.ui.dom_selected_bone_label.innerHTML = 'None'
+
+      if (this.bootstrap.ui.dom_selected_bone_label !== null) {
+        this.bootstrap.ui.dom_selected_bone_label.innerHTML = 'None'
+      }
     })
 
     // change view event listeners when configuring skeleton
@@ -103,12 +105,10 @@ export class EventListeners {
     // listen for transform mode changes form edit skeleton step
     // change transform type for controls
     this.bootstrap.ui.dom_transform_translate_button?.addEventListener('click', () => {
-      // this.current_transform_type = 'translate'
       this.bootstrap.transform_controls.setMode('translate')
     })
 
     this.bootstrap.ui.dom_transform_rotate_button?.addEventListener('click', () => {
-      // this.current_transform_type = 'rotate'
       this.bootstrap.transform_controls.setMode('rotate')
     })
   }

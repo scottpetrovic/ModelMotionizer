@@ -12,6 +12,7 @@ const _matrixWorldInv = /*@__PURE__*/ new Matrix4()
 
 class CustomSkeletonHelper extends Line2 {
   private readonly joint_points: Points
+  private readonly jointTexture = new TextureLoader().load('images/skeleton-joint-point.png')
 
   constructor (object: any, options = {}) {
     const bones = getBoneList(object)
@@ -62,7 +63,7 @@ class CustomSkeletonHelper extends Line2 {
       color: options.jointColor || 0xffffff,
       depthTest: false,
       sizeAttenuation: false, // Disable size attenuation to keep size constant in screen space
-      map: new TextureLoader().load('images/skeleton-joint-point.png'), // Use a circular texture
+      map: this.jointTexture,
       transparent: true // Enable transparency for the circular texture
     })
 
