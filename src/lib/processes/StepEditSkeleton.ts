@@ -28,7 +28,7 @@ export class StepEditSkeleton extends EventTarget {
 
   private currently_selected_bone: Bone | null = null
 
-  private joint_hover_point: Object3D | null = null  
+  private joint_hover_point: Object3D | null = null
   private _main_scene_ref: Scene | null = null
 
   constructor () {
@@ -40,7 +40,6 @@ export class StepEditSkeleton extends EventTarget {
     // add the skeleton to the scene
     this._main_scene_ref = main_scene
   }
-
 
   public begin (): void {
     // show UI elemnents for editing mesh
@@ -58,8 +57,7 @@ export class StepEditSkeleton extends EventTarget {
 
     if (this.ui.dom_enable_skin_debugging != null) {
       this.show_debug = this.ui.dom_enable_skin_debugging.checked
-    }
-    else {
+    } else {
       this.show_debug = false
     }
 
@@ -138,19 +136,15 @@ export class StepEditSkeleton extends EventTarget {
       })
     }
 
-    if (this.ui.dom_skinning_algorithm_selection !== null) {
-      this.ui.dom_skinning_algorithm_selection.addEventListener('change', (event) => {
-        const selection = event.target.value
-        this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
-      })
-    }
+    this.ui.dom_skinning_algorithm_selection?.addEventListener('change', (event) => {
+      const selection = event.target.value
+      this.skinning_algorithm = this.convert_skinning_algorithm_to_enum(selection)
+    })
 
-    if (this.ui.dom_enable_skin_debugging !== null) {
-      this.ui.dom_enable_skin_debugging.addEventListener('change', (event) => {
-        this.show_debug = event.target.checked
-        this.update_bind_button_text()
-      })
-    }
+    this.ui.dom_enable_skin_debugging?.addEventListener('change', (event) => {
+      this.show_debug = event.target.checked
+      this.update_bind_button_text()
+    })
   }
 
   private convert_skinning_algorithm_to_enum (value: string): SkinningFormula {

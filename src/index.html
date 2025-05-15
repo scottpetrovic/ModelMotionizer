@@ -116,7 +116,16 @@
 
                 <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
 
-                <p id="bone-selection-section">Selected Bone: <span id="edit-selected-bone-label">None</span></p>
+                 <p id="bone-selection-section">
+                    <span>Selected Bone: <span id="edit-selected-bone-label">None</span></span>
+
+                    <!-- controls to change transfrom mode between transform and rotation -->
+                    <span style="display: flex; flex-direction: row; align-items: center; column-gap: 5px;">
+                        <span>Controls:</span>
+                        <button id="translate-mode-button" class="secondary-button">Translate</button>
+                        <button id="rotate-mode-button" class="secondary-button">Rotate</button>
+                    </span>
+                </p>
 
                 <div class="styled-checkbox">
                     <input type="checkbox" id="mirror-skeleton" name="mirror-skeleton" value="mirror" checked>

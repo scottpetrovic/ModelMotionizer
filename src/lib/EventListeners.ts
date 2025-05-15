@@ -56,15 +56,15 @@ export class EventListeners {
       })
     }
 
-    this.bootstrap.ui.dom_rotate_model_x_button.addEventListener('click', () => {
+    this.bootstrap.ui.dom_rotate_model_x_button?.addEventListener('click', () => {
       this.bootstrap.load_model_step.rotate_model_by_axis('x', 90)
     })
 
-    this.bootstrap.ui.dom_rotate_model_y_button.addEventListener('click', () => {
+    this.bootstrap.ui.dom_rotate_model_y_button?.addEventListener('click', () => {
       this.bootstrap.load_model_step.rotate_model_by_axis('y', 90)
     })
 
-    this.bootstrap.ui.dom_show_skeleton_checkbox.addEventListener('click', (event: MouseEvent) => {
+    this.bootstrap.ui.dom_show_skeleton_checkbox?.addEventListener('click', (event: MouseEvent) => {
       if (this.bootstrap.skeleton_helper !== undefined) {
         this.bootstrap.skeleton_helper.visible = event.target.checked
       } else {
@@ -72,7 +72,7 @@ export class EventListeners {
       }
     })
 
-    this.bootstrap.ui.dom_export_button.addEventListener('click', () => {
+    this.bootstrap.ui.dom_export_button?.addEventListener('click', () => {
       const all_clips = this.bootstrap.animations_listing_step.animation_clips()
       this.bootstrap.file_export_step.set_animation_clips_to_export(all_clips)
       this.bootstrap.file_export_step.export(this.bootstrap.weight_skin_step.final_skinned_meshes(), 'exported-model')
@@ -95,16 +95,21 @@ export class EventListeners {
       this.bootstrap.ui.dom_selected_bone_label.innerHTML = 'None'
     })
 
-    if (this.bootstrap.ui.dom_view_front_change !== null) {
-      this.bootstrap.ui.dom_view_front_change.addEventListener('click', () => { this.bootstrap.switchToView('front') })
-    }
+    // change view event listeners when configuring skeleton
+    this.bootstrap.ui.dom_view_front_change?.addEventListener('click', () => { this.bootstrap.switchToView('front') })
+    this.bootstrap.ui.dom_view_side_change?.addEventListener('click', () => { this.bootstrap.switchToView('side') })
+    this.bootstrap.ui.dom_view_top_change?.addEventListener('click', () => { this.bootstrap.switchToView('top') })
 
-    if (this.bootstrap.ui.dom_view_side_change !== null) {
-      this.bootstrap.ui.dom_view_side_change.addEventListener('click', () => { this.bootstrap.switchToView('side') })
-    }
+    // listen for transform mode changes form edit skeleton step
+    // change transform type for controls
+    this.bootstrap.ui.dom_transform_translate_button?.addEventListener('click', () => {
+      // this.current_transform_type = 'translate'
+      this.bootstrap.transform_controls.setMode('translate')
+    })
 
-    if (this.bootstrap.ui.dom_view_top_change !== null) {
-      this.bootstrap.ui.dom_view_top_change.addEventListener('click', () => { this.bootstrap.switchToView('top') })
-    }
+    this.bootstrap.ui.dom_transform_rotate_button?.addEventListener('click', () => {
+      // this.current_transform_type = 'rotate'
+      this.bootstrap.transform_controls.setMode('rotate')
+    })
   }
 }

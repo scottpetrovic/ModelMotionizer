@@ -19,7 +19,11 @@ export class UI {
   dom_bind_pose_button: HTMLButtonElement | null = null
   dom_scale_skeleton_input_box: HTMLElement | null = null
   dom_move_to_origin_button: HTMLButtonElement | null = null
+
+  // edit skeleton UI step controls
   dom_selected_bone_label: HTMLElement | null = null
+  dom_transform_translate_button: HTMLButtonElement | null = null
+  dom_transform_rotate_button: HTMLButtonElement | null = null
 
   dom_skinning_algorithm_selection: HTMLElement | null = null
   dom_skinned_mesh_tools: HTMLElement | null = null
@@ -75,6 +79,9 @@ export class UI {
     this.dom_scale_skeleton_button = document.querySelector('#scale-skeleton-button')
 
     this.dom_selected_bone_label = document.querySelector('#edit-selected-bone-label')
+
+    this.dom_transform_translate_button = document.querySelector('#bone-selection-section #translate-mode-button')
+    this.dom_transform_rotate_button = document.querySelector('#bone-selection-section #rotate-mode-button')
 
     this.dom_bind_pose_button = document.querySelector('#action_bind_pose')
     this.dom_scale_skeleton_input_box = document.querySelector('#scale-input')

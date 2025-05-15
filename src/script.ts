@@ -172,7 +172,7 @@ export class Bootstrap {
         this.edit_skeleton_step.begin()
         this.edit_skeleton_step.setup_scene(this.scene)
         this.transform_controls.enabled = true
-        this.transform_controls.setMode('translate')
+        this.transform_controls.setMode('translate') // 'translate', 'rotate', or 'scale'
         break
       case ProcessStep.BindPose:
         this.process_step = ProcessStep.BindPose
