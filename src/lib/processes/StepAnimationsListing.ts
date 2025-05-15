@@ -179,6 +179,13 @@ export class StepAnimationsListing extends EventTarget {
   }
 
   private onAllAnimationsLoaded (): void {
+    // sort all animation names alphabetically
+    this.animation_clips_loaded.sort((a: AnimationClip, b: AnimationClip) => {
+      if (a.name < b.name) { return -1 }
+      if (a.name > b.name) { return 1 }
+      return 0
+    })
+
     console.log('all animations loaded:', this.animation_clips_loaded)
 
     // create user interface with all available animation clips
