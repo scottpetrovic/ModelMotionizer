@@ -159,13 +159,16 @@ export class StepAnimationsListing extends EventTarget {
         // then, remove the animation position keyframes. That will mess up the skinning
         // process since we will be offsetting and moving the bone root positions
         const cloned_anims: AnimationClip[] = this.deep_clone_animation_clips(gltf.animations)
-        this.animation_clips_loaded.push(...cloned_anims)
 
         // only keep position tracks
-        this.remove_position_tracks(this.animation_clips_loaded, true)
+        this.remove_position_tracks(cloned_anims, true)
 
         // apply hip bone offset
-        this.apply_hip_bone_offset(this.animation_clips_loaded)
+        this.apply_hip_bone_offset(cloned_anims)
+
+        // we did all the processing needed, so add them
+        // to the full list of animation clips
+        this.animation_clips_loaded.push(...cloned_anims)
 
         remaining_loads--
         if (remaining_loads === 0) {
