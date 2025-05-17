@@ -348,8 +348,9 @@ input[type="file"] {
 
 #header-ui {
     display: flex;
-    gap: 2px;
+    gap: 0;
     flex-direction: row;
+    position: fixed;
 }
 
 /* Tooltip container */
