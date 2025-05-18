@@ -110,6 +110,8 @@ export class StepEditSkeleton extends EventTarget {
     return this.mirror_mode_enabled
   }
 
+
+
   public algorithm (): string {
     return this.skinning_algorithm
   }
@@ -160,7 +162,7 @@ export class StepEditSkeleton extends EventTarget {
     return SkinningFormula.Distance // default if other two don't match
   }
 
-  public remove_event_listeners (): void {
+  private remove_event_listeners (): void {
     if (this.ui.dom_move_to_origin_button !== null) {
       this.ui.dom_move_to_origin_button.removeEventListener('click', () => {})
     }
@@ -181,6 +183,12 @@ export class StepEditSkeleton extends EventTarget {
       this.ui.dom_enable_skin_debugging.removeEventListener('change', () => {})
     }
   }
+
+  public cleanup_on_exit_step (): void {
+    this.remove_event_listeners()
+    this.clear_hover_point_if_exists()
+  }
+
 
   /*
    * Take original armature that we are editing and create a skeleton that Three.js can use
@@ -279,6 +287,16 @@ export class StepEditSkeleton extends EventTarget {
   }
 
   /**
+   * Remove the hover point. This is important when we change steps
+   */
+  private clear_hover_point_if_exists (): void {
+    if (this.joint_hover_point !== null) {
+      this._main_scene_ref?.remove(this.joint_hover_point)
+      this.joint_hover_point = null
+    }
+  }
+
+  /**
    * Create a hover effect for the bone that would be selected for bone editing
    * @param bone 
    * @param camera 
@@ -316,4 +334,6 @@ export class StepEditSkeleton extends EventTarget {
       this.joint_hover_point = null
     }
   }
+
+
 }

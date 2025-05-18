@@ -150,8 +150,8 @@ export class Bootstrap {
     // we will have the current step turn on the UI elements it needs
     this.ui.hide_all_elements()
 
-    // clean up any event listeners from the previous steps
-    this.edit_skeleton_step.remove_event_listeners()
+    // clean up things related to edit step in case we are leaving it
+    this.edit_skeleton_step.cleanup_on_exit_step()
 
     // hide the info container by default
     if (this.ui.dom_info_container !== null) {
