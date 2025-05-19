@@ -268,7 +268,7 @@ export class Bootstrap {
     this.load_model_step.models_geometry_list().forEach((mesh_geometry, index) => {
       // we passed the bone test, so we can do the skinning process
       this.weight_skin_step.set_mesh_geometry(mesh_geometry)
-      const [final_skin_indices, final_skin_weights]: number[][] = this.weight_skin_step.calculate_weights();
+      const [final_skin_indices, final_skin_weights]: number[][] = this.weight_skin_step.calculate_weights()
 
       mesh_geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(final_skin_indices, 4))
       mesh_geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(final_skin_weights, 4))

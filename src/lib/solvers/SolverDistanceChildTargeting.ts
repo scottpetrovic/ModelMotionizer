@@ -12,22 +12,33 @@ import { Generators } from '../Generators.js'
 export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver {
   private readonly points_to_show_for_debugging: Vector3[] = []
 
+  // cache objects to help speed up calculations
+  private cached_bone_positions: Vector3[] = [] // bone positions don't change
+  private readonly bone_object_to_index = new Map<Bone, number>() // map to get the index of the bone object
+
   public calculate_indexes_and_weights (): number[][] {
     // There can be multiple objects that need skinning, so
     // this will make sure we have a clean slate by putting it in function
     const skin_indices: number[] = []
     const skin_weights: number[] = []
 
+    // create cached items for all the vertex calculations later
+    this.cached_bone_positions = this.get_bone_master_data().map(b => Utility.world_position_from_object(b.bone_object))
+    this.get_bone_master_data().forEach((b, idx) => this.bone_object_to_index.set(b.bone_object, idx))
+
     // mutates (assigns) skin_indices and skin_weights
+    console.time('calculate_closest_bone_weights')
     this.calculate_closest_bone_weights(skin_indices, skin_weights)
+    console.timeEnd('calculate_closest_bone_weights')
 
     // this is the second pass, where we look at the parent bone and assign weights
     // to it if the direction is similar. This will help bones mostly affect their children
+    console.time('calculate_parent_bone_weights')
     this.calculate_parent_bone_weights(skin_indices, skin_weights)
+    console.timeEnd('calculate_parent_bone_weights')
 
     if (this.show_debug) {
       this.debugging_scene_object.add(this.objects_to_show_for_debugging())
-      // console.log('Debugging points:', this.get_bone_master_data())
       this.points_to_show_for_debugging.length = 0 // Clear the points after adding to the scene
     }
 
@@ -54,8 +65,13 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
       }
 
       // Calculate direction vectors
-      const current_bone_position = Utility.world_position_from_object(current_bone)
-      const parent_bone_position = Utility.world_position_from_object(parent_bone)
+      const current_bone_position = this.cached_bone_positions[current_bone_index]
+
+      // const parent_bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === parent_bone)
+      const parent_bone_index = this.bone_object_to_index.get(parent_bone)
+      if (parent_bone_index === -1 || parent_bone_index === undefined) continue
+      const parent_bone_position = this.cached_bone_positions[parent_bone_index]
+
 
       const direction_to_current_bone = new Vector3().subVectors(vertex_position, current_bone_position).normalize()
       const direction_to_parent_bone = new Vector3().subVectors(vertex_position, parent_bone_position).normalize()
@@ -120,7 +136,7 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
           }
         }
 
-        const distance: number = Utility.world_position_from_object(bone.bone_object).distanceTo(vertex_position)
+        const distance: number = this.cached_bone_positions[idx].distanceTo(vertex_position)
         if (distance < closest_bone_distance) {
           // closest_bone = bone.bone_object
           closest_bone_distance = distance
@@ -140,7 +156,9 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
     const intesection_point: Vector3 | null = this.cast_intersection_ray_down_from_bone(bone.bone_object)
 
     // get the distance from the bone point to the intersection point
-    const bone_position: Vector3 = Utility.world_position_from_object(bone.bone_object)
+    const bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === bone.bone_object)
+    const bone_position: Vector3 = this.cached_bone_positions[bone_index]
+
     let distance_to_intersection: number = intesection_point?.distanceTo(bone_position) ?? 0
     distance_to_intersection *= 1.1 // buffer zone to make sure to include vertices at intersection
 
@@ -165,7 +183,8 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
     const raycaster = new Raycaster()
 
     // Set the ray's origin to the bone's world position
-    const bone_position = Utility.world_position_from_object(bone)
+    const bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === bone)
+    const bone_position = this.cached_bone_positions[bone_index]
 
     // Direction is straight down to find the pevlis "gap"
     raycaster.set(bone_position, new Vector3(0, -1, 0))
