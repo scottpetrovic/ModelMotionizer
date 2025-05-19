@@ -3,6 +3,7 @@ import { Utility } from '../Utilities.js'
 import { SkeletonType } from '../enums/SkeletonType.js'
 import { AbstractAutoSkinSolver } from './AbstractAutoSkinSolver.js'
 import { Generators } from '../Generators.js'
+import BoneCalculationData from '../models/BoneCalculationData.js'
 
 /**
  * SolverDistanceChildTargeting
@@ -15,6 +16,8 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
   // cache objects to help speed up calculations
   private cached_bone_positions: Vector3[] = [] // bone positions don't change
   private readonly bone_object_to_index = new Map<Bone, number>() // map to get the index of the bone object
+  private distance_to_bottom_of_hip: number = 0 // distance to the bottom of the hip bone
+
 
   public calculate_indexes_and_weights (): number[][] {
     // There can be multiple objects that need skinning, so
@@ -25,6 +28,7 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
     // create cached items for all the vertex calculations later
     this.cached_bone_positions = this.get_bone_master_data().map(b => Utility.world_position_from_object(b.bone_object))
     this.get_bone_master_data().forEach((b, idx) => this.bone_object_to_index.set(b.bone_object, idx))
+    this.distance_to_bottom_of_hip = this.calculate_distance_to_bottom_of_hip()
 
     // mutates (assigns) skin_indices and skin_weights
     console.time('calculate_closest_bone_weights')
@@ -43,6 +47,25 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
     }
 
     return [skin_indices, skin_weights]
+  }
+
+  // every vertex checks to see if it is below the hips area,
+  // so do this calculation once and cache it for the lookup later
+  private calculate_distance_to_bottom_of_hip (): number {
+    const hip_bone_object: BoneCalculationData | undefined = this.get_bone_master_data().find(b => b.bone_object.name.toLowerCase().includes('hips'))
+    if (hip_bone_object === undefined) {
+      throw new Error('Hip bone not found')
+    }
+    const intesection_point: Vector3 | null = this.cast_intersection_ray_down_from_bone(hip_bone_object.bone_object)
+
+    // get the distance from the bone point to the intersection point
+    const bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === hip_bone_object.bone_object)
+    const bone_position: Vector3 = this.cached_bone_positions[bone_index]
+
+    let distance_to_bottom_of_hip: number = intesection_point?.distanceTo(bone_position) ?? 0
+    distance_to_bottom_of_hip *= 1.1 // buffer zone to make sure to include vertices at intersection
+
+    return distance_to_bottom_of_hip
   }
 
   private calculate_parent_bone_weights (skin_indices: number[], skin_weights: number[]): void {
@@ -130,9 +153,10 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
         // hip bones should have custom logic for distance. If the distance is too far away we should ignore it
         // This will help with hips when left/right legs could be closer than knee bones
         if (this.skeleton_type === SkeletonType.Human && bone.bone_object.name.includes('hips') === true) {
-          const is_below_hips_area: boolean = this.is_vertex_below_human_hip_bounds(vertex_position, bone)
-          if (is_below_hips_area) {
-            return // skip this bone if the vertex is below the hips area
+          // if the intersection point is lower than the vertex position, that means the vertex is below
+          // the hips area, and is part of the left or right leg...ignore that result
+          if (this.distance_to_bottom_of_hip !== null && this.distance_to_bottom_of_hip < vertex_position.y) {
+            return// this vertex is below our crotch area, so it cannot be part of our hips
           }
         }
 
@@ -150,25 +174,6 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
       skin_indices.push(closest_bone_index, 0, 0, 0)
       skin_weights.push(1.0, 0, 0, 0)
     }
-  }
-
-  private is_vertex_below_human_hip_bounds (vertex_position: Vector3, bone: Bone): boolean {
-    const intesection_point: Vector3 | null = this.cast_intersection_ray_down_from_bone(bone.bone_object)
-
-    // get the distance from the bone point to the intersection point
-    const bone_index = this.get_bone_master_data().findIndex(b => b.bone_object === bone.bone_object)
-    const bone_position: Vector3 = this.cached_bone_positions[bone_index]
-
-    let distance_to_intersection: number = intesection_point?.distanceTo(bone_position) ?? 0
-    distance_to_intersection *= 1.1 // buffer zone to make sure to include vertices at intersection
-
-    // if the intersection point is lower than the vertex position, that means the vertex is below
-    // the hips area, and is part of the left or right leg...ignore that result
-    if (distance_to_intersection !== null && distance_to_intersection < vertex_position.y) {
-      return true// this vertex is below our crotch area, so it cannot be part of our hips
-    }
-
-    return false
   }
 
   private objects_to_show_for_debugging (): Group {
