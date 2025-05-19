@@ -201,8 +201,10 @@ export class StepAnimationsListing extends EventTarget {
       let rotation_tracks: KeyframeTrack[] = []
 
 
+      //const name: String = "".toLowerCase()
+
       if (preserve_root_position) {
-        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('hips.position'))
+        rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.toLowerCase().includes('hips.position'))
       } else {
         rotation_tracks = animation_clip.tracks.filter((x: KeyframeTrack) => x.name.includes('quaternion') || x.name.includes('hips.position'))
       }
