@@ -1,5 +1,5 @@
 import { Vector3, Group, Raycaster, type Bone, Mesh,
-  MeshBasicMaterial, DoubleSide, BufferAttribute, WireframeGeometry
+  MeshBasicMaterial, DoubleSide, BufferAttribute, type WireframeGeometry, type BufferGeometry
 } from 'three'
 
 import { Utility } from '../Utilities.js'
@@ -20,7 +20,6 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
   private cached_bone_positions: Vector3[] = [] // bone positions don't change
   private readonly bone_object_to_index = new Map<Bone, number>() // map to get the index of the bone object
   private distance_to_bottom_of_hip: number = 0 // distance to the bottom of the hip bone
-
 
   public calculate_indexes_and_weights (): number[][] {
     // There can be multiple objects that need skinning, so
@@ -180,8 +179,8 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
   }
 
   private objects_to_show_for_debugging (skin_indices: number[]): Group {
-    const weight_painted_mesh = this.create_weight_paint_debug_mesh(skin_indices)
-    const wireframe_mesh = this.create_wireframe_debug_mesh()
+    const weight_painted_mesh = this.create_weight_paint_debug_mesh(skin_indices, this.geometry)
+    const wireframe_mesh = this.create_wireframe_debug_mesh(this.geometry)
 
     const group = new Group()
     group.add(weight_painted_mesh)
@@ -196,47 +195,59 @@ export default class SolverDistanceChildTargeting extends AbstractAutoSkinSolver
    * It will use the skin_indices to assign colors to the vertices
    * @param skin_indices
    */
-  private create_weight_paint_debug_mesh (skin_indices: number[]): Mesh {
+  private create_weight_paint_debug_mesh (skin_indices: number[], orig_geometry: BufferGeometry): Mesh {
     // Clone the geometry to avoid modifying the original
-    const geometry = this.geometry.clone()
-    const vertex_count = this.geometry_vertex_count()
+    const cloned_geometry = orig_geometry.clone()
+    const vertex_count = cloned_geometry.attributes.position.array.length / 3
 
     // Assign a random color for each bone
-    const bone_colors: { [bone_index: number]: Vector3 } = {}
-    this.get_bone_master_data().forEach((_, idx) => {
-      bone_colors[idx] = new Vector3(Math.random(), Math.random(), Math.random())
-    })
-
-    // Create a Float32Array for vertex colors
-    const colors = new Float32Array(vertex_count * 3)
+    const bone_colors: Vector3[] = this.generateDeterministicBoneColors(80)
 
     // Loop through each vertex and assign color based on the bone index
+    const colors = new Float32Array(vertex_count * 3)
     for (let i = 0; i < vertex_count; i++) {
       const bone_index = skin_indices[i * 4] // Primary bone assignment
       const color = bone_colors[bone_index]
-      colors[i * 3] = color.x
-      colors[i * 3 + 1] = color.y
-      colors[i * 3 + 2] = color.z
+      colors[i * 3] = color.x // red
+      colors[i * 3 + 1] = color.y // green
+      colors[i * 3 + 2] = color.z // blue
     }
-    geometry.setAttribute('color', new BufferAttribute(colors, 3))
+    cloned_geometry.setAttribute('color', new BufferAttribute(colors, 3))
 
     // Create a mesh with vertex colors
     const material = new MeshBasicMaterial({ vertexColors: true, wireframe: false, opacity: 1.0, transparent: false })
-    return new Mesh(geometry, material)
+    return new Mesh(cloned_geometry, material)
   }
 
-  private create_wireframe_debug_mesh(): Mesh {
-    // Clone the geometry to avoid modifying the original
-    const geometry = this.geometry.clone()
+  private generateDeterministicBoneColors (count: number): Vector3[] {
+    // base color, can be any value between 0 and 1
+    let r = 0.2
+    let g = 0.5
+    let b = 0.8
 
-    // Wireframe-only material
+    // Generate a list of colors based on the count
+    const colors: Vector3[] = []
+    const step = [-0.1, 0.1, 0.3]
+    for (let i = 0; i < count; i++) {
+      // Ensure values wrap between 0 and 1
+      r = (r + step[0] + 1) % 1
+      g = (g + step[1] + 1) % 1
+      b = (b + step[2] + 1) % 1
+      colors.push(new Vector3(r, g, b))
+    }
+    return colors
+  }
+
+  private create_wireframe_debug_mesh (orig_mesh: BufferGeometry): Mesh {
     const wireframe_material = new MeshBasicMaterial({
       color: 0xabd9ef, // light blue color
       wireframe: true,
       opacity: 1.0,
       transparent: false
     })
-    return new Mesh(geometry, wireframe_material)
+
+    const cloned_geometry = orig_mesh.clone()
+    return new Mesh(cloned_geometry, wireframe_material)
   }
 
   private cast_intersection_ray_down_from_bone (bone: Bone): Vector3 | null {
