@@ -81,36 +81,32 @@
 
                 <div id="load-skeleton-tools">
 
-                    <p class="step-instructions">Pick base skeleton type to work with. You will modify joints to fit mesh in next step.</p>
+                    <span>
+                        <span style="max-width: 220px">Rotate Model to face front <br/> (blue origin line)</span>
+                        <div style="display: flex; flex-direction: row">                           
+                            <button class="secondary-button" id="rotate-model-x-button">X</button>
+                            <button class="secondary-button" id="rotate-model-y-button">Y</button>
+                            <button class="secondary-button" id="rotate-model-z-button">Z</button>
+                        </div>
+                    </span>
 
-                    <label>Skeleton Type to use:</label>
+                        <hr />
+
+                        <span style="max-width: 220px">
+                            <span>If model is below the ground floor</span>
+                            <div style="display: flex; flex-direction: row">
+                                <button class="secondary-button" id="move-model-to-floor-button">Move</button>
+                            </div>
+                        </span>
+
+                        <hr />
+
+                        <label>Skeleton Type to use:</label>
                         <select id="skeleton-selection">
                             <option value="human">Human</option>
                             <option value="quadraped">4 Leg Creature</option>
                             <option value="bird">Bird</option>
                         </select>
-
-
-
-                        <hr />
-
-                        <span>
-                            <span>Rotate Model to face front</span>
-                            <div style="display: flex; flex-direction: row">                           
-                                <button class="secondary-button" id="rotate-model-x-button">X</button>
-                                <button class="secondary-button" id="rotate-model-y-button">Y</button>
-                                <button class="secondary-button" id="rotate-model-z-button">Z</button>
-                            </div>
-                        </span>
-
-                        <hr />
-
-                        <span>
-                            <span>Move model above floor</span>
-                            <div style="display: flex; flex-direction: row">
-                                <button class="secondary-button" id="move-model-to-floor-button">Move</button>
-                            </div>
-                        </span>
 
                         <hr />
 
@@ -123,7 +119,7 @@
             <span id="skeleton-step-actions">
 
 
-                <p class="step-instructions">Right click on a joint to select and move it with controls.</p>
+                <p class="step-instructions">Right-click to select joints. Move bones into position.</p>
 
                  <p id="bone-selection-section">
                     <span>Selected Bone: <span id="edit-selected-bone-label">None</span></span>
@@ -193,12 +189,6 @@
 
                 <button id="action_back_to_edit_skeleton" >&#x2039; Back to edit skeleton</button>
 
-                <!-- checkbox option to show skeleton -->
-                <div class="styled-checkbox">
-                    <input type="checkbox" id="show-skeleton-checkbox" name="show-skeleton" value="show" checked>
-                    <label for="show-skeleton-checkbox">Show skeleton</label>
-                </div>
-
             </span>
 
 
@@ -206,7 +196,7 @@
 
                 <div id="animations-listing">
                     <div id="animations-listing-header">
-                        <span>Animations</span>
+                        <span>Animation name</span>
                         <div style="margin-right: 1rem;">Export</div>
                     </div>
         
@@ -230,6 +220,14 @@
                         <button id="extend-arm-button" class="secondary-button" >Open Arms</button>
                     </div>
         
+                    <hr />
+
+                    <!-- checkbox option to show skeleton -->
+                    <div class="styled-checkbox">
+                        <input type="checkbox" id="show-skeleton-checkbox" name="show-skeleton" value="show" checked>
+                        <label for="show-skeleton-checkbox">Show skeleton</label>
+                    </div>
+
                     <hr />
         
         
