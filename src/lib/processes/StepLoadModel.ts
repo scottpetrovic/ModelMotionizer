@@ -313,6 +313,35 @@ export class StepLoadModel extends EventTarget {
   }
 
   public move_model_to_floor (): void {
-    console.log('moving model to floor here')
+    // go through all the meshes and find out the lowest point
+    // to use later. A model could contain multiple meshes
+    // and we want to make sure the offset is the same between all of them
+    let final_lowest_point: number = 0
+    this.final_mesh_data.traverse((obj: Object3D) => {
+      // if object is a mesh, rotate the geometry data
+      if (obj.type === 'Mesh') {
+        const mesh_obj: Mesh = obj as Mesh
+        const bounding_box = new Box3().setFromObject(mesh_obj)
+
+        if (bounding_box.min.y < final_lowest_point) {
+          final_lowest_point = bounding_box.min.y
+        }
+      }
+    })
+
+    // move all the meshes to the floor by the amount we calculated above
+    this.final_mesh_data.traverse((obj: Object3D) => {
+      // if object is a mesh, rotate the geometry data
+      if (obj.type === 'Mesh') {
+        const mesh_obj: Mesh = obj as Mesh
+
+        // this actually updates the geometry, so the origin will still be at 0,0,0
+        // maybe need to recompute the bounding box and sphere internally after translate
+        const offset = final_lowest_point * -1
+        mesh_obj.geometry.translate(0, offset, 0)
+        mesh_obj.geometry.computeBoundingBox()
+        mesh_obj.geometry.computeBoundingSphere()
+      }
+    })
   }
 }
