@@ -311,4 +311,8 @@ export class StepLoadModel extends EventTarget {
       }
     })
   }
+
+  public move_model_to_floor (): void {
+    console.log('moving model to floor here')
+  }
 }

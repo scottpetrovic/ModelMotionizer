@@ -7,9 +7,13 @@ export class UI {
   dom_upload_model_button: HTMLButtonElement | null = null
   dom_load_model_button: HTMLButtonElement | null = null
   dom_load_model_debug_checkbox: HTMLInputElement | null = null
+
+  // load skeleton UI
   dom_rotate_model_x_button: HTMLButtonElement | null = null
   dom_rotate_model_y_button: HTMLButtonElement | null = null
   dom_rotate_model_z_button: HTMLButtonElement | null = null
+  dom_move_model_to_floor_button: HTMLButtonElement | null = null
+
   dom_load_skeleton_tools: HTMLElement | null = null
   dom_load_skeleton_button: HTMLButtonElement | null = null
   dom_skeleton_edit_tools: HTMLElement | null = null
@@ -66,9 +70,13 @@ export class UI {
     this.dom_load_model_button = document.querySelector('#load-model-button')
     this.dom_load_model_debug_checkbox = document.querySelector('#load-model-debug-checkbox')
 
+    // UI controls with load skeleton step
     this.dom_rotate_model_x_button = document.querySelector('#rotate-model-x-button')
     this.dom_rotate_model_y_button = document.querySelector('#rotate-model-y-button')
     this.dom_rotate_model_z_button = document.querySelector('#rotate-model-z-button')
+    this.dom_move_model_to_floor_button = document.querySelector('#move-model-to-floor-button')
+
+
 
     // UI controls for loading/working with skeleton
     this.dom_load_skeleton_tools = document.querySelector('#load-skeleton-tools')

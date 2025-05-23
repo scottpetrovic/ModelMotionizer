@@ -52,7 +52,7 @@ export class EventListeners {
       }
     })
 
-
+    // rotate model after loading it in to orient it correctly
     this.bootstrap.ui.dom_rotate_model_x_button?.addEventListener('click', () => {
       this.bootstrap.load_model_step.rotate_model_by_axis('x', 90)
     })
@@ -64,6 +64,11 @@ export class EventListeners {
     this.bootstrap.ui.dom_rotate_model_z_button?.addEventListener('click', () => {
       this.bootstrap.load_model_step.rotate_model_by_axis('z', 90)
     })
+
+    this.bootstrap.ui.dom_move_model_to_floor_button?.addEventListener('click', () => {
+      this.bootstrap.load_model_step.move_model_to_floor()
+    })
+
     this.bootstrap.ui.dom_show_skeleton_checkbox?.addEventListener('click', (event: MouseEvent) => {
       if (this.bootstrap.skeleton_helper !== undefined) {
         this.bootstrap.skeleton_helper.visible = event.target.checked
