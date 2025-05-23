@@ -61,6 +61,9 @@ export class EventListeners {
       this.bootstrap.load_model_step.rotate_model_by_axis('y', 90)
     })
 
+    this.bootstrap.ui.dom_rotate_model_z_button?.addEventListener('click', () => {
+      this.bootstrap.load_model_step.rotate_model_by_axis('z', 90)
+    })
     this.bootstrap.ui.dom_show_skeleton_checkbox?.addEventListener('click', (event: MouseEvent) => {
       if (this.bootstrap.skeleton_helper !== undefined) {
         this.bootstrap.skeleton_helper.visible = event.target.checked
